@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axe Dossier — Analyse et structuration de dossiers complexes</title>
+  <meta name="description" content="Axe Dossier accompagne les dossiers complexes : analyse, synthèse, rédaction administrative et accompagnement structuré." />
+  <style>
+    :root {
+      --bg: #f6f3ee;
+      --surface: #ffffff;
+      --text: #1f1f1f;
+      --muted: #6b6b6b;
+      --line: #ddd6cb;
+      --accent: #111111;
+      --accent-2: #efe8dd;
+      --radius: 20px;
+      --shadow: 0 10px 30px rgba(0,0,0,0.06);
+      --max: 1120px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(14px);
+      background: rgba(246,243,238,0.84);
+      border-bottom: 1px solid rgba(221,214,203,0.8);
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 72px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      background: var(--accent);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow);
+    }
+
+    .nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.72);
+      font-size: 0.95rem;
+      transition: 0.2s ease;
+    }
+
+    .pill:hover { transform: translateY(-1px); }
+
+    .hero {
+      padding: 72px 0 44px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 28px;
+      align-items: stretch;
+    }
+
+    .hero-card,
+    .panel,
+    .step,
+    .price-card,
+    .note-card,
+    .topic-card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      padding: 34px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--accent-2);
+      color: #4a4138;
+      font-size: 0.9rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      line-height: 1.12;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4vw, 4.3rem);
+      letter-spacing: -0.04em;
+      margin-bottom: 18px;
+    }
+
+    .lead {
+      font-size: 1.1rem;
+      color: #47423d;
+      max-width: 62ch;
+      margin-bottom: 24px;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 52px;
+      padding: 0 20px;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--accent);
+    }
+
+    .hero-side {
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel h3 {
+      font-size: 1.15rem;
+      margin-bottom: 14px;
+    }
+
+    .check-list,
+    .clean-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .check-list li,
+    .clean-list li {
+      position: relative;
+      padding-left: 28px;
+      color: #403c38;
+    }
+
+    .check-list li::before,
+    .clean-list li::before {
+      content: "•";
+      position: absolute;
+      left: 10px;
+      top: 0;
+      font-weight: 900;
+    }
+
+    section {
+      padding: 26px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .section-head p {
+      max-width: 62ch;
+      color: var(--muted);
+      margin: 8px 0 0;
+    }
+
+    h2 {
+      font-size: clamp(1.7rem, 2.4vw, 2.6rem);
+      letter-spacing: -0.03em;
+    }
+
+    .grid-3,
+    .grid-2,
+    .steps,
+    .prices,
+    .topics {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-3,
+    .topics,
+    .prices {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .steps {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .topic-card,
+    .step,
+    .price-card,
+    .note-card {
+      padding: 24px;
+    }
+
+    .topic-card h3,
+    .price-card h3,
+    .step h3,
+    .note-card h3 {
+      margin-bottom: 10px;
+      font-size: 1.15rem;
+    }
+
+    .topic-card p,
+    .price-card p,
+    .step p,
+    .note-card p {
+      margin: 0;
+      color: #4b4640;
+    }
+
+    .step-index {
+      display: inline-grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: var(--accent-2);
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .price {
+      display: block;
+      font-size: 2rem;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      margin: 10px 0 14px;
+      font-weight: 800;
+    }
+
+    .note-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+    }
+
+    .footer {
+      padding: 34px 0 70px;
+      color: #5b554f;
+    }
+
+    .footer-card {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,0.7);
+    }
+
+    .footer small {
+      display: block;
+      margin-top: 10px;
+      color: #756e66;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .note-grid,
+      .grid-3,
+      .grid-2,
+      .steps,
+      .prices,
+      .topics {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        align-items: start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar-inner {
+        min-height: auto;
+        padding: 14px 0;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .brand {
+        justify-content: center;
+      }
+
+      .nav {
+        justify-content: center;
+      }
+
+      .hero {
+        padding-top: 40px;
+      }
+
+      .hero-card,
+      .panel,
+      .topic-card,
+      .step,
+      .price-card,
+      .note-card,
+      .footer-card {
+        padding: 20px;
+      }
+
+      .lead {
+        font-size: 1rem;
+      }
+
+      .cta-row {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a href="#top" class="brand" aria-label="Axe Dossier">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier</span>
+      </a>
+
+      <nav class="nav" aria-label="Navigation principale">
+        <a class="pill" href="#services">Services</a>
+        <a class="pill" href="#situations">Situations</a>
+        <a class="pill" href="#methode">Méthode</a>
+        <a class="pill" href="#tarifs">Tarifs</a>
+        <a class="pill" href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-card">
+          <div class="eyebrow">Analyse · Structure · Rédaction</div>
+          <h1>Dossiers complexes, litiges, successions.<br>Remettre de l’ordre avant d’agir.</h1>
+          <p class="lead">
+            Axe Dossier intervient sur les situations bloquées, confuses ou sensibles.
+            L’objectif est simple : analyser les pièces, clarifier les faits, structurer le dossier
+            et préparer des réponses écrites utilisables.
+          </p>
+
+          <div class="cta-row">
+            <a class="btn btn-primary" href="mailto:contact@axedossier.fr?subject=Transmission%20de%20dossier&body=Bonjour,%0A%0AJe%20souhaite%20vous%20transmettre%20mon%20dossier.%0A%0AType%20de%20situation%20:%0A%0ADocuments%20disponibles%20:%0A">Envoyer mon dossier</a>
+            <a class="btn btn-secondary" href="#methode">Voir la méthode</a>
+          </div>
+        </div>
+
+        <div class="hero-side">
+          <aside class="panel">
+            <h3>Intervention</h3>
+            <ul class="check-list">
+              <li>Analyse et synthèse de dossier</li>
+              <li>Préparation et rédaction de courriers</li>
+              <li>Structuration des pièces et chronologie</li>
+              <li>Accompagnement structuré dans les démarches</li>
+            </ul>
+          </aside>
+
+          <aside class="panel">
+            <h3>Positionnement</h3>
+            <ul class="clean-list">
+              <li>Travail documentaire et rédactionnel</li>
+              <li>Approche claire, factuelle et structurée</li>
+              <li>Retour écrit avant tout échange complémentaire</li>
+            </ul>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Ce qui est pris en charge</h2>
+            <p>Le service est centré sur la lecture du dossier, l’organisation des éléments et la préparation d’une réponse exploitable.</p>
+          </div>
+        </div>
+
+        <div class="topics">
+          <article class="topic-card">
+            <h3>Analyse et synthèse</h3>
+            <p>Lecture des pièces, repérage des points utiles, chronologie des faits, mise en évidence des incohérences et des priorités.</p>
+          </article>
+          <article class="topic-card">
+            <h3>Préparation documentaire</h3>
+            <p>Tri du dossier, structuration des documents, préparation des éléments à transmettre à un interlocuteur, une administration ou un professionnel.</p>
+          </article>
+          <article class="topic-card">
+            <h3>Rédaction administrative</h3>
+            <p>Projet de courrier, réponse argumentée, reformulation claire des faits, synthèse utilisable pour sortir du flou ou du blocage.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="situations">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Situations traitées</h2>
+            <p>Le site vise les situations civiles et administratives complexes du quotidien, ainsi que les successions et dossiers sensibles nécessitant une remise à plat.</p>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <article class="topic-card">
+            <h3>Successions</h3>
+            <p>Blocages entre héritiers, échanges avec notaire, généalogiste, inventaire, courriers, chronologie et organisation du dossier.</p>
+          </article>
+          <article class="topic-card">
+            <h3>Litiges du quotidien</h3>
+            <p>Assurance, voisinage, consommation, prestataire défaillant, relance, mise en demeure, courrier incompris ou dossier confus.</p>
+          </article>
+          <article class="topic-card">
+            <h3>Dossiers administratifs sensibles</h3>
+            <p>Réponse à un organisme, préparation d’un dossier, clarification d’une situation et mise en ordre avant d’engager la suite.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="methode">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Méthode</h2>
+            <p>Pas de bavardage inutile. Le travail commence par les pièces, les dates, les faits et la logique du dossier.</p>
+          </div>
+        </div>
+
+        <div class="steps">
+          <article class="step">
+            <div class="step-index">1</div>
+            <h3>Transmission</h3>
+            <p>Les documents sont envoyés par mail avec un résumé simple de la situation et de la difficulté rencontrée.</p>
+          </article>
+          <article class="step">
+            <div class="step-index">2</div>
+            <h3>Lecture</h3>
+            <p>Le dossier est repris pièce par pièce pour isoler les faits, les contradictions, les manques et les leviers utiles.</p>
+          </article>
+          <article class="step">
+            <div class="step-index">3</div>
+            <h3>Retour écrit</h3>
+            <p>Une synthèse claire est envoyée avec les points clés, les options possibles et, si nécessaire, un projet de réponse.</p>
+          </article>
+          <article class="step">
+            <div class="step-index">4</div>
+            <h3>Suite du dossier</h3>
+            <p>Un échange complémentaire peut être proposé selon la situation. L’appel téléphonique n’est pas systématique.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="tarifs">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Tarifs</h2>
+            <p>À ajuster selon ton positionnement réel. Je t’ai mis une base sobre et crédible pour le lancement.</p>
+          </div>
+        </div>
+
+        <div class="prices">
+          <article class="price-card">
+            <h3>Première lecture</h3>
+            <span class="price">90 €</span>
+            <p>Lecture initiale du dossier et retour sur la faisabilité de l’accompagnement.</p>
+          </article>
+          <article class="price-card">
+            <h3>Analyse + synthèse écrite</h3>
+            <span class="price">190 €</span>
+            <p>Analyse structurée, chronologie, points clés et retour écrit exploitable.</p>
+          </article>
+          <article class="price-card">
+            <h3>Courrier complémentaire</h3>
+            <span class="price">75 €</span>
+            <p>Rédaction d’un courrier ou d’une réponse complémentaire sur la base du dossier déjà étudié.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="wrap note-grid">
+        <article class="note-card">
+          <h3>Contact</h3>
+          <p>
+            Pour une première prise de contact, le plus efficace reste le mail avec les pièces utiles et un résumé factuel.
+            Plus le dossier est cadré, plus l’analyse est rapide.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="mailto:contact@axedossier.fr?subject=Premi%C3%A8re%20prise%20de%20contact&body=Bonjour,%0A%0AJe%20vous%20contacte%20pour%20la%20situation%20suivante%20:%0A%0AType%20de%20dossier%20:%0A%0ADocuments%20disponibles%20:%0A%0AObjectif%20de%20ma%20demande%20:%0A">Écrire maintenant</a>
+          </div>
+        </article>
+
+        <article class="note-card">
+          <h3>Cadre d’intervention</h3>
+          <p>
+            Service d’accompagnement documentaire et rédactionnel.
+            Ne constitue pas une consultation juridique, une activité réglementée de représentation,
+            ni une prise en charge judiciaire.
+          </p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-card">
+      <strong>Axe Dossier</strong>
+      <small>
+        Analyse de dossier · Structuration documentaire · Rédaction administrative<br>
+        Mentions légales, identité de l’exploitant, statut, adresse, email et conditions à compléter avant mise en ligne publique.
+      </small>
+    </div>
+  </footer>
+</body>
+</html>
