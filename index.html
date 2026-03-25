@@ -7,28 +7,33 @@
   <meta name="description" content="Axe Dossier accompagne les dossiers complexes : analyse, synthèse, rédaction administrative et accompagnement structuré." />
   <style>
     :root {
-      --bg: #f6f3ee;
-      --surface: #ffffff;
-      --text: #1f1f1f;
-      --muted: #6b6b6b;
-      --line: #ddd6cb;
+      --bg: #f3efe8;
+      --surface: rgba(255,255,255,0.82);
+      --surface-strong: #ffffff;
+      --text: #171717;
+      --muted: #66615a;
+      --line: rgba(23,23,23,0.08);
       --accent: #111111;
-      --accent-2: #efe8dd;
-      --radius: 20px;
-      --shadow: 0 10px 30px rgba(0,0,0,0.06);
-      --max: 1120px;
+      --accent-soft: #e9e1d4;
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --shadow: 0 20px 60px rgba(0,0,0,0.08);
+      --max: 1180px;
     }
 
     * { box-sizing: border-box; }
-
     html { scroll-behavior: smooth; }
 
     body {
       margin: 0;
       font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
       color: var(--text);
-      line-height: 1.6;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.9), transparent 30%),
+        radial-gradient(circle at right 20%, rgba(233,225,212,0.8), transparent 22%),
+        var(--bg);
+      line-height: 1.55;
     }
 
     a { color: inherit; text-decoration: none; }
@@ -42,17 +47,17 @@
       position: sticky;
       top: 0;
       z-index: 20;
-      backdrop-filter: blur(14px);
-      background: rgba(246,243,238,0.84);
-      border-bottom: 1px solid rgba(221,214,203,0.8);
+      background: rgba(243,239,232,0.74);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(23,23,23,0.05);
     }
 
     .topbar-inner {
+      min-height: 78px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      min-height: 72px;
+      gap: 18px;
     }
 
     .brand {
@@ -64,9 +69,9 @@
     }
 
     .brand-mark {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
       background: var(--accent);
       color: #fff;
       display: grid;
@@ -78,47 +83,59 @@
 
     .nav {
       display: flex;
-      flex-wrap: wrap;
       gap: 10px;
+      flex-wrap: wrap;
       justify-content: flex-end;
     }
 
     .pill {
       padding: 10px 14px;
-      border: 1px solid var(--line);
       border-radius: 999px;
-      background: rgba(255,255,255,0.72);
-      font-size: 0.95rem;
-      transition: 0.2s ease;
+      background: rgba(255,255,255,0.65);
+      border: 1px solid rgba(23,23,23,0.07);
+      font-size: 0.94rem;
+      transition: transform 0.2s ease, background 0.2s ease;
     }
 
-    .pill:hover { transform: translateY(-1px); }
+    .pill:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.95);
+    }
 
     .hero {
-      padding: 72px 0 44px;
+      padding: 56px 0 26px;
     }
 
-    .hero-grid {
+    .hero-shell {
       display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 28px;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 20px;
       align-items: stretch;
     }
 
-    .hero-card,
-    .panel,
-    .step,
-    .price-card,
-    .note-card,
-    .topic-card {
+    .card {
       background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: var(--radius);
+      border-radius: var(--radius-xl);
       box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
     }
 
-    .hero-card {
-      padding: 34px;
+    .hero-main {
+      padding: 42px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(233,225,212,0.75), rgba(233,225,212,0));
+      pointer-events: none;
     }
 
     .eyebrow {
@@ -127,49 +144,46 @@
       gap: 8px;
       padding: 8px 12px;
       border-radius: 999px;
-      background: var(--accent-2);
-      color: #4a4138;
-      font-size: 0.9rem;
+      background: var(--accent-soft);
+      color: #4e473e;
+      font-size: 0.88rem;
       font-weight: 700;
       margin-bottom: 18px;
     }
 
-    h1, h2, h3 {
-      margin: 0;
-      line-height: 1.12;
-    }
+    h1, h2, h3, p { margin: 0; }
 
     h1 {
-      font-size: clamp(2.2rem, 4vw, 4.3rem);
-      letter-spacing: -0.04em;
+      font-size: clamp(2.35rem, 4.2vw, 5rem);
+      letter-spacing: -0.055em;
+      line-height: 0.98;
+      max-width: 10ch;
       margin-bottom: 18px;
     }
 
     .lead {
-      font-size: 1.1rem;
-      color: #47423d;
-      max-width: 62ch;
-      margin-bottom: 24px;
+      max-width: 58ch;
+      color: #4c473f;
+      font-size: 1.08rem;
     }
 
-    .cta-row {
+    .hero-actions {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      margin-top: 22px;
+      margin-top: 26px;
     }
 
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
       min-height: 52px;
       padding: 0 20px;
       border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border: 1px solid var(--accent);
       font-weight: 700;
-      transition: 0.2s ease;
+      transition: transform 0.2s ease, opacity 0.2s ease;
     }
 
     .btn:hover { transform: translateY(-1px); }
@@ -180,26 +194,31 @@
     }
 
     .btn-secondary {
-      background: #fff;
+      background: rgba(255,255,255,0.7);
       color: var(--accent);
+      border-color: rgba(23,23,23,0.1);
     }
 
     .hero-side {
       display: grid;
-      gap: 18px;
+      gap: 20px;
     }
 
-    .panel {
-      padding: 24px;
+    .mini-card {
+      padding: 28px;
+      border-radius: var(--radius-xl);
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
     }
 
-    .panel h3 {
-      font-size: 1.15rem;
+    .mini-card h3 {
+      font-size: 1rem;
+      letter-spacing: -0.02em;
       margin-bottom: 14px;
     }
 
-    .check-list,
-    .clean-list {
+    .mini-list {
       list-style: none;
       padding: 0;
       margin: 0;
@@ -207,24 +226,50 @@
       gap: 12px;
     }
 
-    .check-list li,
-    .clean-list li {
+    .mini-list li {
+      padding-left: 18px;
       position: relative;
-      padding-left: 28px;
-      color: #403c38;
+      color: #49443e;
     }
 
-    .check-list li::before,
-    .clean-list li::before {
-      content: "•";
+    .mini-list li::before {
+      content: "";
       position: absolute;
-      left: 10px;
-      top: 0;
-      font-weight: 900;
+      left: 0;
+      top: 10px;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #1a1a1a;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      background: #f8f5ef;
+      border: 1px solid rgba(23,23,23,0.06);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.45rem;
+      letter-spacing: -0.04em;
+      margin-bottom: 4px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.9rem;
     }
 
     section {
-      padding: 26px 0;
+      padding: 22px 0;
     }
 
     .section-head {
@@ -232,119 +277,121 @@
       align-items: end;
       justify-content: space-between;
       gap: 16px;
-      margin-bottom: 22px;
-    }
-
-    .section-head p {
-      max-width: 62ch;
-      color: var(--muted);
-      margin: 8px 0 0;
+      margin-bottom: 18px;
     }
 
     h2 {
-      font-size: clamp(1.7rem, 2.4vw, 2.6rem);
-      letter-spacing: -0.03em;
+      font-size: clamp(1.7rem, 2.4vw, 2.8rem);
+      letter-spacing: -0.04em;
+    }
+
+    .section-head p {
+      max-width: 54ch;
+      color: var(--muted);
     }
 
     .grid-3,
-    .grid-2,
     .steps,
-    .prices,
-    .topics {
+    .pricing,
+    .contact-grid {
       display: grid;
       gap: 18px;
     }
 
     .grid-3,
-    .topics,
-    .prices {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-
-    .grid-2 {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .pricing {
+      grid-template-columns: repeat(3, minmax(0,1fr));
     }
 
     .steps {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0,1fr));
     }
 
-    .topic-card,
+    .contact-grid {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+
+    .feature,
     .step,
     .price-card,
-    .note-card {
-      padding: 24px;
+    .contact-card,
+    .disclaimer {
+      padding: 26px;
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
     }
 
-    .topic-card h3,
-    .price-card h3,
+    .feature h3,
     .step h3,
-    .note-card h3 {
+    .price-card h3,
+    .contact-card h3,
+    .disclaimer h3 {
+      font-size: 1.08rem;
       margin-bottom: 10px;
-      font-size: 1.15rem;
+      letter-spacing: -0.02em;
     }
 
-    .topic-card p,
-    .price-card p,
+    .feature p,
     .step p,
-    .note-card p {
-      margin: 0;
-      color: #4b4640;
+    .price-card p,
+    .contact-card p,
+    .disclaimer p {
+      color: #4f4942;
     }
 
-    .step-index {
-      display: inline-grid;
-      place-items: center;
+    .step-no {
       width: 38px;
       height: 38px;
       border-radius: 12px;
-      background: var(--accent-2);
+      display: grid;
+      place-items: center;
+      background: var(--accent-soft);
       font-weight: 800;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
     .price {
       display: block;
+      margin: 10px 0 12px;
       font-size: 2rem;
       line-height: 1;
-      letter-spacing: -0.04em;
-      margin: 10px 0 14px;
       font-weight: 800;
+      letter-spacing: -0.05em;
     }
 
-    .note-grid {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 18px;
+    .contact-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
     }
 
     .footer {
-      padding: 34px 0 70px;
-      color: #5b554f;
+      padding: 28px 0 64px;
     }
 
-    .footer-card {
-      padding: 24px;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
+    .footer-box {
+      padding: 22px 24px;
+      border-radius: var(--radius-lg);
       background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      color: #605951;
     }
 
-    .footer small {
+    .footer-box small {
       display: block;
-      margin-top: 10px;
-      color: #756e66;
+      margin-top: 8px;
       line-height: 1.5;
     }
 
-    @media (max-width: 980px) {
-      .hero-grid,
-      .note-grid,
+    @media (max-width: 1024px) {
+      .hero-shell,
       .grid-3,
-      .grid-2,
       .steps,
-      .prices,
-      .topics {
+      .pricing,
+      .contact-grid {
         grid-template-columns: 1fr;
       }
 
@@ -362,39 +409,13 @@
         align-items: stretch;
       }
 
-      .brand {
-        justify-content: center;
-      }
-
-      .nav {
-        justify-content: center;
-      }
-
-      .hero {
-        padding-top: 40px;
-      }
-
-      .hero-card,
-      .panel,
-      .topic-card,
-      .step,
-      .price-card,
-      .note-card,
-      .footer-card {
-        padding: 20px;
-      }
-
-      .lead {
-        font-size: 1rem;
-      }
-
-      .cta-row {
-        flex-direction: column;
-      }
-
-      .btn {
-        width: 100%;
-      }
+      .brand, .nav { justify-content: center; }
+      .hero-main, .mini-card, .feature, .step, .price-card, .contact-card, .disclaimer, .footer-box { padding: 20px; }
+      .hero { padding-top: 36px; }
+      .hero-actions { flex-direction: column; }
+      .btn { width: 100%; }
+      .metrics { grid-template-columns: 1fr; }
+      h1 { max-width: none; }
     }
   </style>
 </head>
@@ -418,41 +439,48 @@
 
   <main id="top">
     <section class="hero">
-      <div class="wrap hero-grid">
-        <div class="hero-card">
-          <div class="eyebrow">Analyse · Structure · Rédaction</div>
-          <h1>Dossiers complexes, litiges, successions.<br>Remettre de l’ordre avant d’agir.</h1>
+      <div class="wrap hero-shell">
+        <article class="card hero-main">
+          <div class="eyebrow">Dossiers complexes · Litiges · Successions</div>
+          <h1>Remettre un dossier dans l’axe.</h1>
           <p class="lead">
-            Axe Dossier intervient sur les situations bloquées, confuses ou sensibles.
-            L’objectif est simple : analyser les pièces, clarifier les faits, structurer le dossier
-            et préparer des réponses écrites utilisables.
+            Analyse, synthèse, structuration documentaire et rédaction administrative pour les situations
+            bloquées, confuses ou sensibles.
           </p>
 
-          <div class="cta-row">
+          <div class="hero-actions">
             <a class="btn btn-primary" href="mailto:contact@axedossier.fr?subject=Transmission%20de%20dossier&body=Bonjour,%0A%0AJe%20souhaite%20vous%20transmettre%20mon%20dossier.%0A%0AType%20de%20situation%20:%0A%0ADocuments%20disponibles%20:%0A">Envoyer mon dossier</a>
             <a class="btn btn-secondary" href="#methode">Voir la méthode</a>
           </div>
-        </div>
+        </article>
 
         <div class="hero-side">
-          <aside class="panel">
+          <article class="mini-card">
             <h3>Intervention</h3>
-            <ul class="check-list">
+            <ul class="mini-list">
               <li>Analyse et synthèse de dossier</li>
-              <li>Préparation et rédaction de courriers</li>
-              <li>Structuration des pièces et chronologie</li>
-              <li>Accompagnement structuré dans les démarches</li>
+              <li>Préparation documentaire</li>
+              <li>Rédaction de courriers</li>
+              <li>Accompagnement structuré</li>
             </ul>
-          </aside>
+          </article>
 
-          <aside class="panel">
-            <h3>Positionnement</h3>
-            <ul class="clean-list">
-              <li>Travail documentaire et rédactionnel</li>
-              <li>Approche claire, factuelle et structurée</li>
-              <li>Retour écrit avant tout échange complémentaire</li>
-            </ul>
-          </aside>
+          <article class="mini-card">
+            <div class="metrics">
+              <div class="metric">
+                <strong>1</strong>
+                <span>mail pour démarrer</span>
+              </div>
+              <div class="metric">
+                <strong>4</strong>
+                <span>étapes simples</span>
+              </div>
+              <div class="metric">
+                <strong>0</strong>
+                <span>discours inutile</span>
+              </div>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -461,23 +489,23 @@
       <div class="wrap">
         <div class="section-head">
           <div>
-            <h2>Ce qui est pris en charge</h2>
-            <p>Le service est centré sur la lecture du dossier, l’organisation des éléments et la préparation d’une réponse exploitable.</p>
+            <h2>Services</h2>
+            <p>Le cœur du travail tient en trois blocs : comprendre, structurer, rédiger.</p>
           </div>
         </div>
 
-        <div class="topics">
-          <article class="topic-card">
-            <h3>Analyse et synthèse</h3>
-            <p>Lecture des pièces, repérage des points utiles, chronologie des faits, mise en évidence des incohérences et des priorités.</p>
+        <div class="grid-3">
+          <article class="feature">
+            <h3>Analyser</h3>
+            <p>Lecture des pièces, chronologie des faits, points de blocage, incohérences et éléments déterminants.</p>
           </article>
-          <article class="topic-card">
-            <h3>Préparation documentaire</h3>
-            <p>Tri du dossier, structuration des documents, préparation des éléments à transmettre à un interlocuteur, une administration ou un professionnel.</p>
+          <article class="feature">
+            <h3>Structurer</h3>
+            <p>Organisation du dossier, hiérarchie des documents, synthèse claire et préparation des démarches utiles.</p>
           </article>
-          <article class="topic-card">
-            <h3>Rédaction administrative</h3>
-            <p>Projet de courrier, réponse argumentée, reformulation claire des faits, synthèse utilisable pour sortir du flou ou du blocage.</p>
+          <article class="feature">
+            <h3>Rédiger</h3>
+            <p>Courrier, réponse argumentée, reformulation factuelle et support écrit exploitable.</p>
           </article>
         </div>
       </div>
@@ -487,23 +515,23 @@
       <div class="wrap">
         <div class="section-head">
           <div>
-            <h2>Situations traitées</h2>
-            <p>Le site vise les situations civiles et administratives complexes du quotidien, ainsi que les successions et dossiers sensibles nécessitant une remise à plat.</p>
+            <h2>Situations</h2>
+            <p>Successions, litiges du quotidien, blocages administratifs et dossiers civils sensibles.</p>
           </div>
         </div>
 
         <div class="grid-3">
-          <article class="topic-card">
+          <article class="feature">
             <h3>Successions</h3>
-            <p>Blocages entre héritiers, échanges avec notaire, généalogiste, inventaire, courriers, chronologie et organisation du dossier.</p>
+            <p>Échanges difficiles, inventaire, notaire, généalogiste, blocages entre héritiers.</p>
           </article>
-          <article class="topic-card">
-            <h3>Litiges du quotidien</h3>
-            <p>Assurance, voisinage, consommation, prestataire défaillant, relance, mise en demeure, courrier incompris ou dossier confus.</p>
+          <article class="feature">
+            <h3>Litiges</h3>
+            <p>Assurance, voisinage, prestataire, relance, mise en demeure, dossier incompris.</p>
           </article>
-          <article class="topic-card">
-            <h3>Dossiers administratifs sensibles</h3>
-            <p>Réponse à un organisme, préparation d’un dossier, clarification d’une situation et mise en ordre avant d’engager la suite.</p>
+          <article class="feature">
+            <h3>Administratif</h3>
+            <p>Réponse à un organisme, clarification d’une situation et remise à plat du dossier.</p>
           </article>
         </div>
       </div>
@@ -514,30 +542,30 @@
         <div class="section-head">
           <div>
             <h2>Méthode</h2>
-            <p>Pas de bavardage inutile. Le travail commence par les pièces, les dates, les faits et la logique du dossier.</p>
+            <p>Une méthode courte, nette, et centrée sur les pièces.</p>
           </div>
         </div>
 
         <div class="steps">
           <article class="step">
-            <div class="step-index">1</div>
+            <div class="step-no">1</div>
             <h3>Transmission</h3>
-            <p>Les documents sont envoyés par mail avec un résumé simple de la situation et de la difficulté rencontrée.</p>
+            <p>Envoi du dossier par mail avec un résumé factuel.</p>
           </article>
           <article class="step">
-            <div class="step-index">2</div>
+            <div class="step-no">2</div>
             <h3>Lecture</h3>
-            <p>Le dossier est repris pièce par pièce pour isoler les faits, les contradictions, les manques et les leviers utiles.</p>
+            <p>Reprise des dates, des pièces et de la logique d’ensemble.</p>
           </article>
           <article class="step">
-            <div class="step-index">3</div>
-            <h3>Retour écrit</h3>
-            <p>Une synthèse claire est envoyée avec les points clés, les options possibles et, si nécessaire, un projet de réponse.</p>
+            <div class="step-no">3</div>
+            <h3>Synthèse</h3>
+            <p>Retour écrit clair avec options et points clés.</p>
           </article>
           <article class="step">
-            <div class="step-index">4</div>
-            <h3>Suite du dossier</h3>
-            <p>Un échange complémentaire peut être proposé selon la situation. L’appel téléphonique n’est pas systématique.</p>
+            <div class="step-no">4</div>
+            <h3>Suite</h3>
+            <p>Échange complémentaire si la situation le justifie.</p>
           </article>
         </div>
       </div>
@@ -548,62 +576,53 @@
         <div class="section-head">
           <div>
             <h2>Tarifs</h2>
-            <p>À ajuster selon ton positionnement réel. Je t’ai mis une base sobre et crédible pour le lancement.</p>
+            <p>Base de lancement simple. Tu pourras monter ensuite sans tout refaire.</p>
           </div>
         </div>
 
-        <div class="prices">
+        <div class="pricing">
           <article class="price-card">
             <h3>Première lecture</h3>
             <span class="price">90 €</span>
-            <p>Lecture initiale du dossier et retour sur la faisabilité de l’accompagnement.</p>
+            <p>Lecture initiale et premier cadrage.</p>
           </article>
           <article class="price-card">
-            <h3>Analyse + synthèse écrite</h3>
+            <h3>Analyse + synthèse</h3>
             <span class="price">190 €</span>
-            <p>Analyse structurée, chronologie, points clés et retour écrit exploitable.</p>
+            <p>Retour écrit structuré et exploitable.</p>
           </article>
           <article class="price-card">
             <h3>Courrier complémentaire</h3>
             <span class="price">75 €</span>
-            <p>Rédaction d’un courrier ou d’une réponse complémentaire sur la base du dossier déjà étudié.</p>
+            <p>Rédaction sur la base du dossier déjà étudié.</p>
           </article>
         </div>
       </div>
     </section>
 
     <section id="contact">
-      <div class="wrap note-grid">
-        <article class="note-card">
+      <div class="wrap contact-grid">
+        <article class="contact-card">
           <h3>Contact</h3>
-          <p>
-            Pour une première prise de contact, le plus efficace reste le mail avec les pièces utiles et un résumé factuel.
-            Plus le dossier est cadré, plus l’analyse est rapide.
-          </p>
-          <div class="cta-row">
+          <strong>Un mail clair vaut mieux qu’un long appel confus.</strong>
+          <p>Transmets les pièces utiles, un résumé bref, et l’objectif recherché. Le travail commence là.</p>
+          <div class="hero-actions">
             <a class="btn btn-primary" href="mailto:contact@axedossier.fr?subject=Premi%C3%A8re%20prise%20de%20contact&body=Bonjour,%0A%0AJe%20vous%20contacte%20pour%20la%20situation%20suivante%20:%0A%0AType%20de%20dossier%20:%0A%0ADocuments%20disponibles%20:%0A%0AObjectif%20de%20ma%20demande%20:%0A">Écrire maintenant</a>
           </div>
         </article>
 
-        <article class="note-card">
+        <article class="disclaimer">
           <h3>Cadre d’intervention</h3>
-          <p>
-            Service d’accompagnement documentaire et rédactionnel.
-            Ne constitue pas une consultation juridique, une activité réglementée de représentation,
-            ni une prise en charge judiciaire.
-          </p>
+          <p>Service d’accompagnement documentaire et rédactionnel. Ne constitue pas une consultation juridique, une représentation en justice ou une prise en charge judiciaire.</p>
         </article>
       </div>
     </section>
   </main>
 
   <footer class="footer">
-    <div class="wrap footer-card">
+    <div class="wrap footer-box">
       <strong>Axe Dossier</strong>
-      <small>
-        Analyse de dossier · Structuration documentaire · Rédaction administrative<br>
-        Mentions légales, identité de l’exploitant, statut, adresse, email et conditions à compléter avant mise en ligne publique.
-      </small>
+      <small>Mentions légales, identité de l’exploitant, statut, adresse, email et conditions à compléter avant mise en ligne publique.</small>
     </div>
   </footer>
 </body>
