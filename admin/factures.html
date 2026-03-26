@@ -492,6 +492,8 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     deleteDoc,
     doc,
     updateDoc,
+    setDoc,
+    getDoc,
     onSnapshot,
     query,
     orderBy,
@@ -514,9 +516,14 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   const dossiersRef = collection(db, "dossiers");
   const invoicesRef = collection(db, "factures");
 
+  const settingsRef = doc(db, "settings", "main");
+  const countersRef = doc(db, "counters", "main");
+
   let allClients = [];
   let allDossiers = [];
   let allInvoices = [];
+  let currentSettings = {};
+  let currentCounters = {};
   let editingInvoiceId = null;
 
   function escapeHtml(text = "") {
@@ -543,6 +550,41 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     if (status === "RETARD") return "retard";
     if (status === "ANNULEE") return "annulee";
     return "";
+  }
+
+  function currentYear() {
+    return new Date().getFullYear();
+  }
+
+  function padNumber(n) {
+    return String(Number(n || 1)).padStart(3, "0");
+  }
+
+  function defaultSettings() {
+    return {
+      businessName: "Axe Dossier",
+      ownerName: "Sophie Dumas",
+      legalForm: "EI",
+      address: "24 hameau de danis\n09700 Saverdun",
+      email: "contact@axe-dossier.fr",
+      phone: "",
+      siret: "",
+      ape: "",
+      iban: "",
+      bic: "",
+      legalNotice: "",
+      vatMode: "NO",
+      vatRate: 20,
+      vatNumber: "",
+      tvaExemptionText: "TVA non applicable, art. 293 B du CGI"
+    };
+  }
+
+  function defaultCounters() {
+    return {
+      invoicePrefix: "FAC",
+      nextInvoiceNumber: 1
+    };
   }
 
   function fillClientSelect() {
@@ -583,7 +625,8 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     document.getElementById("invoiceClient").value = invoice.clientId || "";
     fillDossierSelect(invoice.clientId || "");
     document.getElementById("invoiceDossier").value = invoice.dossierId || "";
-    document.getElementById("invoiceAmount").value = invoice.amount ?? "";
+    document.getElementById("invoiceAmount").value =
+      invoice.amountTTC ?? invoice.amount ?? "";
     document.getElementById("invoiceDueDate").value = invoice.dueDate || "";
     document.getElementById("invoiceStatus").value = invoice.status || "BROUILLON";
     document.getElementById("invoiceMode").value = invoice.mode || "VIREMENT";
@@ -598,7 +641,10 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     ).length;
     totalPaid.textContent = invoices.filter(i => i.status === "PAYEE").length;
 
-    const sum = invoices.reduce((acc, item) => acc + Number(item.amount || 0), 0);
+    const sum = invoices.reduce(
+      (acc, item) => acc + Number(item.amountTTC ?? item.amount ?? 0),
+      0
+    );
     totalAmount.textContent = formatMoney(sum);
   }
 
@@ -609,8 +655,13 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     const filter = statusFilter.value;
 
     const filtered = allInvoices.filter(invoice => {
-      const clientName = clientMap[invoice.clientId]?.name || "";
-      const dossierTitle = dossierMap[invoice.dossierId]?.title || "";
+      const clientName =
+        invoice.clientSnapshot?.name ||
+        clientMap[invoice.clientId]?.name ||
+        "";
+
+      const dossierTitle =
+        dossierMap[invoice.dossierId]?.title || "";
 
       const blob = [
         invoice.number || "",
@@ -640,10 +691,18 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     }
 
     invoiceList.innerHTML = filtered.map(invoice => {
-      const clientName = clientMap[invoice.clientId]?.name || "Client supprimé";
+      const clientName =
+        invoice.clientSnapshot?.name ||
+        clientMap[invoice.clientId]?.name ||
+        "Client supprimé";
+
       const dossierTitle = invoice.dossierId
         ? (dossierMap[invoice.dossierId]?.title || "Dossier supprimé")
         : "Aucun dossier";
+
+      const amountTTC = invoice.amountTTC ?? invoice.amount ?? 0;
+      const amountHT = invoice.amountHT ?? amountTTC;
+      const amountVAT = invoice.amountVAT ?? 0;
 
       return `
         <article class="invoice-item">
@@ -665,7 +724,9 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
 
           <div class="invoice-meta">
             ${invoice.label ? `<span><strong>Libellé :</strong> ${escapeHtml(invoice.label)}</span>` : ""}
-            <span class="amount">${formatMoney(invoice.amount)}</span>
+            <span><strong>HT :</strong> ${formatMoney(amountHT)}</span>
+            <span><strong>TVA :</strong> ${formatMoney(amountVAT)}</span>
+            <span class="amount">${formatMoney(amountTTC)}</span>
           </div>
 
           ${invoice.notes ? `<div class="invoice-notes">${escapeHtml(invoice.notes).replace(/\n/g, "<br>")}</div>` : ""}
@@ -679,19 +740,119 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     }).join("");
   }
 
-  function createInvoice(data) {
+  function buildClientSnapshot(client) {
     return {
-      number: (data.get("invoiceNumber") || "").trim(),
+      name: client?.name || "",
+      type: client?.type || "",
+      email: client?.email || "",
+      phone: client?.phone || "",
+      address: client?.address || ""
+    };
+  }
+
+  function buildBusinessSnapshot(settings) {
+    const s = { ...defaultSettings(), ...settings };
+
+    return {
+      businessName: s.businessName || "",
+      ownerName: s.ownerName || "",
+      legalForm: s.legalForm || "",
+      address: s.address || "",
+      email: s.email || "",
+      phone: s.phone || "",
+      siret: s.siret || "",
+      ape: s.ape || "",
+      iban: s.iban || "",
+      bic: s.bic || "",
+      legalNotice: s.legalNotice || "",
+      vatMode: s.vatMode || "NO",
+      vatRate: Number(s.vatRate || 0),
+      vatNumber: s.vatNumber || "",
+      tvaExemptionText: s.tvaExemptionText || "TVA non applicable, art. 293 B du CGI"
+    };
+  }
+
+  function computeAmounts(amountInput, businessSnapshot) {
+    const amountTTC = Number(amountInput || 0);
+    const vatMode = businessSnapshot.vatMode || "NO";
+    const vatRate = Number(businessSnapshot.vatRate || 0);
+
+    if (vatMode === "YES" && vatRate > 0) {
+      const amountHT = Number((amountTTC / (1 + vatRate / 100)).toFixed(2));
+      const amountVAT = Number((amountTTC - amountHT).toFixed(2));
+      return { amountHT, amountVAT, amountTTC };
+    }
+
+    return {
+      amountHT: amountTTC,
+      amountVAT: 0,
+      amountTTC
+    };
+  }
+
+  async function getNextInvoiceNumberIfNeeded(manualNumber) {
+    const trimmed = (manualNumber || "").trim();
+    if (trimmed) return trimmed;
+
+    const countersSnap = await getDoc(countersRef);
+    const counters = countersSnap.exists()
+      ? { ...defaultCounters(), ...countersSnap.data() }
+      : defaultCounters();
+
+    const nextNumber = counters.nextInvoiceNumber || 1;
+    const prefix = counters.invoicePrefix || "FAC";
+    const generated = `${prefix}-${currentYear()}-${padNumber(nextNumber)}`;
+
+    await setDoc(
+      countersRef,
+      {
+        invoicePrefix: prefix,
+        nextInvoiceNumber: nextNumber + 1,
+        updatedAt: serverTimestamp()
+      },
+      { merge: true }
+    );
+
+    return generated;
+  }
+
+  async function buildInvoicePayload(data, existingInvoice = null) {
+    const clientId = data.get("invoiceClient") || "";
+    const dossierId = data.get("invoiceDossier") || "";
+    const amountInput = Number(data.get("invoiceAmount") || 0);
+
+    const client = allClients.find(c => c.id === clientId);
+    const businessSnapshot = buildBusinessSnapshot(currentSettings);
+    const clientSnapshot = buildClientSnapshot(client);
+    const amounts = computeAmounts(amountInput, businessSnapshot);
+
+    let number = (data.get("invoiceNumber") || "").trim();
+
+    if (!existingInvoice) {
+      number = await getNextInvoiceNumberIfNeeded(number);
+    } else {
+      number = number || existingInvoice.number || "";
+    }
+
+    return {
+      number,
       date: data.get("invoiceDate") || "",
-      clientId: data.get("invoiceClient") || "",
-      dossierId: data.get("invoiceDossier") || "",
-      amount: Number(data.get("invoiceAmount") || 0),
+      clientId,
+      dossierId,
       dueDate: data.get("invoiceDueDate") || "",
       status: data.get("invoiceStatus") || "BROUILLON",
       mode: data.get("invoiceMode") || "VIREMENT",
       label: (data.get("invoiceLabel") || "").trim(),
       notes: (data.get("invoiceNotes") || "").trim(),
-      createdAt: serverTimestamp(),
+
+      amountHT: amounts.amountHT,
+      amountVAT: amounts.amountVAT,
+      amountTTC: amounts.amountTTC,
+
+      clientSnapshot,
+      businessSnapshot,
+
+      createdAt: existingInvoice?.createdAt || serverTimestamp(),
       updatedAt: serverTimestamp()
     };
   }
@@ -700,27 +861,37 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     e.preventDefault();
 
     const data = new FormData(form);
-    const payload = createInvoice(data);
+    const clientId = data.get("invoiceClient") || "";
+    const amount = Number(data.get("invoiceAmount") || 0);
 
-    if (!payload.number || !payload.clientId || !payload.amount) return;
+    if (!clientId || !amount) return;
 
     try {
       if (editingInvoiceId) {
+        const existing = allInvoices.find(i => i.id === editingInvoiceId);
+        const payload = await buildInvoicePayload(data, existing);
+
         await updateDoc(doc(db, "factures", editingInvoiceId), {
           number: payload.number,
           date: payload.date,
           clientId: payload.clientId,
           dossierId: payload.dossierId,
-          amount: payload.amount,
           dueDate: payload.dueDate,
           status: payload.status,
           mode: payload.mode,
           label: payload.label,
           notes: payload.notes,
+          amountHT: payload.amountHT,
+          amountVAT: payload.amountVAT,
+          amountTTC: payload.amountTTC,
+          clientSnapshot: payload.clientSnapshot,
+          businessSnapshot: payload.businessSnapshot,
           updatedAt: serverTimestamp()
         });
+
         editingInvoiceId = null;
       } else {
+        const payload = await buildInvoicePayload(data, null);
         await addDoc(invoicesRef, payload);
       }
 
@@ -804,6 +975,30 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     },
     (err) => {
       console.error("Erreur chargement dossiers :", err);
+    }
+  );
+
+  onSnapshot(
+    settingsRef,
+    (snap) => {
+      currentSettings = snap.exists()
+        ? { ...defaultSettings(), ...snap.data() }
+        : defaultSettings();
+    },
+    (err) => {
+      console.error("Erreur chargement settings :", err);
+    }
+  );
+
+  onSnapshot(
+    countersRef,
+    (snap) => {
+      currentCounters = snap.exists()
+        ? { ...defaultCounters(), ...snap.data() }
+        : defaultCounters();
+    },
+    (err) => {
+      console.error("Erreur chargement counters :", err);
     }
   );
 
