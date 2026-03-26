@@ -438,289 +438,296 @@
   </main>
 
   <script type="module">
-    import "./auth-guard.js";
-    import { db } from "./firebase-config.js";
-    import {
-      doc,
-      setDoc,
-      onSnapshot,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import "./auth-guard.js";
+  import { db } from "./firebase-config.js";
+  import {
+    doc,
+    setDoc,
+    onSnapshot,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const form = document.getElementById("settingsForm");
-    const savedMessage = document.getElementById("savedMessage");
-    const resetSettingsBtn = document.getElementById("resetSettings");
+  const form = document.getElementById("settingsForm");
+  const savedMessage = document.getElementById("savedMessage");
+  const resetSettingsBtn = document.getElementById("resetSettings");
 
-    const previewIdentity = document.getElementById("previewIdentity");
-    const previewTerms = document.getElementById("previewTerms");
-    const nextDevis = document.getElementById("nextDevis");
-    const nextFacture = document.getElementById("nextFacture");
-    const nextPaiement = document.getElementById("nextPaiement");
+  const previewIdentity = document.getElementById("previewIdentity");
+  const previewTerms = document.getElementById("previewTerms");
+  const nextDevis = document.getElementById("nextDevis");
+  const nextFacture = document.getElementById("nextFacture");
+  const nextPaiement = document.getElementById("nextPaiement");
 
-    const settingsRef = doc(db, "settings", "main");
-    const countersRef = doc(db, "counters", "main");
+  const settingsRef = doc(db, "settings", "main");
+  const countersRef = doc(db, "counters", "main");
 
-    let currentSettings = {};
-    let currentCounters = {};
+  let currentSettings = {};
+  let currentCounters = {};
 
-    function escapeHtml(text = "") {
-      return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+  function escapeHtml(text = "") {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function currentYear() {
+    return new Date().getFullYear();
+  }
+
+  function getEl(id) {
+    return document.getElementById(id);
+  }
+
+  function getValue(id, fallback = "") {
+    const el = getEl(id);
+    return el ? (el.value ?? fallback) : fallback;
+  }
+
+  function setValue(id, value) {
+    const el = getEl(id);
+    if (el) el.value = value ?? "";
+  }
+
+  function defaultSettings() {
+    return {
+      businessName: "Axe Dossier",
+      ownerName: "Sophie Dumas",
+      legalForm: "EI",
+      address: "24 hameau de danis\n09700 Saverdun",
+      email: "contact@axe-dossier.fr",
+      phone: "",
+      siret: "",
+      ape: "",
+      logoUrl: "",
+      bankName: "",
+      iban: "",
+      bic: "",
+      legalNotice: "",
+      vatMode: "NO",
+      vatRate: 20,
+      vatNumber: "",
+      tvaExemptionText: "TVA non applicable, art. 293 B du CGI"
+    };
+  }
+
+  function defaultCounters() {
+    return {
+      quotePrefix: "DEV",
+      invoicePrefix: "FAC",
+      paymentPrefix: "PAY",
+      nextQuoteNumber: 1,
+      nextInvoiceNumber: 1,
+      nextPaymentNumber: 1
+    };
+  }
+
+  function padNumber(n) {
+    return String(Number(n || 1)).padStart(3, "0");
+  }
+
+  function renderCounters() {
+    const year = currentYear();
+    const c = { ...defaultCounters(), ...currentCounters };
+
+    nextDevis.textContent = `${c.quotePrefix}-${year}-${padNumber(c.nextQuoteNumber)}`;
+    nextFacture.textContent = `${c.invoicePrefix}-${year}-${padNumber(c.nextInvoiceNumber)}`;
+    nextPaiement.textContent = `${c.paymentPrefix}-${year}-${padNumber(c.nextPaymentNumber)}`;
+  }
+
+  function toggleVatFields() {
+    const vatMode = getValue("vatMode", "NO");
+    const vatRateField = getEl("vatRateField");
+    const vatNumberField = getEl("vatNumberField");
+    const tvaExemptionField = getEl("tvaExemptionField");
+
+    if (vatMode === "YES") {
+      if (vatRateField) vatRateField.style.display = "";
+      if (vatNumberField) vatNumberField.style.display = "";
+      if (tvaExemptionField) tvaExemptionField.style.display = "none";
+    } else {
+      if (vatRateField) vatRateField.style.display = "none";
+      if (vatNumberField) vatNumberField.style.display = "none";
+      if (tvaExemptionField) tvaExemptionField.style.display = "";
+    }
+  }
+
+  function fillForm() {
+    const s = { ...defaultSettings(), ...currentSettings };
+
+    setValue("businessName", s.businessName);
+    setValue("ownerName", s.ownerName);
+    setValue("legalForm", s.legalForm);
+    setValue("address", s.address);
+    setValue("email", s.email);
+    setValue("phone", s.phone);
+    setValue("siret", s.siret);
+    setValue("ape", s.ape);
+    setValue("logoUrl", s.logoUrl);
+    setValue("bankName", s.bankName);
+    setValue("iban", s.iban);
+    setValue("bic", s.bic);
+    setValue("legalNotice", s.legalNotice);
+    setValue("vatMode", s.vatMode);
+    setValue("vatRate", s.vatRate);
+    setValue("vatNumber", s.vatNumber);
+    setValue("tvaExemptionText", s.tvaExemptionText);
+
+    toggleVatFields();
+    renderPreview();
+    renderCounters();
+  }
+
+  function renderPreview() {
+    const s = { ...defaultSettings(), ...currentSettings };
+
+    const identityParts = [
+      s.businessName,
+      s.ownerName,
+      s.legalForm,
+      s.address,
+      s.email,
+      s.phone,
+      s.siret ? `SIRET : ${s.siret}` : "",
+      s.ape ? `APE : ${s.ape}` : "",
+      s.vatMode === "YES" && s.vatNumber ? `TVA : ${s.vatNumber}` : "",
+      s.bankName ? `Banque : ${s.bankName}` : "",
+      s.iban ? `IBAN : ${s.iban}` : "",
+      s.bic ? `BIC : ${s.bic}` : "",
+      s.logoUrl ? `Logo : configuré` : ""
+    ].filter(Boolean);
+
+    previewIdentity.innerHTML = identityParts.length
+      ? identityParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("")
+      : "Aucun paramètre enregistré.";
+
+    const termsParts = [];
+
+    if (s.vatMode === "YES") {
+      termsParts.push(`Soumis à la TVA${s.vatRate !== "" && s.vatRate != null ? ` : ${s.vatRate} %` : ""}`);
+      if (s.vatNumber) termsParts.push(`N° TVA : ${s.vatNumber}`);
+    } else {
+      termsParts.push(s.tvaExemptionText || "TVA non applicable, art. 293 B du CGI");
     }
 
-    function currentYear() {
-      return new Date().getFullYear();
+    if (s.legalNotice) termsParts.push(s.legalNotice);
+
+    previewTerms.innerHTML = termsParts.length
+      ? termsParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("<br>")
+      : "Aucune mention enregistrée.";
+  }
+
+  function showSaved() {
+    savedMessage.classList.add("show");
+    setTimeout(() => savedMessage.classList.remove("show"), 1800);
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const settings = {
+      businessName: getValue("businessName").trim(),
+      ownerName: getValue("ownerName").trim(),
+      legalForm: getValue("legalForm").trim(),
+      address: getValue("address").trim(),
+      email: getValue("email").trim(),
+      phone: getValue("phone").trim(),
+      siret: getValue("siret").trim(),
+      ape: getValue("ape").trim(),
+      logoUrl: getValue("logoUrl").trim(),
+      bankName: getValue("bankName").trim(),
+      iban: getValue("iban").trim(),
+      bic: getValue("bic").trim(),
+      legalNotice: getValue("legalNotice").trim(),
+      vatMode: getValue("vatMode", currentSettings.vatMode || "NO").trim() || "NO",
+      vatRate: Number(getValue("vatRate", currentSettings.vatRate ?? 20)) || 20,
+      vatNumber: getValue("vatNumber", currentSettings.vatNumber || "").trim(),
+      tvaExemptionText: getValue(
+        "tvaExemptionText",
+        currentSettings.tvaExemptionText || "TVA non applicable, art. 293 B du CGI"
+      ).trim() || "TVA non applicable, art. 293 B du CGI",
+      updatedAt: serverTimestamp()
+    };
+
+    try {
+      await setDoc(settingsRef, settings, { merge: true });
+
+      await setDoc(
+        countersRef,
+        {
+          quotePrefix: currentCounters.quotePrefix || "DEV",
+          invoicePrefix: currentCounters.invoicePrefix || "FAC",
+          paymentPrefix: currentCounters.paymentPrefix || "PAY",
+          nextQuoteNumber: currentCounters.nextQuoteNumber || 1,
+          nextInvoiceNumber: currentCounters.nextInvoiceNumber || 1,
+          nextPaymentNumber: currentCounters.nextPaymentNumber || 1,
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+
+      showSaved();
+    } catch (err) {
+      console.error("Erreur enregistrement settings :", err);
+      alert("Impossible d’enregistrer les paramètres.");
     }
+  });
 
-    function getEl(id) {
-      return document.getElementById(id);
+  resetSettingsBtn.addEventListener("click", async () => {
+    const ok = confirm("Réinitialiser les paramètres avec les valeurs par défaut ?");
+    if (!ok) return;
+
+    try {
+      await setDoc(
+        settingsRef,
+        {
+          ...defaultSettings(),
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+
+      await setDoc(
+        countersRef,
+        {
+          ...defaultCounters(),
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+    } catch (err) {
+      console.error("Erreur reset settings :", err);
+      alert("Impossible de réinitialiser les paramètres.");
     }
+  });
 
-    function getValue(id, fallback = "") {
-      const el = getEl(id);
-      return el ? (el.value ?? fallback) : fallback;
+  getEl("vatMode")?.addEventListener("change", () => {
+    toggleVatFields();
+    renderPreview();
+  });
+
+  onSnapshot(
+    settingsRef,
+    (snap) => {
+      currentSettings = snap.exists() ? snap.data() : defaultSettings();
+      fillForm();
+    },
+    (err) => {
+      console.error("Erreur chargement settings :", err);
     }
+  );
 
-    function setValue(id, value) {
-      const el = getEl(id);
-      if (el) el.value = value ?? "";
-    }
-
-    function defaultSettings() {
-      return {
-        businessName: "Axe Dossier",
-        ownerName: "Sophie Dumas",
-        legalForm: "EI",
-        address: "24 hameau de danis\n09700 Saverdun",
-        email: "contact@axe-dossier.fr",
-        phone: "",
-        siret: "",
-        ape: "",
-        iban: "",
-        bic: "",
-        legalNotice: "",
-        vatMode: "NO",
-        vatRate: 20,
-        vatNumber: "",
-        tvaExemptionText: "TVA non applicable, art. 293 B du CGI"
-      };
-    }
-
-    function defaultCounters() {
-      return {
-        quotePrefix: "DEV",
-        invoicePrefix: "FAC",
-        paymentPrefix: "PAY",
-        nextQuoteNumber: 1,
-        nextInvoiceNumber: 1,
-        nextPaymentNumber: 1
-      };
-    }
-
-    function padNumber(n) {
-      return String(Number(n || 1)).padStart(3, "0");
-    }
-
-    function renderCounters() {
-      const year = currentYear();
-      const c = { ...defaultCounters(), ...currentCounters };
-
-      nextDevis.textContent = `${c.quotePrefix}-${year}-${padNumber(c.nextQuoteNumber)}`;
-      nextFacture.textContent = `${c.invoicePrefix}-${year}-${padNumber(c.nextInvoiceNumber)}`;
-      nextPaiement.textContent = `${c.paymentPrefix}-${year}-${padNumber(c.nextPaymentNumber)}`;
-    }
-
-    function toggleVatFields() {
-      const vatMode = getValue("vatMode", "NO");
-
-      const vatRateField = getEl("vatRateField");
-      const vatNumberField = getEl("vatNumberField");
-      const tvaExemptionField = getEl("tvaExemptionField");
-
-      if (vatMode === "YES") {
-        if (vatRateField) vatRateField.style.display = "";
-        if (vatNumberField) vatNumberField.style.display = "";
-        if (tvaExemptionField) tvaExemptionField.style.display = "none";
-      } else {
-        if (vatRateField) vatRateField.style.display = "none";
-        if (vatNumberField) vatNumberField.style.display = "none";
-        if (tvaExemptionField) tvaExemptionField.style.display = "";
-      }
-    }
-
-    function fillForm() {
-      const s = { ...defaultSettings(), ...currentSettings };
-
-      setValue("businessName", s.businessName);
-      setValue("ownerName", s.ownerName);
-      setValue("legalForm", s.legalForm);
-      setValue("address", s.address);
-      setValue("email", s.email);
-      setValue("phone", s.phone);
-      setValue("siret", s.siret);
-      setValue("ape", s.ape);
-      setValue("iban", s.iban);
-      setValue("bic", s.bic);
-      setValue("legalNotice", s.legalNotice);
-      setValue("vatMode", s.vatMode);
-      setValue("vatRate", s.vatRate);
-      setValue("vatNumber", s.vatNumber);
-      setValue("tvaExemptionText", s.tvaExemptionText);
-
-      toggleVatFields();
-      renderPreview();
+  onSnapshot(
+    countersRef,
+    (snap) => {
+      currentCounters = snap.exists() ? snap.data() : defaultCounters();
       renderCounters();
+    },
+    (err) => {
+      console.error("Erreur chargement counters :", err);
     }
-
-    function renderPreview() {
-      const s = { ...defaultSettings(), ...currentSettings };
-
-      const identityParts = [
-        s.businessName,
-        s.ownerName,
-        s.legalForm,
-        s.address,
-        s.email,
-        s.phone,
-        s.siret ? `SIRET : ${s.siret}` : "",
-        s.ape ? `APE : ${s.ape}` : "",
-        s.vatMode === "YES" && s.vatNumber ? `TVA : ${s.vatNumber}` : "",
-        s.iban ? `IBAN : ${s.iban}` : "",
-        s.bic ? `BIC : ${s.bic}` : ""
-      ].filter(Boolean);
-
-      previewIdentity.innerHTML = identityParts.length
-        ? identityParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("")
-        : "Aucun paramètre enregistré.";
-
-      const termsParts = [];
-
-      if (s.vatMode === "YES") {
-        termsParts.push(`Soumis à la TVA${s.vatRate !== "" && s.vatRate != null ? ` : ${s.vatRate} %` : ""}`);
-        if (s.vatNumber) termsParts.push(`N° TVA : ${s.vatNumber}`);
-      } else {
-        termsParts.push(s.tvaExemptionText || "TVA non applicable, art. 293 B du CGI");
-      }
-
-      if (s.legalNotice) termsParts.push(s.legalNotice);
-
-      previewTerms.innerHTML = termsParts.length
-        ? termsParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("<br>")
-        : "Aucune mention enregistrée.";
-    }
-
-    function showSaved() {
-      savedMessage.classList.add("show");
-      setTimeout(() => savedMessage.classList.remove("show"), 1800);
-    }
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const settings = {
-        businessName: getValue("businessName").trim(),
-        ownerName: getValue("ownerName").trim(),
-        legalForm: getValue("legalForm").trim(),
-        address: getValue("address").trim(),
-        email: getValue("email").trim(),
-        phone: getValue("phone").trim(),
-        siret: getValue("siret").trim(),
-        ape: getValue("ape").trim(),
-        iban: getValue("iban").trim(),
-        bic: getValue("bic").trim(),
-        legalNotice: getValue("legalNotice").trim(),
-        vatMode: getValue("vatMode", currentSettings.vatMode || "NO").trim() || "NO",
-        vatRate: Number(getValue("vatRate", currentSettings.vatRate ?? 20)) || 20,
-        vatNumber: getValue("vatNumber", currentSettings.vatNumber || "").trim(),
-        tvaExemptionText: getValue(
-          "tvaExemptionText",
-          currentSettings.tvaExemptionText || "TVA non applicable, art. 293 B du CGI"
-        ).trim() || "TVA non applicable, art. 293 B du CGI",
-        updatedAt: serverTimestamp()
-      };
-
-      try {
-        await setDoc(settingsRef, settings, { merge: true });
-
-        await setDoc(
-          countersRef,
-          {
-            quotePrefix: currentCounters.quotePrefix || "DEV",
-            invoicePrefix: currentCounters.invoicePrefix || "FAC",
-            paymentPrefix: currentCounters.paymentPrefix || "PAY",
-            nextQuoteNumber: currentCounters.nextQuoteNumber || 1,
-            nextInvoiceNumber: currentCounters.nextInvoiceNumber || 1,
-            nextPaymentNumber: currentCounters.nextPaymentNumber || 1,
-            updatedAt: serverTimestamp()
-          },
-          { merge: true }
-        );
-
-        showSaved();
-      } catch (err) {
-        console.error("Erreur enregistrement settings :", err);
-        alert("Impossible d’enregistrer les paramètres.");
-      }
-    });
-
-    resetSettingsBtn.addEventListener("click", async () => {
-      const ok = confirm("Réinitialiser les paramètres avec les valeurs par défaut ?");
-      if (!ok) return;
-
-      try {
-        await setDoc(
-          settingsRef,
-          {
-            ...defaultSettings(),
-            updatedAt: serverTimestamp()
-          },
-          { merge: true }
-        );
-
-        await setDoc(
-          countersRef,
-          {
-            ...defaultCounters(),
-            updatedAt: serverTimestamp()
-          },
-          { merge: true }
-        );
-      } catch (err) {
-        console.error("Erreur reset settings :", err);
-        alert("Impossible de réinitialiser les paramètres.");
-      }
-    });
-
-    getEl("vatMode")?.addEventListener("change", () => {
-      toggleVatFields();
-      renderPreview();
-    });
-
-    onSnapshot(
-      settingsRef,
-      (snap) => {
-        currentSettings = snap.exists() ? snap.data() : defaultSettings();
-        fillForm();
-      },
-      (err) => {
-        console.error("Erreur chargement settings :", err);
-      }
-    );
-
-    onSnapshot(
-      countersRef,
-      (snap) => {
-        currentCounters = snap.exists() ? snap.data() : defaultCounters();
-        renderCounters();
-      },
-      (err) => {
-        console.error("Erreur chargement counters :", err);
-      }
-    );
-  </script>
+  );
+</script>
 </body>
 </html>
