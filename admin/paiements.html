@@ -1,0 +1,652 @@
+<!DOCTYPE html><html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axe Dossier — Paiements</title>
+  <style>
+    :root{
+      --bg:#f3efe8;
+      --card:#ffffff;
+      --text:#171717;
+      --muted:#66615a;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --soft:#e9e1d4;
+      --radius:18px;
+      --shadow:0 16px 40px rgba(0,0,0,0.06);
+      --max:1180px;
+    }*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+a{text-decoration:none;color:inherit}
+.wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:rgba(243,239,232,0.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+}
+
+.topbar-inner{
+  min-height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:800;
+  letter-spacing:.02em;
+}
+
+.brand-mark{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  background:var(--accent);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+  box-shadow:var(--shadow);
+}
+
+.nav{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.pill{
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.7);
+  border:1px solid var(--line);
+  font-size:.94rem;
+}
+
+main{padding:32px 0 56px}
+
+.hero{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:22px;
+}
+
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
+.hero p{color:var(--muted);max-width:68ch;margin-top:8px}
+
+.grid{
+  display:grid;
+  grid-template-columns:420px 1fr;
+  gap:20px;
+  align-items:start;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+  padding:24px;
+}
+
+.card h2{
+  font-size:1.2rem;
+  margin-bottom:14px;
+  letter-spacing:-.02em;
+}
+
+.field{margin-bottom:14px}
+.field label{
+  display:block;
+  font-size:.92rem;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.field input,
+.field textarea,
+.field select{
+  width:100%;
+  min-height:48px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px 14px;
+  font:inherit;
+  color:var(--text);
+  background:#fff;
+}
+
+.field textarea{min-height:100px;resize:vertical}
+
+.row-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.btn{
+  min-height:48px;
+  padding:0 18px;
+  border-radius:999px;
+  border:1px solid var(--accent);
+  background:var(--accent);
+  color:#fff;
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.btn-secondary{
+  background:#fff;
+  color:var(--accent);
+  border-color:var(--line);
+}
+
+.toolbar{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+
+.search,
+.filter{
+  min-height:48px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:0 16px;
+  font:inherit;
+  background:#fff;
+}
+
+.search{flex:1 1 260px}
+.filter{min-width:190px}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.stat{
+  background:#faf7f1;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+}
+
+.stat strong{
+  display:block;
+  font-size:1.35rem;
+  letter-spacing:-.04em;
+  margin-bottom:4px;
+}
+
+.stat span{color:var(--muted);font-size:.92rem}
+
+.empty{
+  padding:24px;
+  border:1px dashed var(--line);
+  border-radius:18px;
+  color:var(--muted);
+  text-align:center;
+  background:#fcfbf8;
+}
+
+.payment-list{display:grid;gap:14px}
+
+.payment-item{
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:18px;
+  background:#fff;
+  display:grid;
+  gap:12px;
+}
+
+.payment-top{
+  display:flex;
+  align-items:start;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.payment-title{
+  font-size:1.08rem;
+  font-weight:800;
+  letter-spacing:-.02em;
+  margin-bottom:4px;
+}
+
+.payment-meta{
+  display:grid;
+  gap:6px;
+  color:#4f4942;
+  font-size:.95rem;
+}
+
+.badges{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:0 10px;
+  border-radius:999px;
+  background:var(--soft);
+  font-size:.82rem;
+  font-weight:700;
+  color:#4f493f;
+  border:1px solid rgba(23,23,23,0.06);
+}
+
+.badge.virement{background:#efe8dd}
+.badge.cheque{background:#f6edd8}
+.badge.especes{background:#ececec}
+.badge.autre{background:#ece4ef}
+
+.payment-notes{
+  color:var(--muted);
+  font-size:.94rem;
+  line-height:1.5;
+}
+
+.mini-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.mini-btn{
+  min-height:36px;
+  padding:0 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#fff;
+  font:inherit;
+  cursor:pointer;
+}
+
+.amount{
+  font-size:1.35rem;
+  font-weight:800;
+  letter-spacing:-.04em;
+}
+
+.note{
+  margin-top:12px;
+  padding:14px 16px;
+  border-radius:14px;
+  background:#faf7f1;
+  border:1px solid var(--line);
+  color:#4f4942;
+  font-size:.92rem;
+}
+
+@media (max-width: 980px){
+  .grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+}
+
+@media (max-width: 720px){
+  .topbar-inner{
+    min-height:auto;
+    padding:14px 0;
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .brand,.nav{justify-content:center}
+  .hero{flex-direction:column;align-items:start}
+  .card{padding:20px}
+  .payment-top{flex-direction:column}
+  .row-2{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr}
+  .actions .btn{width:100%}
+}
+
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="index.html" aria-label="Retour admin">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier · Paiements</span>
+      </a><nav class="nav" aria-label="Navigation admin">
+    <a class="pill" href="index.html">Admin</a>
+    <a class="pill" href="clients.html">Clients</a>
+    <a class="pill" href="dossiers.html">Dossiers</a>
+    <a class="pill" href="documents.html">Documents</a>
+    <a class="pill" href="factures.html">Factures</a>
+    <a class="pill" href="paiements.html">Paiements</a>
+    <a class="pill" href="settings.html">Settings</a>
+  </nav>
+</div>
+
+  </header>  <main>
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <h1>Paiements</h1>
+          <p>Tu enregistres ici les règlements reçus, avec lien vers la facture, date, mode et montant. Cela te permet d’avoir un suivi propre avant d’automatiser davantage.</p>
+        </div>
+      </section><section class="grid">
+    <article class="card">
+      <h2>Ajouter un paiement</h2>
+      <form id="paymentForm">
+        <div class="field">
+          <label for="paymentInvoice">Facture</label>
+          <select id="paymentInvoice" name="paymentInvoice" required>
+            <option value="">Sélectionner une facture</option>
+          </select>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="paymentDate">Date de paiement</label>
+            <input id="paymentDate" name="paymentDate" type="date" />
+          </div>
+          <div class="field">
+            <label for="paymentAmount">Montant reçu (€)</label>
+            <input id="paymentAmount" name="paymentAmount" type="number" step="0.01" min="0" placeholder="190.00" required />
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="paymentMode">Mode</label>
+            <select id="paymentMode" name="paymentMode">
+              <option value="VIREMENT">VIREMENT</option>
+              <option value="CHEQUE">CHEQUE</option>
+              <option value="ESPECES">ESPECES</option>
+              <option value="AUTRE">AUTRE</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="paymentReference">Référence</label>
+            <input id="paymentReference" name="paymentReference" type="text" placeholder="Ex. Virement 14/04 / Chèque n°..." />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="paymentNotes">Notes internes</label>
+          <textarea id="paymentNotes" name="paymentNotes" placeholder="Ex. acompte, règlement complet, reste à recevoir, vérifié en banque..."></textarea>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn">Enregistrer</button>
+          <button type="reset" class="btn btn-secondary">Vider</button>
+        </div>
+      </form>
+
+      <div class="note">
+        Version 1 : enregistrement simple. Ensuite on pourra calculer automatiquement les soldes par facture et marquer une facture comme <strong>PAYEE</strong> selon le cumul des règlements.
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="stats">
+        <div class="stat">
+          <strong id="totalPayments">0</strong>
+          <span>Paiements</span>
+        </div>
+        <div class="stat">
+          <strong id="totalPaidAmount">0 €</strong>
+          <span>Total encaissé</span>
+        </div>
+        <div class="stat">
+          <strong id="totalVirements">0</strong>
+          <span>Virements</span>
+        </div>
+        <div class="stat">
+          <strong id="totalCheques">0</strong>
+          <span>Chèques</span>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input id="searchInput" class="search" type="text" placeholder="Rechercher un paiement..." />
+        <select id="modeFilter" class="filter">
+          <option value="">Tous les modes</option>
+          <option value="VIREMENT">VIREMENT</option>
+          <option value="CHEQUE">CHEQUE</option>
+          <option value="ESPECES">ESPECES</option>
+          <option value="AUTRE">AUTRE</option>
+        </select>
+      </div>
+
+      <div id="paymentList" class="payment-list"></div>
+    </article>
+  </section>
+</div>
+
+  </main>  <script>
+    const CLIENTS_KEY = "axe_dossier_clients_v1";
+    const INVOICES_KEY = "axe_dossier_invoices_v1";
+    const PAYMENTS_KEY = "axe_dossier_payments_v1";
+
+    const form = document.getElementById("paymentForm");
+    const paymentInvoice = document.getElementById("paymentInvoice");
+    const paymentAmount = document.getElementById("paymentAmount");
+    const paymentList = document.getElementById("paymentList");
+    const searchInput = document.getElementById("searchInput");
+    const modeFilter = document.getElementById("modeFilter");
+
+    const totalPayments = document.getElementById("totalPayments");
+    const totalPaidAmount = document.getElementById("totalPaidAmount");
+    const totalVirements = document.getElementById("totalVirements");
+    const totalCheques = document.getElementById("totalCheques");
+
+    function loadClients() {
+      try { return JSON.parse(localStorage.getItem(CLIENTS_KEY)) || []; }
+      catch (e) { return []; }
+    }
+
+    function loadInvoices() {
+      try { return JSON.parse(localStorage.getItem(INVOICES_KEY)) || []; }
+      catch (e) { return []; }
+    }
+
+    function loadPayments() {
+      try { return JSON.parse(localStorage.getItem(PAYMENTS_KEY)) || []; }
+      catch (e) { return []; }
+    }
+
+    function savePayments(items) {
+      localStorage.setItem(PAYMENTS_KEY, JSON.stringify(items));
+    }
+
+    function escapeHtml(text = "") {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatMoney(value) {
+      const num = Number(value || 0);
+      return num.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+    }
+
+    function modeBadgeClass(mode = "") {
+      if (mode === "VIREMENT") return "virement";
+      if (mode === "CHEQUE") return "cheque";
+      if (mode === "ESPECES") return "especes";
+      return "autre";
+    }
+
+    function fillInvoiceSelect() {
+      const invoices = loadInvoices();
+      const current = paymentInvoice.value;
+      const options = ['<option value="">Sélectionner une facture</option>']
+        .concat(invoices.map(invoice => `<option value="${invoice.id}" data-amount="${invoice.amount || 0}">${escapeHtml(invoice.number)} — ${escapeHtml(invoice.label || "Sans libellé")}</option>`));
+      paymentInvoice.innerHTML = options.join("");
+      if (current) paymentInvoice.value = current;
+    }
+
+    function renderStats(payments) {
+      totalPayments.textContent = payments.length;
+      totalPaidAmount.textContent = formatMoney(payments.reduce((acc, p) => acc + Number(p.amount || 0), 0));
+      totalVirements.textContent = payments.filter(p => p.mode === "VIREMENT").length;
+      totalCheques.textContent = payments.filter(p => p.mode === "CHEQUE").length;
+    }
+
+    function renderPayments() {
+      const clients = loadClients();
+      const invoices = loadInvoices();
+      const payments = loadPayments();
+      const clientMap = Object.fromEntries(clients.map(c => [c.id, c]));
+      const invoiceMap = Object.fromEntries(invoices.map(i => [i.id, i]));
+      const q = (searchInput.value || "").trim().toLowerCase();
+      const filter = modeFilter.value;
+
+      const filtered = payments.filter(payment => {
+        const invoice = invoiceMap[payment.invoiceId];
+        const clientName = invoice ? (clientMap[invoice.clientId]?.name || "") : "";
+        const blob = [
+          payment.reference,
+          payment.notes,
+          payment.mode,
+          invoice?.number || "",
+          invoice?.label || "",
+          clientName
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = blob.includes(q);
+        const matchesMode = !filter || payment.mode === filter;
+        return matchesSearch && matchesMode;
+      });
+
+      renderStats(payments);
+
+      if (!invoices.length) {
+        paymentList.innerHTML = '<div class="empty">Ajoute d’abord au moins une facture dans factures.html.</div>';
+        return;
+      }
+
+      if (!filtered.length) {
+        paymentList.innerHTML = '<div class="empty">Aucun paiement pour le moment.</div>';
+        return;
+      }
+
+      paymentList.innerHTML = filtered
+        .slice()
+        .reverse()
+        .map(payment => {
+          const invoice = invoiceMap[payment.invoiceId];
+          const clientName = invoice ? (clientMap[invoice.clientId]?.name || "Client supprimé") : "Facture supprimée";
+          return `
+            <article class="payment-item">
+              <div class="payment-top">
+                <div>
+                  <div class="payment-title">${escapeHtml(invoice?.number || "Facture supprimée")}</div>
+                  <div class="payment-meta">
+                    <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
+                    ${invoice?.label ? `<span><strong>Libellé :</strong> ${escapeHtml(invoice.label)}</span>` : ""}
+                    ${payment.date ? `<span><strong>Date :</strong> ${escapeHtml(payment.date)}</span>` : ""}
+                    ${payment.reference ? `<span><strong>Référence :</strong> ${escapeHtml(payment.reference)}</span>` : ""}
+                  </div>
+                </div>
+                <div class="badges">
+                  <span class="badge ${modeBadgeClass(payment.mode)}">${escapeHtml(payment.mode)}</span>
+                </div>
+              </div>
+
+              <div class="payment-meta">
+                <span class="amount">${formatMoney(payment.amount)}</span>
+              </div>
+
+              ${payment.notes ? `<div class="payment-notes">${escapeHtml(payment.notes).replace(/\n/g, "<br>")}</div>` : ""}
+
+              <div class="mini-actions">
+                <button class="mini-btn" type="button" onclick="deletePayment('${payment.id}')">Supprimer</button>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+    }
+
+    function createPayment(data) {
+      return {
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        invoiceId: data.get("paymentInvoice") || "",
+        date: data.get("paymentDate") || "",
+        amount: Number(data.get("paymentAmount") || 0),
+        mode: data.get("paymentMode") || "VIREMENT",
+        reference: data.get("paymentReference")?.trim() || "",
+        notes: data.get("paymentNotes")?.trim() || "",
+        createdAt: Date.now()
+      };
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const payment = createPayment(data);
+
+      if (!payment.invoiceId || !payment.amount) return;
+
+      const payments = loadPayments();
+      payments.push(payment);
+      savePayments(payments);
+      form.reset();
+      document.getElementById("paymentMode").value = "VIREMENT";
+      renderPayments();
+    });
+
+    paymentInvoice.addEventListener("change", (e) => {
+      const option = e.target.selectedOptions[0];
+      if (!paymentAmount.value && option?.dataset?.amount) {
+        paymentAmount.value = option.dataset.amount;
+      }
+    });
+
+    searchInput.addEventListener("input", renderPayments);
+    modeFilter.addEventListener("change", renderPayments);
+
+    window.deletePayment = function(id) {
+      const ok = confirm("Supprimer ce paiement ?");
+      if (!ok) return;
+      const payments = loadPayments().filter(payment => payment.id !== id);
+      savePayments(payments);
+      renderPayments();
+    };
+
+    fillInvoiceSelect();
+    renderPayments();
+  </script></body>
+</html>
