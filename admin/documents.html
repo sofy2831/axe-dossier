@@ -460,7 +460,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   
 <script type="module">
   import "./auth-guard.js";
-  import { db } from "./firebase-config.js";
+  import { db, storage } from "./firebase-config.js";
   import {
     collection,
     addDoc,
@@ -473,11 +473,19 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+  import {
+    ref,
+    uploadBytes,
+    getDownloadURL,
+    deleteObject
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
   const form = document.getElementById("documentForm");
   const dossierSelect = document.getElementById("documentDossier");
   const documentList = document.getElementById("documentList");
   const searchInput = document.getElementById("searchInput");
   const typeFilter = document.getElementById("typeFilter");
+  const documentFileInput = document.getElementById("documentFile");
 
   const totalDocuments = document.getElementById("totalDocuments");
   const totalCourriers = document.getElementById("totalCourriers");
@@ -522,6 +530,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     document.getElementById("documentDate").value = item.date || "";
     document.getElementById("documentUrl").value = item.url || "";
     document.getElementById("documentNotes").value = item.notes || "";
+    if (documentFileInput) documentFileInput.value = "";
   }
 
   function renderStats(documents) {
@@ -546,6 +555,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
         item.type || "",
         item.notes || "",
         item.url || "",
+        item.fileName || "",
         dossier?.title || "",
         clientName
       ].join(" ").toLowerCase();
@@ -580,6 +590,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
                 <span><strong>Dossier :</strong> ${escapeHtml(dossier?.title || "Dossier supprimé")}</span>
                 <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
                 ${item.date ? `<span><strong>Date :</strong> ${escapeHtml(item.date)}</span>` : ""}
+                ${item.fileName ? `<span><strong>Fichier :</strong> ${escapeHtml(item.fileName)}</span>` : ""}
               </div>
             </div>
             <div class="badges">
@@ -587,7 +598,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
             </div>
           </div>
 
-          ${item.url ? `<div class="doc-meta"><span><strong>Lien :</strong> ${escapeHtml(item.url)}</span></div>` : ""}
+          ${item.url ? `<div class="doc-meta"><span><strong>Lien :</strong> <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">ouvrir</a></span></div>` : ""}
           ${item.notes ? `<div class="doc-notes">${escapeHtml(item.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
           <div class="mini-actions">
@@ -599,6 +610,28 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     }).join("");
   }
 
+  function sanitizeFileName(name = "") {
+    return String(name)
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9._-]/g, "_");
+  }
+
+  async function uploadDocumentFile(file, dossierId, docId) {
+    const safeName = sanitizeFileName(file.name);
+    const filePath = `documents/${dossierId}/${docId}/${safeName}`;
+    const fileRef = ref(storage, filePath);
+
+    await uploadBytes(fileRef, file);
+    const fileUrl = await getDownloadURL(fileRef);
+
+    return {
+      fileName: file.name,
+      filePath,
+      url: fileUrl
+    };
+  }
+
   function createDocument(data) {
     return {
       title: (data.get("documentTitle") || "").trim(),
@@ -607,6 +640,8 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       date: data.get("documentDate") || "",
       url: (data.get("documentUrl") || "").trim(),
       notes: (data.get("documentNotes") || "").trim(),
+      fileName: "",
+      filePath: "",
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
@@ -617,26 +652,59 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
 
     const data = new FormData(form);
     const payload = createDocument(data);
+    const file = documentFileInput?.files?.[0] || null;
 
     if (!payload.title || !payload.dossierId) return;
 
     try {
       if (editingDocumentId) {
-        await updateDoc(doc(db, "documents", editingDocumentId), {
+        const existing = allDocuments.find(d => d.id === editingDocumentId);
+        const updatePayload = {
           title: payload.title,
           dossierId: payload.dossierId,
           type: payload.type,
           date: payload.date,
-          url: payload.url,
           notes: payload.notes,
           updatedAt: serverTimestamp()
-        });
+        };
+
+        if (file) {
+          if (existing?.filePath) {
+            try {
+              await deleteObject(ref(storage, existing.filePath));
+            } catch (err) {
+              console.warn("Ancien fichier non supprimé :", err);
+            }
+          }
+
+          const uploaded = await uploadDocumentFile(file, payload.dossierId, editingDocumentId);
+          updatePayload.fileName = uploaded.fileName;
+          updatePayload.filePath = uploaded.filePath;
+          updatePayload.url = uploaded.url;
+        } else {
+          updatePayload.url = payload.url || existing?.url || "";
+          updatePayload.fileName = existing?.fileName || "";
+          updatePayload.filePath = existing?.filePath || "";
+        }
+
+        await updateDoc(doc(db, "documents", editingDocumentId), updatePayload);
         editingDocumentId = null;
       } else {
-        await addDoc(documentsRef, payload);
+        const docRef = await addDoc(documentsRef, payload);
+
+        if (file) {
+          const uploaded = await uploadDocumentFile(file, payload.dossierId, docRef.id);
+          await updateDoc(doc(db, "documents", docRef.id), {
+            fileName: uploaded.fileName,
+            filePath: uploaded.filePath,
+            url: uploaded.url,
+            updatedAt: serverTimestamp()
+          });
+        }
       }
 
       form.reset();
+      if (documentFileInput) documentFileInput.value = "";
       document.getElementById("documentType").value = "Courrier";
     } catch (err) {
       console.error("Erreur enregistrement document :", err);
@@ -668,11 +736,22 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     if (!ok) return;
 
     try {
+      const existing = allDocuments.find(d => d.id === id);
+
+      if (existing?.filePath) {
+        try {
+          await deleteObject(ref(storage, existing.filePath));
+        } catch (err) {
+          console.warn("Fichier Storage non supprimé :", err);
+        }
+      }
+
       await deleteDoc(doc(db, "documents", id));
 
       if (editingDocumentId === id) {
         editingDocumentId = null;
         form.reset();
+        if (documentFileInput) documentFileInput.value = "";
         document.getElementById("documentType").value = "Courrier";
       }
     } catch (err) {
