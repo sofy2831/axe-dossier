@@ -575,6 +575,8 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       phone: "",
       siret: "",
       ape: "",
+      logoUrl: "",
+      bankName: "",
       iban: "",
       bic: "",
       legalNotice: "",
@@ -630,13 +632,29 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     document.getElementById("invoiceClient").value = invoice.clientId || "";
     fillDossierSelect(invoice.clientId || "");
     document.getElementById("invoiceDossier").value = invoice.dossierId || "";
-    document.getElementById("invoiceAmount").value =
-      invoice.amountTTC ?? invoice.amount ?? "";
     document.getElementById("invoiceDueDate").value = invoice.dueDate || "";
     document.getElementById("invoiceStatus").value = invoice.status || "BROUILLON";
     document.getElementById("invoiceMode").value = invoice.mode || "VIREMENT";
-    document.getElementById("invoiceLabel").value = invoice.label || "";
     document.getElementById("invoiceNotes").value = invoice.notes || "";
+
+    const firstLine = Array.isArray(invoice.lines) && invoice.lines.length
+      ? invoice.lines[0]
+      : null;
+
+    if (document.getElementById("invoiceLineDesignation")) {
+      document.getElementById("invoiceLineDesignation").value =
+        firstLine?.designation || invoice.label || "";
+    }
+
+    if (document.getElementById("invoiceLineQty")) {
+      document.getElementById("invoiceLineQty").value =
+        firstLine?.quantity ?? 1;
+    }
+
+    if (document.getElementById("invoiceLineUnitPrice")) {
+      document.getElementById("invoiceLineUnitPrice").value =
+        firstLine?.unitPriceTTC ?? invoice.amountTTC ?? invoice.amount ?? "";
+    }
   }
 
   function renderStats(invoices) {
@@ -670,9 +688,13 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
         dossierMap[invoice.dossierId]?.title ||
         "";
 
+      const firstLabel = Array.isArray(invoice.lines) && invoice.lines.length
+        ? invoice.lines[0].designation || ""
+        : (invoice.label || "");
+
       const blob = [
         invoice.number || "",
-        invoice.label || "",
+        firstLabel,
         invoice.status || "",
         invoice.mode || "",
         invoice.notes || "",
@@ -711,6 +733,10 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       const amountHT = invoice.amountHT ?? amountTTC;
       const amountVAT = invoice.amountVAT ?? 0;
 
+      const firstLabel = Array.isArray(invoice.lines) && invoice.lines.length
+        ? invoice.lines[0].designation || ""
+        : (invoice.label || "");
+
       return `
         <article class="invoice-item">
           <div class="invoice-top">
@@ -730,7 +756,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
           </div>
 
           <div class="invoice-meta">
-            ${invoice.label ? `<span><strong>Libellé :</strong> ${escapeHtml(invoice.label)}</span>` : ""}
+            ${firstLabel ? `<span><strong>Libellé :</strong> ${escapeHtml(firstLabel)}</span>` : ""}
             <span><strong>HT :</strong> ${formatMoney(amountHT)}</span>
             <span><strong>TVA :</strong> ${formatMoney(amountVAT)}</span>
             <span class="amount">${formatMoney(amountTTC)}</span>
@@ -770,6 +796,8 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       phone: s.phone || "",
       siret: s.siret || "",
       ape: s.ape || "",
+      logoUrl: s.logoUrl || "",
+      bankName: s.bankName || "",
       iban: s.iban || "",
       bic: s.bic || "",
       legalNotice: s.legalNotice || "",
@@ -780,22 +808,39 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     };
   }
 
-  function computeAmounts(amountInput, businessSnapshot) {
-    const amountTTC = Number(amountInput || 0);
+  function computeAmounts(amountTTC, businessSnapshot) {
+    const totalTTC = Number(amountTTC || 0);
     const vatMode = businessSnapshot.vatMode || "NO";
     const vatRate = Number(businessSnapshot.vatRate || 0);
 
     if (vatMode === "YES" && vatRate > 0) {
-      const amountHT = Number((amountTTC / (1 + vatRate / 100)).toFixed(2));
-      const amountVAT = Number((amountTTC - amountHT).toFixed(2));
-      return { amountHT, amountVAT, amountTTC };
+      const amountHT = Number((totalTTC / (1 + vatRate / 100)).toFixed(2));
+      const amountVAT = Number((totalTTC - amountHT).toFixed(2));
+      return { amountHT, amountVAT, amountTTC: totalTTC };
     }
 
     return {
-      amountHT: amountTTC,
+      amountHT: totalTTC,
       amountVAT: 0,
-      amountTTC
+      amountTTC: totalTTC
     };
+  }
+
+  function buildInvoiceLinesFromForm() {
+    const designation = (document.getElementById("invoiceLineDesignation")?.value || "").trim();
+    const quantity = Number(document.getElementById("invoiceLineQty")?.value || 1);
+    const unitPriceTTC = Number(document.getElementById("invoiceLineUnitPrice")?.value || 0);
+
+    if (!designation || !quantity || !unitPriceTTC) return [];
+
+    const totalTTC = Number((quantity * unitPriceTTC).toFixed(2));
+
+    return [{
+      designation,
+      quantity,
+      unitPriceTTC,
+      totalTTC
+    }];
   }
 
   async function getNextInvoiceNumberIfNeeded(manualNumber) {
@@ -827,14 +872,21 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   async function buildInvoicePayload(data, existingInvoice = null) {
     const clientId = data.get("invoiceClient") || "";
     const dossierId = data.get("invoiceDossier") || "";
-    const amountInput = Number(data.get("invoiceAmount") || 0);
 
     const client = allClients.find(c => c.id === clientId);
     const dossier = allDossiers.find(d => d.id === dossierId);
 
     const businessSnapshot = buildBusinessSnapshot(currentSettings);
     const clientSnapshot = buildClientSnapshot(client);
-    const amounts = computeAmounts(amountInput, businessSnapshot);
+
+    let lines = buildInvoiceLinesFromForm();
+
+    if (!lines.length && existingInvoice?.lines?.length) {
+      lines = existingInvoice.lines;
+    }
+
+    const amountTTCFromLines = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
+    const amounts = computeAmounts(amountTTCFromLines, businessSnapshot);
 
     let number = (data.get("invoiceNumber") || "").trim();
 
@@ -853,8 +905,10 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       dueDate: data.get("invoiceDueDate") || "",
       status: data.get("invoiceStatus") || "BROUILLON",
       mode: data.get("invoiceMode") || "VIREMENT",
-      label: (data.get("invoiceLabel") || "").trim(),
+      label: lines[0]?.designation || "",
       notes: (data.get("invoiceNotes") || "").trim(),
+
+      lines,
 
       amountHT: amounts.amountHT,
       amountVAT: amounts.amountVAT,
@@ -873,9 +927,10 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
 
     const data = new FormData(form);
     const clientId = data.get("invoiceClient") || "";
-    const amount = Number(data.get("invoiceAmount") || 0);
+    const lines = buildInvoiceLinesFromForm();
+    const total = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
 
-    if (!clientId || !amount) return;
+    if (!clientId || !total) return;
 
     try {
       if (editingInvoiceId) {
@@ -893,6 +948,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
           mode: payload.mode,
           label: payload.label,
           notes: payload.notes,
+          lines: payload.lines,
           amountHT: payload.amountHT,
           amountVAT: payload.amountVAT,
           amountTTC: payload.amountTTC,
@@ -911,6 +967,10 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       document.getElementById("invoiceStatus").value = "BROUILLON";
       document.getElementById("invoiceMode").value = "VIREMENT";
       fillDossierSelect("");
+
+      if (document.getElementById("invoiceLineQty")) {
+        document.getElementById("invoiceLineQty").value = 1;
+      }
     } catch (err) {
       console.error("Erreur enregistrement facture :", err);
       alert("Impossible d’enregistrer la facture.");
