@@ -324,6 +324,35 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
           </div>
         </div>
 
+<div class="card-section">
+  <h3>TVA</h3>
+
+  <div class="row-2">
+    <div class="field">
+      <label for="vatMode">Régime TVA</label>
+      <select id="vatMode" name="vatMode">
+        <option value="EXEMPT">EXEMPT</option>
+        <option value="SUBJECT">SUBJECT</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="vatRate">Taux TVA (%)</label>
+      <input id="vatRate" name="vatRate" type="number" step="0.01" min="0" placeholder="20" />
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="vatNumber">Numéro TVA intracommunautaire</label>
+    <input id="vatNumber" name="vatNumber" type="text" placeholder="FR..." />
+  </div>
+
+  <div class="field">
+    <label for="tvaExemptionText">Mention d’exonération TVA</label>
+    <textarea id="tvaExemptionText" name="tvaExemptionText" placeholder="Ex. TVA non applicable, art. 293 B du CGI"></textarea>
+  </div>
+</div>
+        
         <div class="row-2">
           <div class="field">
             <label for="iban">IBAN</label>
