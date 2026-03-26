@@ -464,182 +464,223 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   </section>
 </div>
 
-  </main>  <script>
-    const CLIENTS_KEY = "axe_dossier_clients_v1";
-    const DOSSIERS_KEY = "axe_dossier_dossiers_v1";
+  </main> 
+  <script type="module">
+  import "./auth-guard.js";
+  import { db } from "./firebase-config.js";
+  import {
+    collection,
+    addDoc,
+    deleteDoc,
+    doc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const form = document.getElementById("dossierForm");
-    const clientSelect = document.getElementById("dossierClient");
-    const dossierList = document.getElementById("dossierList");
-    const searchInput = document.getElementById("searchInput");
-    const statusFilter = document.getElementById("statusFilter");
+  const form = document.getElementById("dossierForm");
+  const clientSelect = document.getElementById("dossierClient");
+  const dossierList = document.getElementById("dossierList");
+  const searchInput = document.getElementById("searchInput");
+  const statusFilter = document.getElementById("statusFilter");
 
-    const totalDossiers = document.getElementById("totalDossiers");
-    const totalEnCours = document.getElementById("totalEnCours");
-    const totalAttente = document.getElementById("totalAttente");
-    const totalClos = document.getElementById("totalClos");
+  const totalDossiers = document.getElementById("totalDossiers");
+  const totalEnCours = document.getElementById("totalEnCours");
+  const totalAttente = document.getElementById("totalAttente");
+  const totalClos = document.getElementById("totalClos");
 
-    function loadClients() {
-      try { return JSON.parse(localStorage.getItem(CLIENTS_KEY)) || []; }
-      catch (e) { return []; }
+  const clientsRef = collection(db, "clients");
+  const dossiersRef = collection(db, "dossiers");
+
+  let allClients = [];
+  let allDossiers = [];
+
+  function escapeHtml(text = "") {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function formatStatusClass(status = "") {
+    if (status === "EN_COURS") return "status-en-cours";
+    if (status === "EN_ATTENTE") return "status-attente";
+    if (status === "CLOS") return "status-clos";
+    if (status === "ARCHIVE") return "status-archive";
+    return "";
+  }
+
+  function fillClientSelect() {
+    const current = clientSelect.value;
+    const options = ['<option value="">Sélectionner un client</option>']
+      .concat(
+        allClients.map(client => `<option value="${client.id}">${escapeHtml(client.name || "")}</option>`)
+      );
+
+    clientSelect.innerHTML = options.join("");
+    if (current && allClients.some(c => c.id === current)) {
+      clientSelect.value = current;
     }
+  }
 
-    function loadDossiers() {
-      try { return JSON.parse(localStorage.getItem(DOSSIERS_KEY)) || []; }
-      catch (e) { return []; }
-    }
+  function renderStats(dossiers) {
+    totalDossiers.textContent = dossiers.length;
+    totalEnCours.textContent = dossiers.filter(d => d.status === "EN_COURS").length;
+    totalAttente.textContent = dossiers.filter(d => d.status === "EN_ATTENTE").length;
+    totalClos.textContent = dossiers.filter(d => d.status === "CLOS" || d.status === "ARCHIVE").length;
+  }
 
-    function saveDossiers(items) {
-      localStorage.setItem(DOSSIERS_KEY, JSON.stringify(items));
-    }
+  function renderDossiers() {
+    const q = (searchInput.value || "").trim().toLowerCase();
+    const filter = statusFilter.value;
+    const clientMap = Object.fromEntries(allClients.map(client => [client.id, client]));
 
-    function escapeHtml(text = "") {
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
+    const filtered = allDossiers.filter(dossier => {
+      const clientName = clientMap[dossier.clientId]?.name || "";
+      const blob = [
+        dossier.title || "",
+        dossier.type || "",
+        dossier.status || "",
+        dossier.reference || "",
+        dossier.summary || "",
+        dossier.notes || "",
+        clientName
+      ].join(" ").toLowerCase();
 
-    function formatStatusClass(status = "") {
-      if (status === "EN_COURS") return "status-en-cours";
-      if (status === "EN_ATTENTE") return "status-attente";
-      if (status === "CLOS") return "status-clos";
-      if (status === "ARCHIVE") return "status-archive";
-      return "";
-    }
-
-    function fillClientSelect() {
-      const clients = loadClients();
-      const current = clientSelect.value;
-      const options = ['<option value="">Sélectionner un client</option>']
-        .concat(clients.map(client => `<option value="${client.id}">${escapeHtml(client.name)}</option>`));
-      clientSelect.innerHTML = options.join("");
-      if (current) clientSelect.value = current;
-    }
-
-    function renderStats(dossiers) {
-      totalDossiers.textContent = dossiers.length;
-      totalEnCours.textContent = dossiers.filter(d => d.status === "EN_COURS").length;
-      totalAttente.textContent = dossiers.filter(d => d.status === "EN_ATTENTE").length;
-      totalClos.textContent = dossiers.filter(d => d.status === "CLOS" || d.status === "ARCHIVE").length;
-    }
-
-    function renderDossiers() {
-      const clients = loadClients();
-      const clientMap = Object.fromEntries(clients.map(client => [client.id, client]));
-      const dossiers = loadDossiers();
-      const q = (searchInput.value || "").trim().toLowerCase();
-      const filter = statusFilter.value;
-
-      const filtered = dossiers.filter(dossier => {
-        const clientName = clientMap[dossier.clientId]?.name || "";
-        const blob = [
-          dossier.title,
-          dossier.type,
-          dossier.status,
-          dossier.reference,
-          dossier.summary,
-          dossier.notes,
-          clientName
-        ].join(" ").toLowerCase();
-
-        const matchesSearch = blob.includes(q);
-        const matchesStatus = !filter || dossier.status === filter;
-        return matchesSearch && matchesStatus;
-      });
-
-      renderStats(dossiers);
-
-      if (!clients.length) {
-        dossierList.innerHTML = '<div class="empty">Ajoute d’abord au moins un client dans clients.html.</div>';
-        return;
-      }
-
-      if (!filtered.length) {
-        dossierList.innerHTML = '<div class="empty">Aucun dossier pour le moment.</div>';
-        return;
-      }
-
-      dossierList.innerHTML = filtered
-        .slice()
-        .reverse()
-        .map(dossier => {
-          const clientName = clientMap[dossier.clientId]?.name || "Client supprimé";
-          return `
-            <article class="dossier-item">
-              <div class="dossier-top">
-                <div>
-                  <div class="dossier-title">${escapeHtml(dossier.title)}</div>
-                  <div class="dossier-meta">
-                    <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
-                    ${dossier.reference ? `<span><strong>Réf. :</strong> ${escapeHtml(dossier.reference)}</span>` : ""}
-                    ${dossier.openedAt ? `<span><strong>Ouverture :</strong> ${escapeHtml(dossier.openedAt)}</span>` : ""}
-                  </div>
-                </div>
-                <div class="badges">
-                  <span class="badge">${escapeHtml(dossier.type)}</span>
-                  <span class="badge ${formatStatusClass(dossier.status)}">${escapeHtml(dossier.status)}</span>
-                </div>
-              </div>
-
-              ${dossier.summary ? `<div class="dossier-meta"><span><strong>Résumé :</strong> ${escapeHtml(dossier.summary).replace(/\n/g, "<br>")}</span></div>` : ""}
-              ${dossier.notes ? `<div class="dossier-notes">${escapeHtml(dossier.notes).replace(/\n/g, "<br>")}</div>` : ""}
-
-              <div class="mini-actions">
-                <button class="mini-btn" type="button" onclick="deleteDossier('${dossier.id}')">Supprimer</button>
-              </div>
-            </article>
-          `;
-        })
-        .join("");
-    }
-
-    function createDossier(data) {
-      return {
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-        title: data.get("dossierTitle")?.trim() || "",
-        clientId: data.get("dossierClient") || "",
-        type: data.get("dossierType") || "Autre",
-        status: data.get("dossierStatus") || "EN_COURS",
-        openedAt: data.get("dossierOpenedAt") || "",
-        reference: data.get("dossierReference")?.trim() || "",
-        summary: data.get("dossierSummary")?.trim() || "",
-        notes: data.get("dossierNotes")?.trim() || "",
-        createdAt: Date.now()
-      };
-    }
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const data = new FormData(form);
-      const dossier = createDossier(data);
-
-      if (!dossier.title || !dossier.clientId) return;
-
-      const dossiers = loadDossiers();
-      dossiers.push(dossier);
-      saveDossiers(dossiers);
-      form.reset();
-      document.getElementById("dossierStatus").value = "EN_COURS";
-      renderDossiers();
+      const matchesSearch = blob.includes(q);
+      const matchesStatus = !filter || dossier.status === filter;
+      return matchesSearch && matchesStatus;
     });
 
-    searchInput.addEventListener("input", renderDossiers);
-    statusFilter.addEventListener("change", renderDossiers);
+    renderStats(allDossiers);
 
-    window.deleteDossier = function(id) {
-      const ok = confirm("Supprimer ce dossier ?");
-      if (!ok) return;
-      const dossiers = loadDossiers().filter(dossier => dossier.id !== id);
-      saveDossiers(dossiers);
-      renderDossiers();
+    if (!allClients.length) {
+      dossierList.innerHTML = '<div class="empty">Ajoute d’abord au moins un client dans clients.html.</div>';
+      return;
+    }
+
+    if (!filtered.length) {
+      dossierList.innerHTML = '<div class="empty">Aucun dossier pour le moment.</div>';
+      return;
+    }
+
+    dossierList.innerHTML = filtered.map(dossier => {
+      const clientName = clientMap[dossier.clientId]?.name || "Client supprimé";
+
+      return `
+        <article class="dossier-item">
+          <div class="dossier-top">
+            <div>
+              <div class="dossier-title">${escapeHtml(dossier.title || "")}</div>
+              <div class="dossier-meta">
+                <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
+                ${dossier.reference ? `<span><strong>Réf. :</strong> ${escapeHtml(dossier.reference)}</span>` : ""}
+                ${dossier.openedAt ? `<span><strong>Ouverture :</strong> ${escapeHtml(dossier.openedAt)}</span>` : ""}
+              </div>
+            </div>
+            <div class="badges">
+              <span class="badge">${escapeHtml(dossier.type || "")}</span>
+              <span class="badge ${formatStatusClass(dossier.status)}">${escapeHtml(dossier.status || "")}</span>
+            </div>
+          </div>
+
+          ${dossier.summary ? `<div class="dossier-meta"><span><strong>Résumé :</strong> ${escapeHtml(dossier.summary).replace(/\n/g, "<br>")}</span></div>` : ""}
+          ${dossier.notes ? `<div class="dossier-notes">${escapeHtml(dossier.notes).replace(/\n/g, "<br>")}</div>` : ""}
+
+          <div class="mini-actions">
+            <button class="mini-btn" type="button" data-delete-id="${dossier.id}">Supprimer</button>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  function createDossier(data) {
+    return {
+      title: (data.get("dossierTitle") || "").trim(),
+      clientId: data.get("dossierClient") || "",
+      type: data.get("dossierType") || "Autre",
+      status: data.get("dossierStatus") || "EN_COURS",
+      openedAt: data.get("dossierOpenedAt") || "",
+      reference: (data.get("dossierReference") || "").trim(),
+      summary: (data.get("dossierSummary") || "").trim(),
+      notes: (data.get("dossierNotes") || "").trim(),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
     };
+  }
 
-    fillClientSelect();
-    renderDossiers();
-  </script>
-<script type="module" src="./auth-guard.js"></script>
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = new FormData(form);
+    const dossier = createDossier(data);
+
+    if (!dossier.title || !dossier.clientId) return;
+
+    try {
+      await addDoc(dossiersRef, dossier);
+      form.reset();
+      document.getElementById("dossierStatus").value = "EN_COURS";
+    } catch (err) {
+      console.error("Erreur ajout dossier :", err);
+      alert("Impossible d’enregistrer le dossier.");
+    }
+  });
+
+  searchInput.addEventListener("input", renderDossiers);
+  statusFilter.addEventListener("change", renderDossiers);
+
+  dossierList.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-delete-id]");
+    if (!btn) return;
+
+    const id = btn.getAttribute("data-delete-id");
+    const ok = confirm("Supprimer ce dossier ?");
+    if (!ok) return;
+
+    try {
+      await deleteDoc(doc(db, "dossiers", id));
+    } catch (err) {
+      console.error("Erreur suppression dossier :", err);
+      alert("Impossible de supprimer le dossier.");
+    }
+  });
+
+  onSnapshot(
+    query(clientsRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allClients = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      fillClientSelect();
+      renderDossiers();
+    },
+    (err) => {
+      console.error("Erreur chargement clients :", err);
+    }
+  );
+
+  onSnapshot(
+    query(dossiersRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allDossiers = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      renderDossiers();
+    },
+    (err) => {
+      console.error("Erreur chargement dossiers :", err);
+      dossierList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
+      renderStats([]);
+    }
+  );
+</script>
+
 </body>
 </html>
