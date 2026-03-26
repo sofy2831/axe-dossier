@@ -19,6 +19,7 @@
 
     *{box-sizing:border-box}
     html,body{margin:0;padding:0}
+
     body{
       font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:var(--bg);
@@ -107,7 +108,7 @@
 
     .header{
       display:grid;
-      grid-template-columns:1.3fr 1fr;
+      grid-template-columns:1fr 1fr;
       gap:24px;
       align-items:start;
       margin-bottom:28px;
@@ -121,6 +122,7 @@
     }
 
     .muted{color:var(--muted)}
+
     .block{
       border:1px solid var(--line);
       border-radius:18px;
@@ -181,10 +183,19 @@
 
     .desc tr:last-child td{border-bottom:none}
 
-    .totals{
+    .hidden-col{
+      display:none;
+    }
+
+    .summary-grid{
+      display:grid;
+      grid-template-columns:1fr 420px;
+      gap:18px;
+      align-items:start;
       margin-top:18px;
-      margin-left:auto;
-      width:min(100%,420px);
+    }
+
+    .totals{
       border:1px solid var(--line);
       border-radius:18px;
       overflow:hidden;
@@ -200,7 +211,11 @@
     }
 
     .totals-row:last-child{border-bottom:none}
-    .totals-row strong{font-size:1.06rem}
+
+    .totals-row strong{
+      font-size:1.06rem;
+    }
+
     .grand-total{
       background:#f3eee6;
       font-weight:900;
@@ -218,16 +233,14 @@
       line-height:1.55;
     }
 
-    .status-badge{
-      display:inline-flex;
-      align-items:center;
-      min-height:30px;
-      padding:0 12px;
-      border-radius:999px;
-      background:var(--soft);
-      border:1px solid var(--line);
-      font-size:.82rem;
-      font-weight:700;
+    .invoice-footer{
+      margin-top:22px;
+      padding-top:16px;
+      border-top:1px solid var(--line);
+      text-align:center;
+      color:#4f4942;
+      font-size:.92rem;
+      line-height:1.6;
     }
 
     .empty,
@@ -243,7 +256,8 @@
 
     @media (max-width: 860px){
       .header,
-      .footer-grid{
+      .footer-grid,
+      .summary-grid{
         grid-template-columns:1fr;
       }
 
@@ -284,31 +298,23 @@
 
     <article id="sheet" class="sheet" style="display:none;">
       <section class="header">
-        <div>
-          <div class="title">Facture</div>
-          <div class="meta">
-            <div><strong id="invoiceNumber">—</strong></div>
-            <div>Date : <span id="invoiceDate">—</span></div>
-            <div>Échéance : <span id="invoiceDueDate">—</span></div>
-            <div>Statut : <span id="invoiceStatus" class="status-badge">—</span></div>
-          </div>
-        </div>
-
         <div class="block">
           <h2>Émetteur</h2>
           <div id="businessBlock" class="meta"></div>
         </div>
-      </section>
 
-      <section class="footer-grid">
-        <div class="block">
-          <h2>Client</h2>
-          <div id="clientBlock" class="meta"></div>
-        </div>
+        <div>
+          <div class="title">Facture</div>
+          <div class="meta" style="margin-bottom:18px;">
+            <div><strong id="invoiceNumber">—</strong></div>
+            <div>Date : <span id="invoiceDate">—</span></div>
+            <div>Échéance : <span id="invoiceDueDate">—</span></div>
+          </div>
 
-        <div class="block">
-          <h2>Références</h2>
-          <div id="refsBlock" class="meta"></div>
+          <div class="block">
+            <h2>Client</h2>
+            <div id="clientBlock" class="meta"></div>
+          </div>
         </div>
       </section>
 
@@ -318,9 +324,9 @@
           <table>
             <thead>
               <tr>
-                <th style="width:65%;">Désignation</th>
-                <th style="width:15%;">TVA</th>
-                <th style="width:20%;">Montant</th>
+                <th style="width:70%;">Désignation</th>
+                <th id="vatHeader" style="width:12%;">TVA</th>
+                <th style="width:18%;">Montant</th>
               </tr>
             </thead>
             <tbody>
@@ -333,18 +339,31 @@
           </table>
         </div>
 
-        <div class="totals">
-          <div class="totals-row">
-            <span>Total HT</span>
-            <strong id="amountHT">—</strong>
-          </div>
-          <div class="totals-row">
-            <span>TVA</span>
-            <strong id="amountVAT">—</strong>
-          </div>
-          <div class="totals-row grand-total">
-            <span>Total TTC</span>
-            <strong id="amountTTC">—</strong>
+        <div class="summary-grid">
+          <div></div>
+
+          <div>
+            <div class="totals">
+              <div class="totals-row">
+                <span>Total HT</span>
+                <strong id="amountHT">—</strong>
+              </div>
+
+              <div id="vatTotalsRow" class="totals-row">
+                <span>TVA</span>
+                <strong id="amountVAT">—</strong>
+              </div>
+
+              <div class="totals-row grand-total">
+                <span>Total TTC</span>
+                <strong id="amountTTC">—</strong>
+              </div>
+            </div>
+
+            <div class="block" style="margin-top:18px;">
+              <h2>Références</h2>
+              <div id="refsBlock" class="meta"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -357,7 +376,7 @@
 
         <div class="block">
           <h2>Coordonnées bancaires</h2>
-          <div id="bankBlock" class="bank muted">Non renseignées.</div>
+          <div id="bankBlock" class="bank">Non renseignées.</div>
         </div>
       </section>
 
@@ -367,6 +386,8 @@
           <div id="notesBlock" class="meta muted">Aucune note.</div>
         </div>
       </section>
+
+      <footer class="invoice-footer" id="footerBlock"></footer>
     </article>
   </main>
 
@@ -409,46 +430,65 @@
       return `<div>${escapeHtml(text)}</div>`;
     }
 
+    function cleanSingleLine(text = "") {
+      return String(text).replace(/\n/g, " ").trim();
+    }
+
     function renderBusiness(snapshot = {}) {
+      const address = cleanSingleLine(snapshot.address || "");
       const parts = [
         snapshot.businessName || "",
         snapshot.ownerName || "",
         snapshot.legalForm || "",
-        snapshot.address || "",
+        address,
         snapshot.email || "",
         snapshot.phone || "",
         snapshot.siret ? `SIRET : ${snapshot.siret}` : "",
-        snapshot.ape ? `APE : ${snapshot.ape}` : "",
-        snapshot.vatMode === "YES" && snapshot.vatNumber ? `TVA : ${snapshot.vatNumber}` : ""
+        snapshot.ape ? `APE : ${snapshot.ape}` : ""
       ].filter(Boolean);
 
       return parts.length
-        ? parts.map(p => line(p.replace(/\n/g, " "))).join("")
-        : '<div class="muted">Aucune donnée émetteur.</div>';
+        ? parts.map(p => line(p)).join("")
+        : "<div>Aucune donnée émetteur.</div>";
     }
 
     function renderClient(snapshot = {}) {
+      const address = cleanSingleLine(snapshot.address || "");
       const parts = [
         snapshot.name || "",
         snapshot.type || "",
-        snapshot.address || "",
+        address,
         snapshot.email || "",
         snapshot.phone || ""
       ].filter(Boolean);
 
       return parts.length
-        ? parts.map(p => line(p.replace(/\n/g, " "))).join("")
-        : '<div class="muted">Aucune donnée client.</div>';
+        ? parts.map(p => line(p)).join("")
+        : "<div>Aucune donnée client.</div>";
     }
 
-    function renderRefs(data = {}) {
-      const parts = [
-        data.dossierId ? `Dossier lié : ${data.dossierId}` : "Aucun dossier lié",
-        data.mode ? `Mode prévu : ${data.mode}` : "",
-        data.status ? `Statut : ${data.status}` : ""
-      ].filter(Boolean);
+    async function renderRefs(data = {}) {
+      const parts = [];
 
-      return parts.map(p => line(p)).join("");
+      if (data.dossierId) {
+        try {
+          const dossierSnap = await getDoc(doc(db, "dossiers", data.dossierId));
+          if (dossierSnap.exists()) {
+            const dossier = dossierSnap.data();
+            parts.push(`Dossier : ${dossier.title || data.dossierId}`);
+          }
+        } catch (e) {
+          parts.push("Dossier : non chargé");
+        }
+      }
+
+      if (data.mode) {
+        parts.push(`Mode prévu : ${data.mode}`);
+      }
+
+      return parts.length
+        ? parts.map(p => line(p)).join("")
+        : "<div>Aucune référence.</div>";
     }
 
     function renderMentions(snapshot = {}) {
@@ -457,15 +497,21 @@
       if (snapshot.vatMode === "YES") {
         parts.push(`Soumis à la TVA${snapshot.vatRate ? ` : ${snapshot.vatRate} %` : ""}`);
         if (snapshot.vatNumber) parts.push(`N° TVA : ${snapshot.vatNumber}`);
-      } else {
-        parts.push(snapshot.tvaExemptionText || "TVA non applicable, art. 293 B du CGI");
+      } else if (snapshot.tvaExemptionText) {
+        parts.push(snapshot.tvaExemptionText);
       }
 
-      if (snapshot.legalNotice) parts.push(snapshot.legalNotice);
+      if (
+        snapshot.legalNotice &&
+        snapshot.legalNotice.trim() &&
+        snapshot.legalNotice.trim() !== (snapshot.tvaExemptionText || "").trim()
+      ) {
+        parts.push(snapshot.legalNotice);
+      }
 
       return parts.length
         ? parts.map(p => line(p)).join("")
-        : '<div class="muted">Aucune mention.</div>';
+        : "<div>Aucune mention.</div>";
     }
 
     function renderBank(snapshot = {}) {
@@ -473,7 +519,41 @@
       if (snapshot.iban) parts.push(`IBAN : ${snapshot.iban}`);
       if (snapshot.bic) parts.push(`BIC : ${snapshot.bic}`);
 
-      return parts.length ? escapeHtml(parts.join("\n")) : "Non renseignées.";
+      return parts.length ? parts.join("\n") : "Non renseignées.";
+    }
+
+    function renderFooter(snapshot = {}) {
+      const address = cleanSingleLine(snapshot.address || "");
+      const parts = [
+        snapshot.businessName || "Axe Dossier",
+        address,
+        snapshot.siret ? `SIRET : ${snapshot.siret}` : "",
+        snapshot.ape ? `APE : ${snapshot.ape}` : ""
+      ].filter(Boolean);
+
+      return escapeHtml(parts.join(" — "));
+    }
+
+    function applyTVADisplay(business = {}) {
+      const vatMode = business.vatMode || "NO";
+      const vatRate = Number(business.vatRate || 0);
+      const hasTVA = vatMode === "YES" && vatRate > 0;
+
+      const vatHeader = document.getElementById("vatHeader");
+      const vatCell = document.getElementById("invoiceVatCell");
+      const vatTotalsRow = document.getElementById("vatTotalsRow");
+
+      if (hasTVA) {
+        vatHeader.classList.remove("hidden-col");
+        vatCell.classList.remove("hidden-col");
+        vatTotalsRow.style.display = "";
+        vatCell.textContent = `${vatRate} %`;
+      } else {
+        vatHeader.classList.add("hidden-col");
+        vatCell.classList.add("hidden-col");
+        vatTotalsRow.style.display = "none";
+        vatCell.textContent = "";
+      }
     }
 
     function showError(message) {
@@ -506,20 +586,14 @@
         document.getElementById("invoiceNumber").textContent = data.number || "—";
         document.getElementById("invoiceDate").textContent = data.date || "—";
         document.getElementById("invoiceDueDate").textContent = data.dueDate || "—";
-        document.getElementById("invoiceStatus").textContent = data.status || "—";
 
         document.title = `${data.number || "Facture"} — Axe Dossier`;
 
         document.getElementById("businessBlock").innerHTML = renderBusiness(business);
         document.getElementById("clientBlock").innerHTML = renderClient(client);
-        document.getElementById("refsBlock").innerHTML = renderRefs(data);
+        document.getElementById("refsBlock").innerHTML = await renderRefs(data);
 
         document.getElementById("invoiceLabel").textContent = data.label || "Prestation";
-        document.getElementById("invoiceVatCell").textContent =
-          business.vatMode === "YES"
-            ? `${Number(business.vatRate || 0)} %`
-            : "Non applicable";
-
         document.getElementById("invoiceAmountCell").textContent =
           formatMoney(data.amountTTC ?? data.amount ?? 0);
 
@@ -532,8 +606,11 @@
         document.getElementById("amountTTC").textContent =
           formatMoney(data.amountTTC ?? data.amount ?? 0);
 
+        applyTVADisplay(business);
+
         document.getElementById("mentionsBlock").innerHTML = renderMentions(business);
         document.getElementById("bankBlock").textContent = renderBank(business);
+        document.getElementById("footerBlock").textContent = renderFooter(business);
 
         document.getElementById("notesBlock").innerHTML = data.notes
           ? `<div>${escapeHtml(data.notes).replace(/\n/g, "<br>")}</div>`
