@@ -391,6 +391,16 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
           <input id="documentUrl" name="documentUrl" type="text" placeholder="Ex. https://... ou chemin futur Storage" />
         </div>
 
+<div class="field">
+  <label for="documentFile">Fichier (PDF, JPG, PNG, DOC, DOCX)</label>
+  <input
+    id="documentFile"
+    name="documentFile"
+    type="file"
+    accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx"
+  />
+</div>
+        
         <div class="field">
           <label for="documentNotes">Notes</label>
           <textarea id="documentNotes" name="documentNotes" placeholder="Ce que contient le document, pourquoi il compte, ce qu’il faut retenir..."></textarea>
