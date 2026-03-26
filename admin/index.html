@@ -1,29 +1,249 @@
-<!DOCTYPE html><html lang="fr">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Axe Dossier — Admin</title>  <style>
-    body{margin:0;font-family:Inter,system-ui;background:#f3efe8;color:#171717}
-    .wrap{max-width:900px;margin:auto;padding:40px 20px}
-    h1{font-size:28px;margin-bottom:20px}
-    .card{background:#fff;padding:20px;border-radius:12px;margin-top:20px}
-    a{display:block;padding:12px;background:#111;color:#fff;text-decoration:none;margin-top:10px;border-radius:8px}
-  </style></head><body><script>
-  const password = prompt("Accès privé :");
-  if(password !== "axe2026"){
-    document.body.innerHTML = "Accès refusé";
-  }
-</script><div class="wrap">  <h1>Back Office — Axe Dossier</h1>  <div class="card">
-    <strong>Gestion</strong>
-    <a href="clients.html">Clients</a>
-    <a href="dossiers.html">Dossiers</a>
-    <a href="documents.html">Documents</a>
-  </div>  <div class="card">
-    <strong>Comptabilité</strong>
-    <a href="factures.html">Factures</a>
-    <a href="paiements.html">Paiements</a>
-  </div>  <div class="card">
-    <strong>Paramètres</strong>
-    <a href="settings.html">Settings</a>
-  </div></div></body>
+  <title>Axe Dossier — Admin</title>
+  <style>
+    :root{
+      --bg:#f3efe8;
+      --card:#ffffff;
+      --text:#171717;
+      --muted:#66615a;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --shadow:0 16px 40px rgba(0,0,0,0.06);
+      --max:980px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    .wrap{
+      width:min(var(--max),calc(100% - 32px));
+      margin:0 auto;
+      padding:40px 0 56px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:24px;
+    }
+    h1,h2,p{margin:0}
+    h1{
+      font-size:clamp(2rem,4vw,3rem);
+      letter-spacing:-.05em;
+      margin-bottom:10px;
+    }
+    p{color:var(--muted);line-height:1.55}
+    .stack{display:grid;gap:20px}
+    .field{margin-bottom:14px}
+    .field label{
+      display:block;
+      font-size:.92rem;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+    .field input{
+      width:100%;
+      min-height:48px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      font:inherit;
+      background:#fff;
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+    .btn, .menu a{
+      min-height:48px;
+      padding:0 18px;
+      border-radius:999px;
+      border:1px solid var(--accent);
+      background:var(--accent);
+      color:#fff;
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .btn-secondary{
+      background:#fff;
+      color:var(--accent);
+      border-color:var(--line);
+    }
+    .hidden{display:none !important}
+    .menu{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+      margin-top:18px;
+    }
+    .status{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:14px;
+      font-size:.92rem;
+      display:none;
+    }
+    .status.show{display:block}
+    .status.error{
+      background:#f7e3df;
+      color:#6b241f;
+      border:1px solid rgba(23,23,23,0.08);
+    }
+    .status.ok{
+      background:#e8efe4;
+      color:#304127;
+      border:1px solid rgba(23,23,23,0.08);
+    }
+    .topline{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    .muted{color:var(--muted);font-size:.94rem}
+    @media (max-width:720px){
+      .menu{grid-template-columns:1fr}
+      .actions .btn{width:100%}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="stack">
+      <section class="card">
+        <h1>Admin Axe Dossier</h1>
+        <p>Connexion privée au back-office.</p>
+      </section>
+
+      <section id="loginCard" class="card">
+        <h2 style="margin-bottom:14px;">Connexion</h2>
+        <form id="loginForm">
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" type="email" required autocomplete="username" />
+          </div>
+
+          <div class="field">
+            <label for="password">Mot de passe</label>
+            <input id="password" type="password" required autocomplete="current-password" />
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="btn">Se connecter</button>
+          </div>
+        </form>
+
+        <div id="loginStatus" class="status"></div>
+      </section>
+
+      <section id="adminCard" class="card hidden">
+        <div class="topline">
+          <div>
+            <h2>Back-office</h2>
+            <div id="userInfo" class="muted"></div>
+          </div>
+          <button id="logoutBtn" class="btn btn-secondary" type="button">Déconnexion</button>
+        </div>
+
+        <div class="menu">
+          <a href="clients.html">Clients</a>
+          <a href="dossiers.html">Dossiers</a>
+          <a href="documents.html">Documents</a>
+          <a href="factures.html">Factures</a>
+          <a href="paiements.html">Paiements</a>
+          <a href="settings.html">Settings</a>
+        </div>
+
+        <div id="adminStatus" class="status"></div>
+      </section>
+    </div>
+  </div>
+
+  <script type="module">
+    import { login, logout, watchAuth } from "./firebase-auth.js";
+
+    const loginCard = document.getElementById("loginCard");
+    const adminCard = document.getElementById("adminCard");
+    const loginForm = document.getElementById("loginForm");
+    const loginStatus = document.getElementById("loginStatus");
+    const adminStatus = document.getElementById("adminStatus");
+    const userInfo = document.getElementById("userInfo");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    function showStatus(el, message, type = "ok") {
+      el.className = `status show ${type}`;
+      el.textContent = message;
+    }
+
+    function clearStatus(el) {
+      el.className = "status";
+      el.textContent = "";
+    }
+
+    function setLoggedOut() {
+      loginCard.classList.remove("hidden");
+      adminCard.classList.add("hidden");
+      userInfo.textContent = "";
+      clearStatus(adminStatus);
+    }
+
+    function setLoggedIn(user) {
+      loginCard.classList.add("hidden");
+      adminCard.classList.remove("hidden");
+      userInfo.textContent = user?.email || "";
+      clearStatus(loginStatus);
+    }
+
+    watchAuth((user) => {
+      if (user) {
+        setLoggedIn(user);
+      } else {
+        setLoggedOut();
+      }
+    });
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearStatus(loginStatus);
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      try {
+        await login(email, password);
+        showStatus(loginStatus, "Connexion réussie.", "ok");
+      } catch (err) {
+        console.error(err);
+        showStatus(loginStatus, "Connexion refusée. Vérifie l’email et le mot de passe.", "error");
+      }
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await logout();
+        showStatus(adminStatus, "Déconnexion effectuée.", "ok");
+      } catch (err) {
+        console.error(err);
+        showStatus(adminStatus, "Impossible de se déconnecter.", "error");
+      }
+    });
+  </script>
+</body>
 </html>
