@@ -391,127 +391,277 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   </section>
 </div>
 
-  </main>  <script>
-    const SETTINGS_KEY = "axe_dossier_settings_v1";
+  </main>  
+  
+<script type="module">
+  import "./auth-guard.js";
+  import { db } from "./firebase-config.js";
+  import {
+    doc,
+    setDoc,
+    onSnapshot,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const form = document.getElementById("settingsForm");
-    const savedMessage = document.getElementById("savedMessage");
-    const resetSettingsBtn = document.getElementById("resetSettings");
+  const form = document.getElementById("settingsForm");
+  const savedMessage = document.getElementById("savedMessage");
+  const resetSettingsBtn = document.getElementById("resetSettings");
 
-    const previewIdentity = document.getElementById("previewIdentity");
-    const previewTerms = document.getElementById("previewTerms");
-    const nextDevis = document.getElementById("nextDevis");
-    const nextFacture = document.getElementById("nextFacture");
-    const nextPaiement = document.getElementById("nextPaiement");
+  const previewIdentity = document.getElementById("previewIdentity");
+  const previewTerms = document.getElementById("previewTerms");
+  const nextDevis = document.getElementById("nextDevis");
+  const nextFacture = document.getElementById("nextFacture");
+  const nextPaiement = document.getElementById("nextPaiement");
 
-    function loadSettings() {
-      try {
-        return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
-      } catch (e) {
-        return {};
-      }
-    }
+  const settingsRef = doc(db, "settings", "main");
+  const countersRef = doc(db, "counters", "main");
 
-    function saveSettings(data) {
-      localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
-    }
+  let currentSettings = {};
+  let currentCounters = {};
 
-    function escapeHtml(text = "") {
-      return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
+  function escapeHtml(text = "") {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
 
-    function fillForm() {
-      const s = loadSettings();
-      document.getElementById("businessName").value = s.businessName || "Axe Dossier";
-      document.getElementById("ownerName").value = s.ownerName || "Sophie Dumas";
-      document.getElementById("legalForm").value = s.legalForm || "EI";
-      document.getElementById("address").value = s.address || "24 hameau de danis\n09700 Saverdun";
-      document.getElementById("email").value = s.email || "contact@axe-dossier.fr";
-      document.getElementById("phone").value = s.phone || "";
-      document.getElementById("siret").value = s.siret || "";
-      document.getElementById("ape").value = s.ape || "";
-      document.getElementById("iban").value = s.iban || "";
-      document.getElementById("bic").value = s.bic || "";
-      document.getElementById("legalNotice").value = s.legalNotice || "TVA non applicable, art. 293 B du CGI";
-      document.getElementById("paymentTerms").value = s.paymentTerms || "Paiement à réception. Virement bancaire.";
-      renderPreview();
-    }
+  function currentYear() {
+    return new Date().getFullYear();
+  }
 
-    function renderPreview() {
-      const s = loadSettings();
-      const identityParts = [
-        s.businessName,
-        s.ownerName,
-        s.legalForm,
-        s.address,
-        s.email,
-        s.phone,
-        s.siret ? `SIRET : ${s.siret}` : "",
-        s.ape ? `APE : ${s.ape}` : "",
-        s.iban ? `IBAN : ${s.iban}` : "",
-        s.bic ? `BIC : ${s.bic}` : ""
-      ].filter(Boolean);
+  function getEl(id) {
+    return document.getElementById(id);
+  }
 
-      previewIdentity.innerHTML = identityParts.length
-        ? identityParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("")
-        : "Aucun paramètre enregistré.";
+  function getValue(id, fallback = "") {
+    const el = getEl(id);
+    return el ? (el.value ?? fallback) : fallback;
+  }
 
-      const termsParts = [s.legalNotice, s.paymentTerms].filter(Boolean);
-      previewTerms.innerHTML = termsParts.length
-        ? termsParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("<br>")
-        : "Aucune condition enregistrée.";
-    }
+  function setValue(id, value) {
+    const el = getEl(id);
+    if (el) el.value = value ?? "";
+  }
 
-    function currentYear() {
-      return new Date().getFullYear();
-    }
+  function defaultSettings() {
+    return {
+      businessName: "Axe Dossier",
+      ownerName: "Sophie Dumas",
+      legalForm: "EI",
+      address: "24 hameau de danis\n09700 Saverdun",
+      email: "contact@axe-dossier.fr",
+      phone: "",
+      siret: "",
+      ape: "",
+      iban: "",
+      bic: "",
+      legalNotice: "TVA non applicable, art. 293 B du CGI",
+      paymentTerms: "Paiement à réception. Virement bancaire.",
+      vatMode: "EXEMPT",              // EXEMPT ou SUBJECT
+      vatRate: 20,                    // prévu pour plus tard
+      vatNumber: "",
+      tvaExemptionText: "TVA non applicable, art. 293 B du CGI"
+    };
+  }
 
-    function renderCounters() {
-      const year = currentYear();
-      nextDevis.textContent = `DEV-${year}-001`;
-      nextFacture.textContent = `FAC-${year}-001`;
-      nextPaiement.textContent = `PAY-${year}-001`;
-    }
+  function defaultCounters() {
+    return {
+      quotePrefix: "DEV",
+      invoicePrefix: "FAC",
+      paymentPrefix: "PAY",
+      nextQuoteNumber: 1,
+      nextInvoiceNumber: 1,
+      nextPaymentNumber: 1
+    };
+  }
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const data = new FormData(form);
-      const settings = {
-        businessName: data.get("businessName")?.trim() || "",
-        ownerName: data.get("ownerName")?.trim() || "",
-        legalForm: data.get("legalForm")?.trim() || "",
-        address: data.get("address")?.trim() || "",
-        email: data.get("email")?.trim() || "",
-        phone: data.get("phone")?.trim() || "",
-        siret: data.get("siret")?.trim() || "",
-        ape: data.get("ape")?.trim() || "",
-        iban: data.get("iban")?.trim() || "",
-        bic: data.get("bic")?.trim() || "",
-        legalNotice: data.get("legalNotice")?.trim() || "",
-        paymentTerms: data.get("paymentTerms")?.trim() || ""
-      };
+  function padNumber(n) {
+    return String(Number(n || 1)).padStart(3, "0");
+  }
 
-      saveSettings(settings);
-      renderPreview();
-      savedMessage.classList.add("show");
-      setTimeout(() => savedMessage.classList.remove("show"), 1800);
-    });
+  function renderCounters() {
+    const year = currentYear();
+    const c = { ...defaultCounters(), ...currentCounters };
 
-    resetSettingsBtn.addEventListener("click", () => {
-      const ok = confirm("Réinitialiser les paramètres locaux ?");
-      if (!ok) return;
-      localStorage.removeItem(SETTINGS_KEY);
-      fillForm();
-    });
+    nextDevis.textContent = `${c.quotePrefix}-${year}-${padNumber(c.nextQuoteNumber)}`;
+    nextFacture.textContent = `${c.invoicePrefix}-${year}-${padNumber(c.nextInvoiceNumber)}`;
+    nextPaiement.textContent = `${c.paymentPrefix}-${year}-${padNumber(c.nextPaymentNumber)}`;
+  }
 
-    fillForm();
+  function fillForm() {
+    const s = { ...defaultSettings(), ...currentSettings };
+
+    setValue("businessName", s.businessName);
+    setValue("ownerName", s.ownerName);
+    setValue("legalForm", s.legalForm);
+    setValue("address", s.address);
+    setValue("email", s.email);
+    setValue("phone", s.phone);
+    setValue("siret", s.siret);
+    setValue("ape", s.ape);
+    setValue("iban", s.iban);
+    setValue("bic", s.bic);
+    setValue("legalNotice", s.legalNotice);
+    setValue("paymentTerms", s.paymentTerms);
+
+    // Champs TVA prévus pour plus tard si tu les ajoutes dans le HTML
+    setValue("vatMode", s.vatMode);
+    setValue("vatRate", s.vatRate);
+    setValue("vatNumber", s.vatNumber);
+    setValue("tvaExemptionText", s.tvaExemptionText);
+
+    renderPreview();
     renderCounters();
-  </script>
-<script type="module" src="./auth-guard.js"></script>
+  }
+
+  function renderPreview() {
+    const s = { ...defaultSettings(), ...currentSettings };
+
+    const identityParts = [
+      s.businessName,
+      s.ownerName,
+      s.legalForm,
+      s.address,
+      s.email,
+      s.phone,
+      s.siret ? `SIRET : ${s.siret}` : "",
+      s.ape ? `APE : ${s.ape}` : "",
+      s.vatMode === "SUBJECT" && s.vatNumber ? `TVA : ${s.vatNumber}` : "",
+      s.iban ? `IBAN : ${s.iban}` : "",
+      s.bic ? `BIC : ${s.bic}` : ""
+    ].filter(Boolean);
+
+    previewIdentity.innerHTML = identityParts.length
+      ? identityParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("")
+      : "Aucun paramètre enregistré.";
+
+    const termsParts = [];
+
+    if (s.vatMode === "EXEMPT") {
+      termsParts.push(s.tvaExemptionText || "TVA non applicable, art. 293 B du CGI");
+    } else {
+      termsParts.push(`TVA applicable${s.vatRate !== "" && s.vatRate != null ? ` : ${s.vatRate} %` : ""}`);
+    }
+
+    if (s.paymentTerms) termsParts.push(s.paymentTerms);
+
+    previewTerms.innerHTML = termsParts.length
+      ? termsParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("<br>")
+      : "Aucune condition enregistrée.";
+  }
+
+  function showSaved() {
+    savedMessage.classList.add("show");
+    setTimeout(() => savedMessage.classList.remove("show"), 1800);
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const settings = {
+      businessName: getValue("businessName").trim(),
+      ownerName: getValue("ownerName").trim(),
+      legalForm: getValue("legalForm").trim(),
+      address: getValue("address").trim(),
+      email: getValue("email").trim(),
+      phone: getValue("phone").trim(),
+      siret: getValue("siret").trim(),
+      ape: getValue("ape").trim(),
+      iban: getValue("iban").trim(),
+      bic: getValue("bic").trim(),
+      legalNotice: getValue("legalNotice").trim(),
+      paymentTerms: getValue("paymentTerms").trim(),
+
+      // TVA prévue pour futur passage au régime soumis
+      vatMode: getValue("vatMode", currentSettings.vatMode || "EXEMPT").trim() || "EXEMPT",
+      vatRate: Number(getValue("vatRate", currentSettings.vatRate ?? 20)) || 20,
+      vatNumber: getValue("vatNumber", currentSettings.vatNumber || "").trim(),
+      tvaExemptionText: getValue(
+        "tvaExemptionText",
+        currentSettings.tvaExemptionText || "TVA non applicable, art. 293 B du CGI"
+      ).trim() || "TVA non applicable, art. 293 B du CGI",
+
+      updatedAt: serverTimestamp()
+    };
+
+    try {
+      await setDoc(settingsRef, settings, { merge: true });
+
+      // On initialise aussi counters si absent
+      await setDoc(
+        countersRef,
+        {
+          quotePrefix: currentCounters.quotePrefix || "DEV",
+          invoicePrefix: currentCounters.invoicePrefix || "FAC",
+          paymentPrefix: currentCounters.paymentPrefix || "PAY",
+          nextQuoteNumber: currentCounters.nextQuoteNumber || 1,
+          nextInvoiceNumber: currentCounters.nextInvoiceNumber || 1,
+          nextPaymentNumber: currentCounters.nextPaymentNumber || 1,
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+
+      showSaved();
+    } catch (err) {
+      console.error("Erreur enregistrement settings :", err);
+      alert("Impossible d’enregistrer les paramètres.");
+    }
+  });
+
+  resetSettingsBtn.addEventListener("click", async () => {
+    const ok = confirm("Réinitialiser les paramètres avec les valeurs par défaut ?");
+    if (!ok) return;
+
+    try {
+      await setDoc(
+        settingsRef,
+        {
+          ...defaultSettings(),
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+
+      await setDoc(
+        countersRef,
+        {
+          ...defaultCounters(),
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+    } catch (err) {
+      console.error("Erreur reset settings :", err);
+      alert("Impossible de réinitialiser les paramètres.");
+    }
+  });
+
+  onSnapshot(
+    settingsRef,
+    (snap) => {
+      currentSettings = snap.exists() ? snap.data() : defaultSettings();
+      fillForm();
+    },
+    (err) => {
+      console.error("Erreur chargement settings :", err);
+    }
+  );
+
+  onSnapshot(
+    countersRef,
+    (snap) => {
+      currentCounters = snap.exists() ? snap.data() : defaultCounters();
+      renderCounters();
+    },
+    (err) => {
+      console.error("Erreur chargement counters :", err);
+    }
+  );
+</script>
+  
 </body>
 </html>
