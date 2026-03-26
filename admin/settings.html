@@ -1,0 +1,515 @@
+<!DOCTYPE html><html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axe Dossier — Settings</title>
+  <style>
+    :root{
+      --bg:#f3efe8;
+      --card:#ffffff;
+      --text:#171717;
+      --muted:#66615a;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --soft:#e9e1d4;
+      --radius:18px;
+      --shadow:0 16px 40px rgba(0,0,0,0.06);
+      --max:1180px;
+    }*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+a{text-decoration:none;color:inherit}
+.wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:rgba(243,239,232,0.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+}
+
+.topbar-inner{
+  min-height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:800;
+  letter-spacing:.02em;
+}
+
+.brand-mark{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  background:var(--accent);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+  box-shadow:var(--shadow);
+}
+
+.nav{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.pill{
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.7);
+  border:1px solid var(--line);
+  font-size:.94rem;
+}
+
+main{padding:32px 0 56px}
+
+.hero{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:22px;
+}
+
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
+.hero p{color:var(--muted);max-width:72ch;margin-top:8px}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  align-items:start;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+  padding:24px;
+}
+
+.card h2{
+  font-size:1.2rem;
+  margin-bottom:14px;
+  letter-spacing:-.02em;
+}
+
+.field{margin-bottom:14px}
+.field label{
+  display:block;
+  font-size:.92rem;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.field input,
+.field textarea,
+.field select{
+  width:100%;
+  min-height:48px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px 14px;
+  font:inherit;
+  color:var(--text);
+  background:#fff;
+}
+
+.field textarea{min-height:110px;resize:vertical}
+
+.row-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.btn{
+  min-height:48px;
+  padding:0 18px;
+  border-radius:999px;
+  border:1px solid var(--accent);
+  background:var(--accent);
+  color:#fff;
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.btn-secondary{
+  background:#fff;
+  color:var(--accent);
+  border-color:var(--line);
+}
+
+.note{
+  margin-top:12px;
+  padding:14px 16px;
+  border-radius:14px;
+  background:#faf7f1;
+  border:1px solid var(--line);
+  color:#4f4942;
+  font-size:.92rem;
+  line-height:1.5;
+}
+
+.preview{
+  display:grid;
+  gap:12px;
+  margin-top:12px;
+}
+
+.preview-box{
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:18px;
+  background:#fcfbf8;
+}
+
+.preview-box strong{
+  display:block;
+  margin-bottom:8px;
+  font-size:1rem;
+}
+
+.mini-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:12px;
+}
+
+.mini-stat{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:#faf7f1;
+  padding:16px;
+}
+
+.mini-stat strong{
+  display:block;
+  font-size:1.3rem;
+  letter-spacing:-.04em;
+  margin-bottom:4px;
+}
+
+.mini-stat span{color:var(--muted);font-size:.92rem}
+
+.saved{
+  display:none;
+  margin-top:12px;
+  padding:12px 14px;
+  border-radius:14px;
+  background:#e8efe4;
+  border:1px solid rgba(23,23,23,0.08);
+  color:#304127;
+  font-size:.92rem;
+  font-weight:700;
+}
+
+.saved.show{display:block}
+
+@media (max-width: 980px){
+  .grid,.mini-grid{grid-template-columns:1fr}
+}
+
+@media (max-width: 720px){
+  .topbar-inner{
+    min-height:auto;
+    padding:14px 0;
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .brand,.nav{justify-content:center}
+  .hero{flex-direction:column;align-items:start}
+  .card{padding:20px}
+  .row-2{grid-template-columns:1fr}
+  .actions .btn{width:100%}
+}
+
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="index.html" aria-label="Retour admin">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier · Settings</span>
+      </a><nav class="nav" aria-label="Navigation admin">
+    <a class="pill" href="index.html">Admin</a>
+    <a class="pill" href="clients.html">Clients</a>
+    <a class="pill" href="dossiers.html">Dossiers</a>
+    <a class="pill" href="documents.html">Documents</a>
+    <a class="pill" href="factures.html">Factures</a>
+    <a class="pill" href="paiements.html">Paiements</a>
+    <a class="pill" href="settings.html">Settings</a>
+  </nav>
+</div>
+
+  </header>  <main>
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <h1>Settings</h1>
+          <p>Tu centralises ici l’identité de ton activité, tes coordonnées de facturation, tes mentions, et tes compteurs. C’est plus propre que de disperser ça partout.</p>
+        </div>
+      </section><section class="grid">
+    <article class="card">
+      <h2>Identité & facturation</h2>
+      <form id="settingsForm">
+        <div class="field">
+          <label for="businessName">Nom affiché</label>
+          <input id="businessName" name="businessName" type="text" placeholder="Ex. Axe Dossier" />
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="ownerName">Nom / exploitant</label>
+            <input id="ownerName" name="ownerName" type="text" placeholder="Ex. Sophie Dumas" />
+          </div>
+          <div class="field">
+            <label for="legalForm">Statut</label>
+            <input id="legalForm" name="legalForm" type="text" placeholder="Ex. EI" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="address">Adresse</label>
+          <textarea id="address" name="address" placeholder="Adresse complète"></textarea>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="contact@axe-dossier.fr" />
+          </div>
+          <div class="field">
+            <label for="phone">Téléphone</label>
+            <input id="phone" name="phone" type="text" placeholder="06 ..." />
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="siret">SIRET</label>
+            <input id="siret" name="siret" type="text" placeholder="SIRET" />
+          </div>
+          <div class="field">
+            <label for="ape">APE</label>
+            <input id="ape" name="ape" type="text" placeholder="APE" />
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="iban">IBAN</label>
+            <input id="iban" name="iban" type="text" placeholder="FR76..." />
+          </div>
+          <div class="field">
+            <label for="bic">BIC</label>
+            <input id="bic" name="bic" type="text" placeholder="BIC" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="legalNotice">Mentions / pied de facture</label>
+          <textarea id="legalNotice" name="legalNotice" placeholder="Ex. TVA non applicable, art. 293 B du CGI"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="paymentTerms">Conditions de règlement</label>
+          <textarea id="paymentTerms" name="paymentTerms" placeholder="Ex. Paiement à réception. Virement bancaire."></textarea>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn">Enregistrer</button>
+          <button type="button" id="resetSettings" class="btn btn-secondary">Réinitialiser</button>
+        </div>
+
+        <div id="savedMessage" class="saved">Paramètres enregistrés.</div>
+      </form>
+    </article>
+
+    <article class="card">
+      <h2>Compteurs</h2>
+
+      <div class="mini-grid">
+        <div class="mini-stat">
+          <strong id="nextDevis">DEV-2026-001</strong>
+          <span>Prochain devis</span>
+        </div>
+        <div class="mini-stat">
+          <strong id="nextFacture">FAC-2026-001</strong>
+          <span>Prochaine facture</span>
+        </div>
+        <div class="mini-stat">
+          <strong id="nextPaiement">PAY-2026-001</strong>
+          <span>Prochain paiement</span>
+        </div>
+      </div>
+
+      <div class="note">
+        Pour l’instant, c’est une base manuelle propre. Ensuite, avec Firebase, on stockera ça dans <strong>counters/</strong> pour générer automatiquement des numéros chronologiques fiables.
+      </div>
+
+      <div class="preview">
+        <div class="preview-box">
+          <strong>Aperçu identité</strong>
+          <div id="previewIdentity">Aucun paramètre enregistré.</div>
+        </div>
+
+        <div class="preview-box">
+          <strong>Aperçu règlement</strong>
+          <div id="previewTerms">Aucune condition enregistrée.</div>
+        </div>
+      </div>
+    </article>
+  </section>
+</div>
+
+  </main>  <script>
+    const SETTINGS_KEY = "axe_dossier_settings_v1";
+
+    const form = document.getElementById("settingsForm");
+    const savedMessage = document.getElementById("savedMessage");
+    const resetSettingsBtn = document.getElementById("resetSettings");
+
+    const previewIdentity = document.getElementById("previewIdentity");
+    const previewTerms = document.getElementById("previewTerms");
+    const nextDevis = document.getElementById("nextDevis");
+    const nextFacture = document.getElementById("nextFacture");
+    const nextPaiement = document.getElementById("nextPaiement");
+
+    function loadSettings() {
+      try {
+        return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveSettings(data) {
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
+    }
+
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function fillForm() {
+      const s = loadSettings();
+      document.getElementById("businessName").value = s.businessName || "Axe Dossier";
+      document.getElementById("ownerName").value = s.ownerName || "Sophie Dumas";
+      document.getElementById("legalForm").value = s.legalForm || "EI";
+      document.getElementById("address").value = s.address || "24 hameau de danis\n09700 Saverdun";
+      document.getElementById("email").value = s.email || "contact@axe-dossier.fr";
+      document.getElementById("phone").value = s.phone || "";
+      document.getElementById("siret").value = s.siret || "";
+      document.getElementById("ape").value = s.ape || "";
+      document.getElementById("iban").value = s.iban || "";
+      document.getElementById("bic").value = s.bic || "";
+      document.getElementById("legalNotice").value = s.legalNotice || "TVA non applicable, art. 293 B du CGI";
+      document.getElementById("paymentTerms").value = s.paymentTerms || "Paiement à réception. Virement bancaire.";
+      renderPreview();
+    }
+
+    function renderPreview() {
+      const s = loadSettings();
+      const identityParts = [
+        s.businessName,
+        s.ownerName,
+        s.legalForm,
+        s.address,
+        s.email,
+        s.phone,
+        s.siret ? `SIRET : ${s.siret}` : "",
+        s.ape ? `APE : ${s.ape}` : "",
+        s.iban ? `IBAN : ${s.iban}` : "",
+        s.bic ? `BIC : ${s.bic}` : ""
+      ].filter(Boolean);
+
+      previewIdentity.innerHTML = identityParts.length
+        ? identityParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("")
+        : "Aucun paramètre enregistré.";
+
+      const termsParts = [s.legalNotice, s.paymentTerms].filter(Boolean);
+      previewTerms.innerHTML = termsParts.length
+        ? termsParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("<br>")
+        : "Aucune condition enregistrée.";
+    }
+
+    function currentYear() {
+      return new Date().getFullYear();
+    }
+
+    function renderCounters() {
+      const year = currentYear();
+      nextDevis.textContent = `DEV-${year}-001`;
+      nextFacture.textContent = `FAC-${year}-001`;
+      nextPaiement.textContent = `PAY-${year}-001`;
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const settings = {
+        businessName: data.get("businessName")?.trim() || "",
+        ownerName: data.get("ownerName")?.trim() || "",
+        legalForm: data.get("legalForm")?.trim() || "",
+        address: data.get("address")?.trim() || "",
+        email: data.get("email")?.trim() || "",
+        phone: data.get("phone")?.trim() || "",
+        siret: data.get("siret")?.trim() || "",
+        ape: data.get("ape")?.trim() || "",
+        iban: data.get("iban")?.trim() || "",
+        bic: data.get("bic")?.trim() || "",
+        legalNotice: data.get("legalNotice")?.trim() || "",
+        paymentTerms: data.get("paymentTerms")?.trim() || ""
+      };
+
+      saveSettings(settings);
+      renderPreview();
+      savedMessage.classList.add("show");
+      setTimeout(() => savedMessage.classList.remove("show"), 1800);
+    });
+
+    resetSettingsBtn.addEventListener("click", () => {
+      const ok = confirm("Réinitialiser les paramètres locaux ?");
+      if (!ok) return;
+      localStorage.removeItem(SETTINGS_KEY);
+      fillForm();
+    });
+
+    fillForm();
+    renderCounters();
+  </script></body>
+</html>
