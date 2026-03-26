@@ -1,0 +1,502 @@
+<!DOCTYPE html><html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>URSSAF, CAF, CPAM : que faire quand un organisme ne répond pas ? | Axe Dossier</title>
+  <meta name="description" content="URSSAF, CAF, CPAM, médecine du travail, administration : que faire quand un organisme ne répond pas, bloque un dossier ou laisse une situation traîner ?" />
+  <meta name="robots" content="index,follow" />
+  <style>
+    :root {
+      --bg: #f3efe8;
+      --surface: rgba(255,255,255,0.88);
+      --text: #171717;
+      --muted: #5f5952;
+      --line: rgba(23,23,23,0.08);
+      --accent: #111111;
+      --accent-soft: #e9e1d4;
+      --radius-xl: 30px;
+      --radius-lg: 22px;
+      --shadow: 0 20px 60px rgba(0,0,0,0.07);
+      --max: 1120px;
+    }* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text);
+  line-height: 1.6;
+  background:
+    radial-gradient(circle at top left, rgba(255,255,255,0.92), transparent 28%),
+    radial-gradient(circle at right 20%, rgba(233,225,212,0.75), transparent 20%),
+    var(--bg);
+}
+
+a { color: inherit; text-decoration: none; }
+.wrap { width: min(var(--max), calc(100% - 32px)); margin: 0 auto; }
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(243,239,232,0.78);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(23,23,23,0.05);
+}
+
+.topbar-inner {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  background: var(--accent);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 0.95rem;
+  box-shadow: var(--shadow);
+}
+
+.nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.pill {
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid rgba(23,23,23,0.07);
+  font-size: 0.94rem;
+}
+
+.hero { padding: 54px 0 24px; }
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+}
+
+.hero-main { padding: 42px; }
+.side-card, .content-card, .cta-card, .faq-item { padding: 26px; }
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #4b443b;
+  font-size: 0.88rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+h1, h2, h3, p { margin: 0; }
+
+h1 {
+  font-size: clamp(2.2rem, 4vw, 4.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.055em;
+  margin-bottom: 18px;
+  max-width: 12ch;
+}
+
+h2 {
+  font-size: clamp(1.6rem, 2.5vw, 2.5rem);
+  letter-spacing: -0.04em;
+  margin-bottom: 14px;
+}
+
+h3 {
+  font-size: 1.08rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 10px;
+}
+
+.lead {
+  max-width: 60ch;
+  color: #4b4640;
+  font-size: 1.08rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.btn {
+  min-height: 52px;
+  padding: 0 20px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--accent);
+  font-weight: 700;
+}
+
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-secondary { background: rgba(255,255,255,0.75); color: var(--accent); border-color: rgba(23,23,23,0.1); }
+
+.hero-side { display: grid; gap: 20px; }
+
+.mini-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.mini-list li {
+  position: relative;
+  padding-left: 18px;
+  color: #49443e;
+}
+
+.mini-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+section { padding: 20px 0; }
+
+.section-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.section-head p {
+  max-width: 60ch;
+  color: var(--muted);
+}
+
+.grid-2, .grid-3, .faq-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+.grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+.faq-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+
+.content-card, .cta-card, .faq-item {
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,0.82);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.content-card p, .cta-card p, .faq-item p { color: #4f4942; }
+
+.footer { padding: 30px 0 64px; }
+.footer-box {
+  padding: 22px 24px;
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,0.72);
+  border: 1px solid var(--line);
+  color: #605951;
+}
+
+@media (max-width: 980px) {
+  .hero-grid, .grid-2, .grid-3, .faq-grid { grid-template-columns: 1fr; }
+  .section-head { flex-direction: column; align-items: start; }
+}
+
+@media (max-width: 720px) {
+  .topbar-inner {
+    min-height: auto;
+    padding: 14px 0;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .brand, .nav { justify-content: center; }
+  .hero-main, .side-card, .content-card, .cta-card, .faq-item, .footer-box { padding: 20px; }
+  .actions { flex-direction: column; }
+  .btn { width: 100%; }
+  h1 { max-width: none; }
+}
+
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a href="index.html" class="brand" aria-label="Axe Dossier">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier</span>
+      </a>
+      <nav class="nav" aria-label="Navigation principale">
+        <a class="pill" href="index.html">Accueil</a>
+        <a class="pill" href="#signes">Signes</a>
+        <a class="pill" href="#actions">Que faire</a>
+        <a class="pill" href="#faq">FAQ</a>
+        <a class="pill" href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <article class="card hero-main">
+          <div class="eyebrow">URSSAF · CAF · CPAM · Organismes</div>
+          <h1>Quand un organisme ne répond pas, le dossier s’enlise.</h1>
+          <p class="lead">
+            URSSAF, CAF, CPAM, médecine du travail, caisse, administration ou service interne d’un organisme : le problème est souvent le même.
+            Le dossier est en attente, les réponses sont floues ou absentes, et la situation finit par devenir chronophage, stressante et parfois coûteuse.
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" href="mailto:contact@axe-dossier.fr?subject=Organisme%20sans%20r%C3%A9ponse&body=Bonjour,%0A%0AJe%20souhaite%20vous%20transmettre%20un%20dossier%20bloqu%C3%A9%20avec%20un%20organisme.%0A%0AOrganisme%20concern%C3%A9%20:%0A%0ASituation%20:%0A%0APi%C3%A8ces%20disponibles%20:%0A">Envoyer mon dossier</a>
+            <a class="btn btn-secondary" href="#actions">Voir quoi faire</a>
+          </div>
+        </article><div class="hero-side">
+      <article class="card side-card">
+        <h3>Recherches fréquentes</h3>
+        <ul class="mini-list">
+          <li>URSSAF ne répond pas</li>
+          <li>CAF dossier bloqué</li>
+          <li>CPAM aucune réponse</li>
+          <li>Médecine du travail silence ou retard</li>
+        </ul>
+      </article>
+      <article class="card side-card">
+        <h3>Le vrai besoin</h3>
+        <p>Reprendre les dates, relances, pièces et demandes déjà faites pour arrêter les messages inutiles et remettre le dossier dans l’axe.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="signes">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Les signes d’un dossier réellement bloqué</h2>
+        <p>Un organisme n’est pas seulement lent. Le blocage commence quand tu ne sais plus ce qui a été envoyé, ce qui manque, ni qui doit répondre.</p>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <article class="content-card">
+        <h3>Aucune réponse claire</h3>
+        <p>Tu relances, on te renvoie ailleurs, ou tu reçois des réponses vagues qui ne traitent pas vraiment le fond du problème.</p>
+      </article>
+      <article class="content-card">
+        <h3>Le dossier tourne en rond</h3>
+        <p>Les mêmes pièces sont redemandées, les interlocuteurs changent, les délais s’allongent et rien n’avance concrètement.</p>
+      </article>
+      <article class="content-card">
+        <h3>Les conséquences s’aggravent</h3>
+        <p>Paiement en attente, droits suspendus, blocage administratif, stress, perte de temps ou risque financier à force d’inaction.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Ce qu’il ne faut pas faire</h2>
+        <p>Le pire réflexe, c’est de relancer encore sans reprendre le dossier proprement. Tu t’épuises et le problème reste identique.</p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <article class="content-card">
+        <h3>Envoyer dix messages différents</h3>
+        <p>Multiplie les mails, appels, formulaires et copies sans logique. Résultat : plus de bruit, moins de lisibilité, zéro stratégie.</p>
+      </article>
+      <article class="content-card">
+        <h3>Tout transmettre sans tri</h3>
+        <p>Un dossier noyé sous les pièces inutiles devient plus faible. Il faut envoyer ce qui compte, pas toute ta vie numérisée.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="actions">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Que faire quand un organisme ne répond pas ?</h2>
+        <p>La seule vraie méthode consiste à reconstituer le dossier, vérifier les relances et préparer une réponse ou une reprise propre.</p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <article class="content-card">
+        <h3>1. Reprendre la chronologie</h3>
+        <p>Date de la demande initiale, pièces transmises, accusés, relances, réponses reçues, décisions ou absences de décision : tout doit être remis à plat.</p>
+      </article>
+      <article class="content-card">
+        <h3>2. Isoler les pièces utiles</h3>
+        <p>Conserver uniquement les documents qui prouvent la demande, les relances, le blocage ou l’erreur. Le reste parasite le dossier.</p>
+      </article>
+      <article class="content-card">
+        <h3>3. Identifier le vrai point de blocage</h3>
+        <p>Parfois il manque une pièce. Parfois la demande a été mal orientée. Parfois le problème vient d’une réponse incomplète ou incohérente.</p>
+      </article>
+      <article class="content-card">
+        <h3>4. Préparer un courrier exploitable</h3>
+        <p>Un message structuré, daté, clair et ciblé pèse plus qu’une nouvelle relance improvisée. C’est souvent là que le dossier recommence à bouger.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Organismes concernés le plus souvent</h2>
+        <p>La logique est la même quel que soit l’interlocuteur : il faut cadrer le dossier avant de relancer.</p>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <article class="cta-card">
+        <h3>URSSAF</h3>
+        <p>Paiement mal affecté, mise en demeure, erreur de compte, absence de réponse, dossier en attente ou échange confus.</p>
+      </article>
+      <article class="cta-card">
+        <h3>CAF / CPAM</h3>
+        <p>Dossier suspendu, remboursement bloqué, justificatif redemandé, absence de retour ou réponse inexploitables.</p>
+      </article>
+      <article class="cta-card">
+        <h3>Médecine du travail / autres</h3>
+        <p>Attestation, prise en charge, rendez-vous, dossier interne ou administratif qui se perd dans les circuits habituels.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Comment Axe Dossier intervient</h2>
+        <p>Le travail porte sur l’analyse documentaire, la synthèse et la rédaction administrative. Le but est d’arrêter le flottement.</p>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <article class="cta-card">
+        <h3>Analyse</h3>
+        <p>Lecture des pièces, repérage des manques, reprise de la chronologie et clarification de la demande initiale.</p>
+      </article>
+      <article class="cta-card">
+        <h3>Synthèse</h3>
+        <p>Retour écrit avec les points faibles, les éléments solides et les actions utiles à lancer ou reprendre.</p>
+      </article>
+      <article class="cta-card">
+        <h3>Rédaction</h3>
+        <p>Préparation d’un courrier, d’une relance ou d’une formulation claire pour remettre le dossier dans l’axe.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Questions fréquentes</h2>
+        <p>Ce sont les formulations que les gens tapent réellement quand ils cherchent une issue.</p>
+      </div>
+    </div>
+
+    <div class="faq-grid">
+      <article class="faq-item">
+        <h3>Que faire si l’URSSAF ne répond pas ?</h3>
+        <p>Reprendre les preuves de paiement, les relances déjà faites, les réponses reçues et préparer un courrier clair au lieu d’empiler les messages.</p>
+      </article>
+      <article class="faq-item">
+        <h3>Que faire si la CAF ou la CPAM bloque mon dossier ?</h3>
+        <p>Vérifier la dernière demande utile, la pièce manquante éventuelle, la chronologie exacte et reformuler le dossier proprement.</p>
+      </article>
+      <article class="faq-item">
+        <h3>Est-ce utile d’appeler encore ?</h3>
+        <p>Pas toujours. Sans dossier cadré, l’appel ajoute souvent de la confusion. Le fond du problème reste entier.</p>
+      </article>
+      <article class="faq-item">
+        <h3>Peut-on être aidé sans partir dans une procédure lourde ?</h3>
+        <p>Oui, sur le plan documentaire et rédactionnel : tri, synthèse, chronologie et préparation d’une relance ou d’un courrier exploitable.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Envoyer un dossier bloqué</h2>
+        <p>Un résumé simple, les pièces utiles, et le nom de l’organisme concerné. C’est suffisant pour démarrer proprement.</p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <article class="cta-card">
+        <h3>À envoyer</h3>
+        <p>Résumé en quelques lignes, copies des relances, pièces principales, décisions ou réponses reçues, et objectif recherché.</p>
+      </article>
+      <article class="cta-card">
+        <h3>À éviter</h3>
+        <p>Dossiers trop lourds, doublons, captures inutiles, ou mails émotionnels sans point précis sur le blocage réel.</p>
+      </article>
+    </div>
+
+    <div class="actions" style="justify-content:center; margin-top:24px;">
+      <a class="btn btn-primary" href="mailto:contact@axe-dossier.fr?subject=Organisme%20sans%20r%C3%A9ponse&body=Bonjour,%0A%0AJe%20vous%20transmets%20un%20dossier%20bloqu%C3%A9%20avec%20un%20organisme.%0A%0AOrganisme%20concern%C3%A9%20:%0A%0ASituation%20:%0A%0AObjectif%20:%0A">Envoyer mon dossier</a>
+    </div>
+  </div>
+</section>
+
+  </main>  <footer class="footer">
+    <div class="wrap footer-box">
+      <strong>Axe Dossier</strong>
+      <p style="margin-top:8px;">Service d’accompagnement documentaire et rédactionnel. Ne constitue pas une consultation juridique, une représentation en justice ou une prise en charge judiciaire.</p>
+    </div>
+  </footer>
+</body>
+</html>
