@@ -451,204 +451,310 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   </section>
 </div>
 
-  </main>  <script>
-    const CLIENTS_KEY = "axe_dossier_clients_v1";
-    const INVOICES_KEY = "axe_dossier_invoices_v1";
-    const PAYMENTS_KEY = "axe_dossier_payments_v1";
+  </main>  
+  
+ <script type="module">
+  import "./auth-guard.js";
+  import { db } from "./firebase-config.js";
+  import {
+    collection,
+    addDoc,
+    deleteDoc,
+    doc,
+    updateDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const form = document.getElementById("paymentForm");
-    const paymentInvoice = document.getElementById("paymentInvoice");
-    const paymentAmount = document.getElementById("paymentAmount");
-    const paymentList = document.getElementById("paymentList");
-    const searchInput = document.getElementById("searchInput");
-    const modeFilter = document.getElementById("modeFilter");
+  const form = document.getElementById("paymentForm");
+  const paymentInvoice = document.getElementById("paymentInvoice");
+  const paymentAmount = document.getElementById("paymentAmount");
+  const paymentList = document.getElementById("paymentList");
+  const searchInput = document.getElementById("searchInput");
+  const modeFilter = document.getElementById("modeFilter");
 
-    const totalPayments = document.getElementById("totalPayments");
-    const totalPaidAmount = document.getElementById("totalPaidAmount");
-    const totalVirements = document.getElementById("totalVirements");
-    const totalCheques = document.getElementById("totalCheques");
+  const totalPayments = document.getElementById("totalPayments");
+  const totalPaidAmount = document.getElementById("totalPaidAmount");
+  const totalVirements = document.getElementById("totalVirements");
+  const totalCheques = document.getElementById("totalCheques");
 
-    function loadClients() {
-      try { return JSON.parse(localStorage.getItem(CLIENTS_KEY)) || []; }
-      catch (e) { return []; }
+  const clientsRef = collection(db, "clients");
+  const invoicesRef = collection(db, "factures");
+  const paymentsRef = collection(db, "paiements");
+
+  let allClients = [];
+  let allInvoices = [];
+  let allPayments = [];
+  let editingPaymentId = null;
+
+  function escapeHtml(text = "") {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function formatMoney(value) {
+    const num = Number(value || 0);
+    return num.toLocaleString("fr-FR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " €";
+  }
+
+  function modeBadgeClass(mode = "") {
+    if (mode === "VIREMENT") return "virement";
+    if (mode === "CHEQUE") return "cheque";
+    if (mode === "ESPECES") return "especes";
+    return "autre";
+  }
+
+  function fillInvoiceSelect() {
+    const current = paymentInvoice.value;
+
+    const options = ['<option value="">Sélectionner une facture</option>']
+      .concat(
+        allInvoices.map(invoice => `
+          <option value="${invoice.id}" data-amount="${invoice.amount || 0}">
+            ${escapeHtml(invoice.number || "")} — ${escapeHtml(invoice.label || "Sans libellé")}
+          </option>
+        `)
+      );
+
+    paymentInvoice.innerHTML = options.join("");
+
+    if (current && allInvoices.some(i => i.id === current)) {
+      paymentInvoice.value = current;
+    }
+  }
+
+  function fillForm(payment) {
+    document.getElementById("paymentInvoice").value = payment.invoiceId || "";
+    document.getElementById("paymentDate").value = payment.date || "";
+    document.getElementById("paymentAmount").value = payment.amount ?? "";
+    document.getElementById("paymentMode").value = payment.mode || "VIREMENT";
+    document.getElementById("paymentReference").value = payment.reference || "";
+    document.getElementById("paymentNotes").value = payment.notes || "";
+  }
+
+  function renderStats(payments) {
+    totalPayments.textContent = payments.length;
+    totalPaidAmount.textContent = formatMoney(
+      payments.reduce((acc, p) => acc + Number(p.amount || 0), 0)
+    );
+    totalVirements.textContent = payments.filter(p => p.mode === "VIREMENT").length;
+    totalCheques.textContent = payments.filter(p => p.mode === "CHEQUE").length;
+  }
+
+  function renderPayments() {
+    const clientMap = Object.fromEntries(allClients.map(c => [c.id, c]));
+    const invoiceMap = Object.fromEntries(allInvoices.map(i => [i.id, i]));
+    const q = (searchInput.value || "").trim().toLowerCase();
+    const filter = modeFilter.value;
+
+    const filtered = allPayments.filter(payment => {
+      const invoice = invoiceMap[payment.invoiceId];
+      const clientName = invoice ? (clientMap[invoice.clientId]?.name || "") : "";
+
+      const blob = [
+        payment.reference || "",
+        payment.notes || "",
+        payment.mode || "",
+        invoice?.number || "",
+        invoice?.label || "",
+        clientName
+      ].join(" ").toLowerCase();
+
+      const matchesSearch = blob.includes(q);
+      const matchesMode = !filter || payment.mode === filter;
+      return matchesSearch && matchesMode;
+    });
+
+    renderStats(allPayments);
+
+    if (!allInvoices.length) {
+      paymentList.innerHTML = '<div class="empty">Ajoute d’abord au moins une facture dans factures.html.</div>';
+      return;
     }
 
-    function loadInvoices() {
-      try { return JSON.parse(localStorage.getItem(INVOICES_KEY)) || []; }
-      catch (e) { return []; }
+    if (!filtered.length) {
+      paymentList.innerHTML = '<div class="empty">Aucun paiement pour le moment.</div>';
+      return;
     }
 
-    function loadPayments() {
-      try { return JSON.parse(localStorage.getItem(PAYMENTS_KEY)) || []; }
-      catch (e) { return []; }
-    }
+    paymentList.innerHTML = filtered.map(payment => {
+      const invoice = invoiceMap[payment.invoiceId];
+      const clientName = invoice ? (clientMap[invoice.clientId]?.name || "Client supprimé") : "Facture supprimée";
 
-    function savePayments(items) {
-      localStorage.setItem(PAYMENTS_KEY, JSON.stringify(items));
-    }
-
-    function escapeHtml(text = "") {
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function formatMoney(value) {
-      const num = Number(value || 0);
-      return num.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
-    }
-
-    function modeBadgeClass(mode = "") {
-      if (mode === "VIREMENT") return "virement";
-      if (mode === "CHEQUE") return "cheque";
-      if (mode === "ESPECES") return "especes";
-      return "autre";
-    }
-
-    function fillInvoiceSelect() {
-      const invoices = loadInvoices();
-      const current = paymentInvoice.value;
-      const options = ['<option value="">Sélectionner une facture</option>']
-        .concat(invoices.map(invoice => `<option value="${invoice.id}" data-amount="${invoice.amount || 0}">${escapeHtml(invoice.number)} — ${escapeHtml(invoice.label || "Sans libellé")}</option>`));
-      paymentInvoice.innerHTML = options.join("");
-      if (current) paymentInvoice.value = current;
-    }
-
-    function renderStats(payments) {
-      totalPayments.textContent = payments.length;
-      totalPaidAmount.textContent = formatMoney(payments.reduce((acc, p) => acc + Number(p.amount || 0), 0));
-      totalVirements.textContent = payments.filter(p => p.mode === "VIREMENT").length;
-      totalCheques.textContent = payments.filter(p => p.mode === "CHEQUE").length;
-    }
-
-    function renderPayments() {
-      const clients = loadClients();
-      const invoices = loadInvoices();
-      const payments = loadPayments();
-      const clientMap = Object.fromEntries(clients.map(c => [c.id, c]));
-      const invoiceMap = Object.fromEntries(invoices.map(i => [i.id, i]));
-      const q = (searchInput.value || "").trim().toLowerCase();
-      const filter = modeFilter.value;
-
-      const filtered = payments.filter(payment => {
-        const invoice = invoiceMap[payment.invoiceId];
-        const clientName = invoice ? (clientMap[invoice.clientId]?.name || "") : "";
-        const blob = [
-          payment.reference,
-          payment.notes,
-          payment.mode,
-          invoice?.number || "",
-          invoice?.label || "",
-          clientName
-        ].join(" ").toLowerCase();
-
-        const matchesSearch = blob.includes(q);
-        const matchesMode = !filter || payment.mode === filter;
-        return matchesSearch && matchesMode;
-      });
-
-      renderStats(payments);
-
-      if (!invoices.length) {
-        paymentList.innerHTML = '<div class="empty">Ajoute d’abord au moins une facture dans factures.html.</div>';
-        return;
-      }
-
-      if (!filtered.length) {
-        paymentList.innerHTML = '<div class="empty">Aucun paiement pour le moment.</div>';
-        return;
-      }
-
-      paymentList.innerHTML = filtered
-        .slice()
-        .reverse()
-        .map(payment => {
-          const invoice = invoiceMap[payment.invoiceId];
-          const clientName = invoice ? (clientMap[invoice.clientId]?.name || "Client supprimé") : "Facture supprimée";
-          return `
-            <article class="payment-item">
-              <div class="payment-top">
-                <div>
-                  <div class="payment-title">${escapeHtml(invoice?.number || "Facture supprimée")}</div>
-                  <div class="payment-meta">
-                    <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
-                    ${invoice?.label ? `<span><strong>Libellé :</strong> ${escapeHtml(invoice.label)}</span>` : ""}
-                    ${payment.date ? `<span><strong>Date :</strong> ${escapeHtml(payment.date)}</span>` : ""}
-                    ${payment.reference ? `<span><strong>Référence :</strong> ${escapeHtml(payment.reference)}</span>` : ""}
-                  </div>
-                </div>
-                <div class="badges">
-                  <span class="badge ${modeBadgeClass(payment.mode)}">${escapeHtml(payment.mode)}</span>
-                </div>
-              </div>
-
+      return `
+        <article class="payment-item">
+          <div class="payment-top">
+            <div>
+              <div class="payment-title">${escapeHtml(invoice?.number || "Facture supprimée")}</div>
               <div class="payment-meta">
-                <span class="amount">${formatMoney(payment.amount)}</span>
+                <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
+                ${invoice?.label ? `<span><strong>Libellé :</strong> ${escapeHtml(invoice.label)}</span>` : ""}
+                ${payment.date ? `<span><strong>Date :</strong> ${escapeHtml(payment.date)}</span>` : ""}
+                ${payment.reference ? `<span><strong>Référence :</strong> ${escapeHtml(payment.reference)}</span>` : ""}
               </div>
+            </div>
+            <div class="badges">
+              <span class="badge ${modeBadgeClass(payment.mode)}">${escapeHtml(payment.mode || "")}</span>
+            </div>
+          </div>
 
-              ${payment.notes ? `<div class="payment-notes">${escapeHtml(payment.notes).replace(/\n/g, "<br>")}</div>` : ""}
+          <div class="payment-meta">
+            <span class="amount">${formatMoney(payment.amount)}</span>
+          </div>
 
-              <div class="mini-actions">
-                <button class="mini-btn" type="button" onclick="deletePayment('${payment.id}')">Supprimer</button>
-              </div>
-            </article>
-          `;
-        })
-        .join("");
-    }
+          ${payment.notes ? `<div class="payment-notes">${escapeHtml(payment.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
-    function createPayment(data) {
-      return {
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-        invoiceId: data.get("paymentInvoice") || "",
-        date: data.get("paymentDate") || "",
-        amount: Number(data.get("paymentAmount") || 0),
-        mode: data.get("paymentMode") || "VIREMENT",
-        reference: data.get("paymentReference")?.trim() || "",
-        notes: data.get("paymentNotes")?.trim() || "",
-        createdAt: Date.now()
-      };
-    }
+          <div class="mini-actions">
+            <button class="mini-btn" type="button" data-edit-id="${payment.id}">Modifier</button>
+            <button class="mini-btn" type="button" data-delete-id="${payment.id}">Supprimer</button>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const data = new FormData(form);
-      const payment = createPayment(data);
+  function createPayment(data) {
+    return {
+      invoiceId: data.get("paymentInvoice") || "",
+      date: data.get("paymentDate") || "",
+      amount: Number(data.get("paymentAmount") || 0),
+      mode: data.get("paymentMode") || "VIREMENT",
+      reference: (data.get("paymentReference") || "").trim(),
+      notes: (data.get("paymentNotes") || "").trim(),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+  }
 
-      if (!payment.invoiceId || !payment.amount) return;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      const payments = loadPayments();
-      payments.push(payment);
-      savePayments(payments);
+    const data = new FormData(form);
+    const payload = createPayment(data);
+
+    if (!payload.invoiceId || !payload.amount) return;
+
+    try {
+      if (editingPaymentId) {
+        await updateDoc(doc(db, "paiements", editingPaymentId), {
+          invoiceId: payload.invoiceId,
+          date: payload.date,
+          amount: payload.amount,
+          mode: payload.mode,
+          reference: payload.reference,
+          notes: payload.notes,
+          updatedAt: serverTimestamp()
+        });
+        editingPaymentId = null;
+      } else {
+        await addDoc(paymentsRef, payload);
+      }
+
       form.reset();
       document.getElementById("paymentMode").value = "VIREMENT";
-      renderPayments();
-    });
+    } catch (err) {
+      console.error("Erreur enregistrement paiement :", err);
+      alert("Impossible d’enregistrer le paiement.");
+    }
+  });
 
-    paymentInvoice.addEventListener("change", (e) => {
-      const option = e.target.selectedOptions[0];
-      if (!paymentAmount.value && option?.dataset?.amount) {
-        paymentAmount.value = option.dataset.amount;
+  paymentInvoice.addEventListener("change", (e) => {
+    const option = e.target.selectedOptions[0];
+    if (!paymentAmount.value && option?.dataset?.amount) {
+      paymentAmount.value = option.dataset.amount;
+    }
+  });
+
+  searchInput.addEventListener("input", renderPayments);
+  modeFilter.addEventListener("change", renderPayments);
+
+  paymentList.addEventListener("click", async (e) => {
+    const editBtn = e.target.closest("[data-edit-id]");
+    if (editBtn) {
+      const id = editBtn.getAttribute("data-edit-id");
+      const payment = allPayments.find(p => p.id === id);
+      if (!payment) return;
+
+      editingPaymentId = id;
+      fillForm(payment);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const deleteBtn = e.target.closest("[data-delete-id]");
+    if (!deleteBtn) return;
+
+    const id = deleteBtn.getAttribute("data-delete-id");
+    const ok = confirm("Supprimer ce paiement ?");
+    if (!ok) return;
+
+    try {
+      await deleteDoc(doc(db, "paiements", id));
+
+      if (editingPaymentId === id) {
+        editingPaymentId = null;
+        form.reset();
+        document.getElementById("paymentMode").value = "VIREMENT";
       }
-    });
+    } catch (err) {
+      console.error("Erreur suppression paiement :", err);
+      alert("Impossible de supprimer le paiement.");
+    }
+  });
 
-    searchInput.addEventListener("input", renderPayments);
-    modeFilter.addEventListener("change", renderPayments);
-
-    window.deletePayment = function(id) {
-      const ok = confirm("Supprimer ce paiement ?");
-      if (!ok) return;
-      const payments = loadPayments().filter(payment => payment.id !== id);
-      savePayments(payments);
+  onSnapshot(
+    query(clientsRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allClients = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
       renderPayments();
-    };
+    },
+    (err) => {
+      console.error("Erreur chargement clients :", err);
+    }
+  );
 
-    fillInvoiceSelect();
-    renderPayments();
-  </script>
-<script type="module" src="./auth-guard.js"></script>
+  onSnapshot(
+    query(invoicesRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allInvoices = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      fillInvoiceSelect();
+      renderPayments();
+    },
+    (err) => {
+      console.error("Erreur chargement factures :", err);
+    }
+  );
+
+  onSnapshot(
+    query(paymentsRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allPayments = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      renderPayments();
+    },
+    (err) => {
+      console.error("Erreur chargement paiements :", err);
+      paymentList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
+      renderStats([]);
+    }
+  );
+</script>
 </body>
 </html>
