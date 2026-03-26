@@ -412,132 +412,160 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   </section>
 </div>
 
-  </main>  <script>
-    const STORAGE_KEY = "axe_dossier_clients_v1";
+  </main>
 
-    const form = document.getElementById("clientForm");
-    const clientList = document.getElementById("clientList");
-    const searchInput = document.getElementById("searchInput");
-    const totalClients = document.getElementById("totalClients");
-    const totalParticuliers = document.getElementById("totalParticuliers");
-    const totalPros = document.getElementById("totalPros");
+<script type="module">
+  import "./auth-guard.js";
+  import { db } from "./firebase-config.js";
+  import {
+    collection,
+    addDoc,
+    deleteDoc,
+    doc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    function loadClients() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-      } catch (e) {
-        return [];
-      }
-    }
+  const form = document.getElementById("clientForm");
+  const clientList = document.getElementById("clientList");
+  const searchInput = document.getElementById("searchInput");
+  const totalClients = document.getElementById("totalClients");
+  const totalParticuliers = document.getElementById("totalParticuliers");
+  const totalPros = document.getElementById("totalPros");
 
-    function saveClients(clients) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
-    }
+  const clientsRef = collection(db, "clients");
 
-    function escapeHtml(text = "") {
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
+  let allClients = [];
 
-    function renderStats(clients) {
-      totalClients.textContent = clients.length;
-      totalParticuliers.textContent = clients.filter(c => c.type === "Particulier").length;
-      totalPros.textContent = clients.filter(c => c.type === "Professionnel").length;
-    }
+  function escapeHtml(text = "") {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
 
-    function renderClients() {
-      const clients = loadClients();
-      const q = (searchInput.value || "").trim().toLowerCase();
+  function renderStats(clients) {
+    totalClients.textContent = clients.length;
+    totalParticuliers.textContent = clients.filter(c => c.type === "Particulier").length;
+    totalPros.textContent = clients.filter(c => c.type === "Professionnel").length;
+  }
 
-      const filtered = clients.filter(client => {
-        const blob = [
-          client.name,
-          client.type,
-          client.email,
-          client.phone,
-          client.address,
-          client.notes
-        ].join(" ").toLowerCase();
-        return blob.includes(q);
-      });
+  function renderClients() {
+    const q = (searchInput.value || "").trim().toLowerCase();
 
-      renderStats(clients);
+    const filtered = allClients.filter(client => {
+      const blob = [
+        client.name || "",
+        client.type || "",
+        client.email || "",
+        client.phone || "",
+        client.address || "",
+        client.notes || ""
+      ].join(" ").toLowerCase();
 
-      if (!filtered.length) {
-        clientList.innerHTML = '<div class="empty">Aucun client pour le moment.</div>';
-        return;
-      }
-
-      clientList.innerHTML = filtered
-        .slice()
-        .reverse()
-        .map(client => `
-          <article class="client-item">
-            <div class="client-top">
-              <div>
-                <div class="client-name">${escapeHtml(client.name)}</div>
-                <div class="client-meta">
-                  ${client.email ? `<span>${escapeHtml(client.email)}</span>` : ""}
-                  ${client.phone ? `<span>${escapeHtml(client.phone)}</span>` : ""}
-                </div>
-              </div>
-              <span class="badge">${escapeHtml(client.type)}</span>
-            </div>
-
-            ${client.address ? `<div class="client-meta"><span>${escapeHtml(client.address).replace(/\n/g, "<br>")}</span></div>` : ""}
-            ${client.notes ? `<div class="client-notes">${escapeHtml(client.notes).replace(/\n/g, "<br>")}</div>` : ""}
-
-            <div class="mini-actions">
-              <button class="mini-btn" type="button" onclick="deleteClient('${client.id}')">Supprimer</button>
-            </div>
-          </article>
-        `)
-        .join("");
-    }
-
-    function createClient(data) {
-      return {
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-        name: data.get("clientName")?.trim() || "",
-        type: data.get("clientType") || "Particulier",
-        email: data.get("clientEmail")?.trim() || "",
-        phone: data.get("clientPhone")?.trim() || "",
-        address: data.get("clientAddress")?.trim() || "",
-        notes: data.get("clientNotes")?.trim() || "",
-        createdAt: Date.now()
-      };
-    }
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const data = new FormData(form);
-      const newClient = createClient(data);
-
-      if (!newClient.name) return;
-
-      const clients = loadClients();
-      clients.push(newClient);
-      saveClients(clients);
-      form.reset();
-      renderClients();
+      return blob.includes(q);
     });
 
-    searchInput.addEventListener("input", renderClients);
+    renderStats(allClients);
 
-    window.deleteClient = function(id) {
-      const ok = confirm("Supprimer ce client ?");
-      if (!ok) return;
-      const clients = loadClients().filter(client => client.id !== id);
-      saveClients(clients);
-      renderClients();
+    if (!filtered.length) {
+      clientList.innerHTML = '<div class="empty">Aucun client pour le moment.</div>';
+      return;
+    }
+
+    clientList.innerHTML = filtered.map(client => `
+      <article class="client-item">
+        <div class="client-top">
+          <div>
+            <div class="client-name">${escapeHtml(client.name || "")}</div>
+            <div class="client-meta">
+              ${client.email ? `<span>${escapeHtml(client.email)}</span>` : ""}
+              ${client.phone ? `<span>${escapeHtml(client.phone)}</span>` : ""}
+            </div>
+          </div>
+          <span class="badge">${escapeHtml(client.type || "")}</span>
+        </div>
+
+        ${client.address ? `<div class="client-meta"><span>${escapeHtml(client.address).replace(/\n/g, "<br>")}</span></div>` : ""}
+        ${client.notes ? `<div class="client-notes">${escapeHtml(client.notes).replace(/\n/g, "<br>")}</div>` : ""}
+
+        <div class="mini-actions">
+          <button class="mini-btn" type="button" data-delete-id="${client.id}">Supprimer</button>
+        </div>
+      </article>
+    `).join("");
+  }
+
+  function createClient(data) {
+    return {
+      name: (data.get("clientName") || "").trim(),
+      type: data.get("clientType") || "Particulier",
+      email: (data.get("clientEmail") || "").trim(),
+      phone: (data.get("clientPhone") || "").trim(),
+      address: (data.get("clientAddress") || "").trim(),
+      notes: (data.get("clientNotes") || "").trim(),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
     };
+  }
 
-    renderClients();
-  </script>
-<script type="module" src="./auth-guard.js"></script>
-  /body>
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = new FormData(form);
+    const newClient = createClient(data);
+
+    if (!newClient.name) return;
+
+    try {
+      await addDoc(clientsRef, newClient);
+      form.reset();
+    } catch (err) {
+      console.error("Erreur ajout client :", err);
+      alert("Impossible d’enregistrer le client.");
+    }
+  });
+
+  searchInput.addEventListener("input", renderClients);
+
+  clientList.addEventListener("click", async (e) => {
+    const btn = e.target.closest("[data-delete-id]");
+    if (!btn) return;
+
+    const id = btn.getAttribute("data-delete-id");
+    const ok = confirm("Supprimer ce client ?");
+    if (!ok) return;
+
+    try {
+      await deleteDoc(doc(db, "clients", id));
+    } catch (err) {
+      console.error("Erreur suppression client :", err);
+      alert("Impossible de supprimer le client.");
+    }
+  });
+
+  const clientsQuery = query(clientsRef, orderBy("createdAt", "desc"));
+
+  onSnapshot(
+    clientsQuery,
+    (snapshot) => {
+      allClients = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      renderClients();
+    },
+    (err) => {
+      console.error("Erreur chargement clients :", err);
+      clientList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
+      renderStats([]);
+    }
+  );
+</script>
+
+</body>
 </html>
