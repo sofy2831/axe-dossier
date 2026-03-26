@@ -446,179 +446,277 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   </section>
 </div>
 
-  </main>  <script>
-    const DOSSIERS_KEY = "axe_dossier_dossiers_v1";
-    const CLIENTS_KEY = "axe_dossier_clients_v1";
-    const DOCUMENTS_KEY = "axe_dossier_documents_v1";
+  </main>  
+  
+<script type="module">
+  import "./auth-guard.js";
+  import { db } from "./firebase-config.js";
+  import {
+    collection,
+    addDoc,
+    deleteDoc,
+    doc,
+    updateDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const form = document.getElementById("documentForm");
-    const dossierSelect = document.getElementById("documentDossier");
-    const documentList = document.getElementById("documentList");
-    const searchInput = document.getElementById("searchInput");
-    const typeFilter = document.getElementById("typeFilter");
+  const form = document.getElementById("documentForm");
+  const dossierSelect = document.getElementById("documentDossier");
+  const documentList = document.getElementById("documentList");
+  const searchInput = document.getElementById("searchInput");
+  const typeFilter = document.getElementById("typeFilter");
 
-    const totalDocuments = document.getElementById("totalDocuments");
-    const totalCourriers = document.getElementById("totalCourriers");
-    const totalEmails = document.getElementById("totalEmails");
-    const totalPieces = document.getElementById("totalPieces");
+  const totalDocuments = document.getElementById("totalDocuments");
+  const totalCourriers = document.getElementById("totalCourriers");
+  const totalEmails = document.getElementById("totalEmails");
+  const totalPieces = document.getElementById("totalPieces");
 
-    function loadClients() {
-      try { return JSON.parse(localStorage.getItem(CLIENTS_KEY)) || []; }
-      catch (e) { return []; }
+  const clientsRef = collection(db, "clients");
+  const dossiersRef = collection(db, "dossiers");
+  const documentsRef = collection(db, "documents");
+
+  let allClients = [];
+  let allDossiers = [];
+  let allDocuments = [];
+  let editingDocumentId = null;
+
+  function escapeHtml(text = "") {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function fillDossierSelect() {
+    const current = dossierSelect.value;
+    const options = ['<option value="">Sélectionner un dossier</option>']
+      .concat(
+        allDossiers.map(dossier => `<option value="${dossier.id}">${escapeHtml(dossier.title || "")}</option>`)
+      );
+
+    dossierSelect.innerHTML = options.join("");
+    if (current && allDossiers.some(d => d.id === current)) {
+      dossierSelect.value = current;
     }
+  }
 
-    function loadDossiers() {
-      try { return JSON.parse(localStorage.getItem(DOSSIERS_KEY)) || []; }
-      catch (e) { return []; }
-    }
+  function fillForm(item) {
+    document.getElementById("documentTitle").value = item.title || "";
+    document.getElementById("documentDossier").value = item.dossierId || "";
+    document.getElementById("documentType").value = item.type || "Courrier";
+    document.getElementById("documentDate").value = item.date || "";
+    document.getElementById("documentUrl").value = item.url || "";
+    document.getElementById("documentNotes").value = item.notes || "";
+  }
 
-    function loadDocuments() {
-      try { return JSON.parse(localStorage.getItem(DOCUMENTS_KEY)) || []; }
-      catch (e) { return []; }
-    }
+  function renderStats(documents) {
+    totalDocuments.textContent = documents.length;
+    totalCourriers.textContent = documents.filter(d => d.type === "Courrier").length;
+    totalEmails.textContent = documents.filter(d => d.type === "Email").length;
+    totalPieces.textContent = documents.filter(d => d.type === "Pièce client" || d.type === "Preuve").length;
+  }
 
-    function saveDocuments(items) {
-      localStorage.setItem(DOCUMENTS_KEY, JSON.stringify(items));
-    }
+  function renderDocuments() {
+    const dossierMap = Object.fromEntries(allDossiers.map(dossier => [dossier.id, dossier]));
+    const clientMap = Object.fromEntries(allClients.map(client => [client.id, client]));
+    const q = (searchInput.value || "").trim().toLowerCase();
+    const filter = typeFilter.value;
 
-    function escapeHtml(text = "") {
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
+    const filtered = allDocuments.filter(item => {
+      const dossier = dossierMap[item.dossierId];
+      const clientName = dossier ? (clientMap[dossier.clientId]?.name || "") : "";
 
-    function fillDossierSelect() {
-      const dossiers = loadDossiers();
-      const current = dossierSelect.value;
-      const options = ['<option value="">Sélectionner un dossier</option>']
-        .concat(dossiers.map(dossier => `<option value="${dossier.id}">${escapeHtml(dossier.title)}</option>`));
-      dossierSelect.innerHTML = options.join("");
-      if (current) dossierSelect.value = current;
-    }
+      const blob = [
+        item.title || "",
+        item.type || "",
+        item.notes || "",
+        item.url || "",
+        dossier?.title || "",
+        clientName
+      ].join(" ").toLowerCase();
 
-    function renderStats(documents) {
-      totalDocuments.textContent = documents.length;
-      totalCourriers.textContent = documents.filter(d => d.type === "Courrier").length;
-      totalEmails.textContent = documents.filter(d => d.type === "Email").length;
-      totalPieces.textContent = documents.filter(d => d.type === "Pièce client" || d.type === "Preuve").length;
-    }
-
-    function renderDocuments() {
-      const dossiers = loadDossiers();
-      const clients = loadClients();
-      const documents = loadDocuments();
-      const dossierMap = Object.fromEntries(dossiers.map(dossier => [dossier.id, dossier]));
-      const clientMap = Object.fromEntries(clients.map(client => [client.id, client]));
-      const q = (searchInput.value || "").trim().toLowerCase();
-      const filter = typeFilter.value;
-
-      const filtered = documents.filter(doc => {
-        const dossier = dossierMap[doc.dossierId];
-        const clientName = dossier ? (clientMap[dossier.clientId]?.name || "") : "";
-        const blob = [
-          doc.title,
-          doc.type,
-          doc.notes,
-          doc.url,
-          dossier?.title || "",
-          clientName
-        ].join(" ").toLowerCase();
-
-        const matchesSearch = blob.includes(q);
-        const matchesType = !filter || doc.type === filter;
-        return matchesSearch && matchesType;
-      });
-
-      renderStats(documents);
-
-      if (!dossiers.length) {
-        documentList.innerHTML = '<div class="empty">Ajoute d’abord au moins un dossier dans dossiers.html.</div>';
-        return;
-      }
-
-      if (!filtered.length) {
-        documentList.innerHTML = '<div class="empty">Aucun document pour le moment.</div>';
-        return;
-      }
-
-      documentList.innerHTML = filtered
-        .slice()
-        .reverse()
-        .map(doc => {
-          const dossier = dossierMap[doc.dossierId];
-          const clientName = dossier ? (clientMap[dossier.clientId]?.name || "Client supprimé") : "Dossier supprimé";
-          return `
-            <article class="doc-item">
-              <div class="doc-top">
-                <div>
-                  <div class="doc-title">${escapeHtml(doc.title)}</div>
-                  <div class="doc-meta">
-                    <span><strong>Dossier :</strong> ${escapeHtml(dossier?.title || "Dossier supprimé")}</span>
-                    <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
-                    ${doc.date ? `<span><strong>Date :</strong> ${escapeHtml(doc.date)}</span>` : ""}
-                  </div>
-                </div>
-                <div class="badges">
-                  <span class="badge">${escapeHtml(doc.type)}</span>
-                </div>
-              </div>
-
-              ${doc.url ? `<div class="doc-meta"><span><strong>Lien :</strong> ${escapeHtml(doc.url)}</span></div>` : ""}
-              ${doc.notes ? `<div class="doc-notes">${escapeHtml(doc.notes).replace(/\n/g, "<br>")}</div>` : ""}
-
-              <div class="mini-actions">
-                <button class="mini-btn" type="button" onclick="deleteDocument('${doc.id}')">Supprimer</button>
-              </div>
-            </article>
-          `;
-        })
-        .join("");
-    }
-
-    function createDocument(data) {
-      return {
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-        title: data.get("documentTitle")?.trim() || "",
-        dossierId: data.get("documentDossier") || "",
-        type: data.get("documentType") || "Autre",
-        date: data.get("documentDate") || "",
-        url: data.get("documentUrl")?.trim() || "",
-        notes: data.get("documentNotes")?.trim() || "",
-        createdAt: Date.now()
-      };
-    }
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const data = new FormData(form);
-      const doc = createDocument(data);
-
-      if (!doc.title || !doc.dossierId) return;
-
-      const documents = loadDocuments();
-      documents.push(doc);
-      saveDocuments(documents);
-      form.reset();
-      renderDocuments();
+      const matchesSearch = blob.includes(q);
+      const matchesType = !filter || item.type === filter;
+      return matchesSearch && matchesType;
     });
 
-    searchInput.addEventListener("input", renderDocuments);
-    typeFilter.addEventListener("change", renderDocuments);
+    renderStats(allDocuments);
 
-    window.deleteDocument = function(id) {
-      const ok = confirm("Supprimer ce document ?");
-      if (!ok) return;
-      const documents = loadDocuments().filter(doc => doc.id !== id);
-      saveDocuments(documents);
-      renderDocuments();
+    if (!allDossiers.length) {
+      documentList.innerHTML = '<div class="empty">Ajoute d’abord au moins un dossier dans dossiers.html.</div>';
+      return;
+    }
+
+    if (!filtered.length) {
+      documentList.innerHTML = '<div class="empty">Aucun document pour le moment.</div>';
+      return;
+    }
+
+    documentList.innerHTML = filtered.map(item => {
+      const dossier = dossierMap[item.dossierId];
+      const clientName = dossier ? (clientMap[dossier.clientId]?.name || "Client supprimé") : "Dossier supprimé";
+
+      return `
+        <article class="doc-item">
+          <div class="doc-top">
+            <div>
+              <div class="doc-title">${escapeHtml(item.title || "")}</div>
+              <div class="doc-meta">
+                <span><strong>Dossier :</strong> ${escapeHtml(dossier?.title || "Dossier supprimé")}</span>
+                <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
+                ${item.date ? `<span><strong>Date :</strong> ${escapeHtml(item.date)}</span>` : ""}
+              </div>
+            </div>
+            <div class="badges">
+              <span class="badge">${escapeHtml(item.type || "")}</span>
+            </div>
+          </div>
+
+          ${item.url ? `<div class="doc-meta"><span><strong>Lien :</strong> ${escapeHtml(item.url)}</span></div>` : ""}
+          ${item.notes ? `<div class="doc-notes">${escapeHtml(item.notes).replace(/\n/g, "<br>")}</div>` : ""}
+
+          <div class="mini-actions">
+            <button class="mini-btn" type="button" data-edit-id="${item.id}">Modifier</button>
+            <button class="mini-btn" type="button" data-delete-id="${item.id}">Supprimer</button>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  function createDocument(data) {
+    return {
+      title: (data.get("documentTitle") || "").trim(),
+      dossierId: data.get("documentDossier") || "",
+      type: data.get("documentType") || "Autre",
+      date: data.get("documentDate") || "",
+      url: (data.get("documentUrl") || "").trim(),
+      notes: (data.get("documentNotes") || "").trim(),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
     };
+  }
 
-    fillDossierSelect();
-    renderDocuments();
-  </script>
-<script type="module" src="./auth-guard.js"></script>
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = new FormData(form);
+    const payload = createDocument(data);
+
+    if (!payload.title || !payload.dossierId) return;
+
+    try {
+      if (editingDocumentId) {
+        await updateDoc(doc(db, "documents", editingDocumentId), {
+          title: payload.title,
+          dossierId: payload.dossierId,
+          type: payload.type,
+          date: payload.date,
+          url: payload.url,
+          notes: payload.notes,
+          updatedAt: serverTimestamp()
+        });
+        editingDocumentId = null;
+      } else {
+        await addDoc(documentsRef, payload);
+      }
+
+      form.reset();
+      document.getElementById("documentType").value = "Courrier";
+    } catch (err) {
+      console.error("Erreur enregistrement document :", err);
+      alert("Impossible d’enregistrer le document.");
+    }
+  });
+
+  searchInput.addEventListener("input", renderDocuments);
+  typeFilter.addEventListener("change", renderDocuments);
+
+  documentList.addEventListener("click", async (e) => {
+    const editBtn = e.target.closest("[data-edit-id]");
+    if (editBtn) {
+      const id = editBtn.getAttribute("data-edit-id");
+      const item = allDocuments.find(d => d.id === id);
+      if (!item) return;
+
+      editingDocumentId = id;
+      fillForm(item);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const deleteBtn = e.target.closest("[data-delete-id]");
+    if (!deleteBtn) return;
+
+    const id = deleteBtn.getAttribute("data-delete-id");
+    const ok = confirm("Supprimer ce document ?");
+    if (!ok) return;
+
+    try {
+      await deleteDoc(doc(db, "documents", id));
+
+      if (editingDocumentId === id) {
+        editingDocumentId = null;
+        form.reset();
+        document.getElementById("documentType").value = "Courrier";
+      }
+    } catch (err) {
+      console.error("Erreur suppression document :", err);
+      alert("Impossible de supprimer le document.");
+    }
+  });
+
+  onSnapshot(
+    query(clientsRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allClients = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      renderDocuments();
+    },
+    (err) => {
+      console.error("Erreur chargement clients :", err);
+    }
+  );
+
+  onSnapshot(
+    query(dossiersRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allDossiers = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      fillDossierSelect();
+      renderDocuments();
+    },
+    (err) => {
+      console.error("Erreur chargement dossiers :", err);
+      documentList.innerHTML = '<div class="empty">Erreur de chargement des dossiers.</div>';
+    }
+  );
+
+  onSnapshot(
+    query(documentsRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allDocuments = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      renderDocuments();
+    },
+    (err) => {
+      console.error("Erreur chargement documents :", err);
+      documentList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
+      renderStats([]);
+    }
+  );
+</script>
+  
 </body>
 </html>
