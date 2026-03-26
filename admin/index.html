@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axe Dossier — Analyse et structuration de dossiers complexes</title>
+  <meta name="description" content="Axe Dossier accompagne les dossiers complexes : analyse, synthèse, rédaction administrative et accompagnement structuré." />
+  <style>
+    :root {
+      --bg: #f3efe8;
+      --surface: rgba(255,255,255,0.82);
+      --surface-strong: #ffffff;
+      --text: #171717;
+      --muted: #66615a;
+      --line: rgba(23,23,23,0.08);
+      --accent: #111111;
+      --accent-soft: #e9e1d4;
+      --radius-xl: 32px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --shadow: 0 20px 60px rgba(0,0,0,0.08);
+      --max: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.9), transparent 30%),
+        radial-gradient(circle at right 20%, rgba(233,225,212,0.8), transparent 22%),
+        var(--bg);
+      line-height: 1.55;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .wrap {
+      width: min(var(--max), calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(243,239,232,0.74);
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(23,23,23,0.05);
+    }
+
+    .topbar-inner {
+      min-height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-mark {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      background: var(--accent);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+      font-size: 0.95rem;
+      box-shadow: var(--shadow);
+    }
+
+    .nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.65);
+      border: 1px solid rgba(23,23,23,0.07);
+      font-size: 0.94rem;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .pill:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.95);
+    }
+
+    .hero {
+      padding: 56px 0 26px;
+    }
+
+    .hero-shell {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .hero-main {
+      padding: 42px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-main::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -80px auto;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(233,225,212,0.75), rgba(233,225,212,0));
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #4e473e;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      font-size: clamp(2.35rem, 4.2vw, 5rem);
+      letter-spacing: -0.055em;
+      line-height: 0.98;
+      max-width: 10ch;
+      margin-bottom: 18px;
+    }
+
+    .lead {
+      max-width: 58ch;
+      color: #4c473f;
+      font-size: 1.08rem;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 26px;
+    }
+
+    .btn {
+      min-height: 52px;
+      padding: 0 20px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--accent);
+      font-weight: 700;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.7);
+      color: var(--accent);
+      border-color: rgba(23,23,23,0.1);
+    }
+
+    .hero-side {
+      display: grid;
+      gap: 20px;
+    }
+
+    .mini-card {
+      padding: 28px;
+      border-radius: var(--radius-xl);
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .mini-card h3 {
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+
+    .mini-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-list li {
+      padding-left: 18px;
+      position: relative;
+      color: #49443e;
+    }
+
+    .mini-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #1a1a1a;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: var(--radius-md);
+      background: #f8f5ef;
+      border: 1px solid rgba(23,23,23,0.06);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 1.45rem;
+      letter-spacing: -0.04em;
+      margin-bottom: 4px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    section {
+      padding: 22px 0;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      font-size: clamp(1.7rem, 2.4vw, 2.8rem);
+      letter-spacing: -0.04em;
+    }
+
+    .section-head p {
+      max-width: 54ch;
+      color: var(--muted);
+    }
+
+    .grid-3,
+    .steps,
+    .pricing,
+    .contact-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid-3,
+    .pricing {
+      grid-template-columns: repeat(3, minmax(0,1fr));
+    }
+
+    .steps {
+      grid-template-columns: repeat(4, minmax(0,1fr));
+    }
+
+    .contact-grid {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+
+    .feature,
+    .step,
+    .price-card,
+    .contact-card,
+    .disclaimer {
+      padding: 26px;
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .feature h3,
+    .step h3,
+    .price-card h3,
+    .contact-card h3,
+    .disclaimer h3 {
+      font-size: 1.08rem;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .feature p,
+    .step p,
+    .price-card p,
+    .contact-card p,
+    .disclaimer p {
+      color: #4f4942;
+    }
+
+    .step-no {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--accent-soft);
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .price {
+      display: block;
+      margin: 10px 0 12px;
+      font-size: 2rem;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+    }
+
+    .contact-card strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .footer {
+      padding: 28px 0 64px;
+    }
+
+    .footer-box {
+      padding: 22px 24px;
+      border-radius: var(--radius-lg);
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      color: #605951;
+    }
+
+    .footer-box small {
+      display: block;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1024px) {
+      .hero-shell,
+      .grid-3,
+      .steps,
+      .pricing,
+      .contact-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        align-items: start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar-inner {
+        min-height: auto;
+        padding: 14px 0;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .brand, .nav { justify-content: center; }
+      .hero-main, .mini-card, .feature, .step, .price-card, .contact-card, .disclaimer, .footer-box { padding: 20px; }
+      .hero { padding-top: 36px; }
+      .hero-actions { flex-direction: column; }
+      .btn { width: 100%; }
+      .metrics { grid-template-columns: 1fr; }
+      h1 { max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a href="#top" class="brand" aria-label="Axe Dossier">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier</span>
+      </a>
+
+      <nav class="nav" aria-label="Navigation principale">
+        <a class="pill" href="#services">Services</a>
+        <a class="pill" href="#situations">Situations</a>
+        <a class="pill" href="#methode">Méthode</a>
+        <a class="pill" href="#tarifs">Tarifs</a>
+        <a class="pill" href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap hero-shell">
+        <article class="card hero-main">
+          <div class="eyebrow">Dossiers complexes · Litiges · Successions</div>
+          <h1>Remettre un dossier dans l’axe.</h1>
+          <p class="lead">
+            Analyse, synthèse, structuration documentaire et rédaction administrative pour les situations
+            bloquées, confuses ou sensibles.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="mailto:contact@axedossier.fr?subject=Transmission%20de%20dossier&body=Bonjour,%0A%0AJe%20souhaite%20vous%20transmettre%20mon%20dossier.%0A%0AType%20de%20situation%20:%0A%0ADocuments%20disponibles%20:%0A">Envoyer mon dossier</a>
+            <a class="btn btn-secondary" href="#methode">Voir la méthode</a>
+          </div>
+        </article>
+
+        <div class="hero-side">
+          <article class="mini-card">
+            <h3>Intervention</h3>
+            <ul class="mini-list">
+              <li>Analyse et synthèse de dossier</li>
+              <li>Préparation documentaire</li>
+              <li>Rédaction de courriers</li>
+              <li>Accompagnement structuré</li>
+            </ul>
+          </article>
+
+          <article class="mini-card">
+            <div class="metrics">
+              <div class="metric">
+                <strong>1</strong>
+                <span>mail pour démarrer</span>
+              </div>
+              <div class="metric">
+                <strong>4</strong>
+                <span>étapes simples</span>
+              </div>
+              <div class="metric">
+                <strong>0</strong>
+                <span>discours inutile</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Services</h2>
+            <p>Le cœur du travail tient en trois blocs : comprendre, structurer, rédiger.</p>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <article class="feature">
+            <h3>Analyser</h3>
+            <p>Lecture des pièces, chronologie des faits, points de blocage, incohérences et éléments déterminants.</p>
+          </article>
+          <article class="feature">
+            <h3>Structurer</h3>
+            <p>Organisation du dossier, hiérarchie des documents, synthèse claire et préparation des démarches utiles.</p>
+          </article>
+          <article class="feature">
+            <h3>Rédiger</h3>
+            <p>Courrier, réponse argumentée, reformulation factuelle et support écrit exploitable.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="situations">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Situations</h2>
+            <p>Successions, litiges du quotidien, blocages administratifs et dossiers civils sensibles.</p>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <article class="feature">
+            <h3>Successions</h3>
+            <p>Échanges difficiles, inventaire, notaire, généalogiste, blocages entre héritiers.</p>
+          </article>
+          <article class="feature">
+            <h3>Litiges</h3>
+            <p>Assurance, voisinage, prestataire, relance, mise en demeure, dossier incompris.</p>
+          </article>
+          <article class="feature">
+            <h3>Administratif</h3>
+            <p>Réponse à un organisme, clarification d’une situation et remise à plat du dossier.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="methode">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Méthode</h2>
+            <p>Une méthode courte, nette, et centrée sur les pièces.</p>
+          </div>
+        </div>
+
+        <div class="steps">
+          <article class="step">
+            <div class="step-no">1</div>
+            <h3>Transmission</h3>
+            <p>Envoi du dossier par mail avec un résumé factuel.</p>
+          </article>
+          <article class="step">
+            <div class="step-no">2</div>
+            <h3>Lecture</h3>
+            <p>Reprise des dates, des pièces et de la logique d’ensemble.</p>
+          </article>
+          <article class="step">
+            <div class="step-no">3</div>
+            <h3>Synthèse</h3>
+            <p>Retour écrit clair avec options et points clés.</p>
+          </article>
+          <article class="step">
+            <div class="step-no">4</div>
+            <h3>Suite</h3>
+            <p>Échange complémentaire si la situation le justifie.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="tarifs">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Tarifs</h2>
+            <p>Base de lancement simple. Tu pourras monter ensuite sans tout refaire.</p>
+          </div>
+        </div>
+
+        <div class="pricing">
+          <article class="price-card">
+            <h3>Première lecture</h3>
+            <span class="price">90 €</span>
+            <p>Lecture initiale et premier cadrage.</p>
+          </article>
+          <article class="price-card">
+            <h3>Analyse + synthèse</h3>
+            <span class="price">190 €</span>
+            <p>Retour écrit structuré et exploitable.</p>
+          </article>
+          <article class="price-card">
+            <h3>Courrier complémentaire</h3>
+            <span class="price">75 €</span>
+            <p>Rédaction sur la base du dossier déjà étudié.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="wrap contact-grid">
+        <article class="contact-card">
+          <h3>Contact</h3>
+          <strong>Un mail clair vaut mieux qu’un long appel confus.</strong>
+          <p>Transmets les pièces utiles, un résumé bref, et l’objectif recherché. Le travail commence là.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="mailto:contact@axedossier.fr?subject=Premi%C3%A8re%20prise%20de%20contact&body=Bonjour,%0A%0AJe%20vous%20contacte%20pour%20la%20situation%20suivante%20:%0A%0AType%20de%20dossier%20:%0A%0ADocuments%20disponibles%20:%0A%0AObjectif%20de%20ma%20demande%20:%0A">Écrire maintenant</a>
+          </div>
+        </article>
+
+        <article class="disclaimer">
+          <h3>Cadre d’intervention</h3>
+          <p>Service d’accompagnement documentaire et rédactionnel. Ne constitue pas une consultation juridique, une représentation en justice ou une prise en charge judiciaire.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Envoyer un dossier</h2>
+            <p>Un dossier clair = une réponse rapide. Respecte ce cadre pour éviter les allers-retours inutiles.</p>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <article class="feature">
+            <h3>À envoyer</h3>
+            <p>
+              • Résumé simple (10 lignes max)<br>
+              • Documents utiles uniquement<br>
+              • Objectif clair (ce que tu veux obtenir)
+            </p>
+          </article>
+
+          <article class="feature">
+            <h3>À éviter</h3>
+            <p>
+              • Messages trop longs ou émotionnels<br>
+              • Documents inutiles ou en doublon<br>
+              • Dossier incomplet sans explication
+            </p>
+          </article>
+
+          <article class="feature">
+            <h3>Conditions</h3>
+            <p>
+              • Réponse sous 24 à 72h<br>
+              • Formats : PDF, JPG, PNG<br>
+              • Taille max : 15 Mo par envoi
+            </p>
+          </article>
+        </div>
+
+        <div style="margin-top:24px; text-align:center;">
+          <a class="btn btn-primary" href="mailto:contact@axe-dossier.fr?subject=Transmission%20de%20dossier&body=Bonjour,%0A%0AType%20de%20dossier%20:%0A%0AObjectif%20:%0A%0A">Envoyer mon dossier</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-box">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;">
+        <div>
+          <strong style="display:block; font-size:1.05rem; margin-bottom:6px;">Axe Dossier</strong>
+          <small>Analyse · Structure · Rédaction</small>
+        </div>
+
+        <details style="max-width:520px;">
+          <summary style="cursor:pointer; font-size:0.9rem; color:#666;">Mentions légales</summary>
+          <small style="display:block; margin-top:8px; line-height:1.5;">
+            Éditeur du site : Sophie Dumas<br>
+            Statut : EI<br>
+            Adresse : 24 hameau de danis, 09700 Saverdun<br>
+            Email : contact@axe-dossier.fr<br>
+            Directeur de la publication : Sophie Dumas<br>
+            Hébergeur : OVH, 2 rue Kellermann, 59100 Roubaix, France
+          </small>
+        </details>
+      </div>
+
+      <div style="margin-top:16px; padding-top:14px; border-top:1px solid rgba(23,23,23,0.08);">
+        <small>
+          Service d’accompagnement documentaire et rédactionnel. Ne constitue pas une consultation juridique,
+          une représentation en justice ou une prise en charge judiciaire.<br>
+          © 2026 Axe Dossier.
+        </small>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
