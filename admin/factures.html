@@ -482,224 +482,346 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   </section>
 </div>
 
-  </main>  <script>
-    const CLIENTS_KEY = "axe_dossier_clients_v1";
-    const DOSSIERS_KEY = "axe_dossier_dossiers_v1";
-    const INVOICES_KEY = "axe_dossier_invoices_v1";
+  </main> 
+  <script type="module">
+  import "./auth-guard.js";
+  import { db } from "./firebase-config.js";
+  import {
+    collection,
+    addDoc,
+    deleteDoc,
+    doc,
+    updateDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const form = document.getElementById("invoiceForm");
-    const invoiceClient = document.getElementById("invoiceClient");
-    const invoiceDossier = document.getElementById("invoiceDossier");
-    const invoiceList = document.getElementById("invoiceList");
-    const searchInput = document.getElementById("searchInput");
-    const statusFilter = document.getElementById("statusFilter");
+  const form = document.getElementById("invoiceForm");
+  const invoiceClient = document.getElementById("invoiceClient");
+  const invoiceDossier = document.getElementById("invoiceDossier");
+  const invoiceList = document.getElementById("invoiceList");
+  const searchInput = document.getElementById("searchInput");
+  const statusFilter = document.getElementById("statusFilter");
 
-    const totalInvoices = document.getElementById("totalInvoices");
-    const totalOpen = document.getElementById("totalOpen");
-    const totalPaid = document.getElementById("totalPaid");
-    const totalAmount = document.getElementById("totalAmount");
+  const totalInvoices = document.getElementById("totalInvoices");
+  const totalOpen = document.getElementById("totalOpen");
+  const totalPaid = document.getElementById("totalPaid");
+  const totalAmount = document.getElementById("totalAmount");
 
-    function loadClients() {
-      try { return JSON.parse(localStorage.getItem(CLIENTS_KEY)) || []; }
-      catch (e) { return []; }
+  const clientsRef = collection(db, "clients");
+  const dossiersRef = collection(db, "dossiers");
+  const invoicesRef = collection(db, "factures");
+
+  let allClients = [];
+  let allDossiers = [];
+  let allInvoices = [];
+  let editingInvoiceId = null;
+
+  function escapeHtml(text = "") {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function formatMoney(value) {
+    const num = Number(value || 0);
+    return num.toLocaleString("fr-FR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " €";
+  }
+
+  function statusBadgeClass(status = "") {
+    if (status === "BROUILLON") return "brouillon";
+    if (status === "ENVOYEE") return "envoyee";
+    if (status === "PAYEE") return "payee";
+    if (status === "RETARD") return "retard";
+    if (status === "ANNULEE") return "annulee";
+    return "";
+  }
+
+  function fillClientSelect() {
+    const current = invoiceClient.value;
+    const options = ['<option value="">Sélectionner un client</option>']
+      .concat(
+        allClients.map(client => `<option value="${client.id}">${escapeHtml(client.name || "")}</option>`)
+      );
+
+    invoiceClient.innerHTML = options.join("");
+
+    if (current && allClients.some(c => c.id === current)) {
+      invoiceClient.value = current;
+    }
+  }
+
+  function fillDossierSelect(clientId = "") {
+    const current = invoiceDossier.value;
+    const filtered = clientId
+      ? allDossiers.filter(d => d.clientId === clientId)
+      : allDossiers;
+
+    const options = ['<option value="">Aucun dossier</option>']
+      .concat(
+        filtered.map(dossier => `<option value="${dossier.id}">${escapeHtml(dossier.title || "")}</option>`)
+      );
+
+    invoiceDossier.innerHTML = options.join("");
+
+    if (current && filtered.some(d => d.id === current)) {
+      invoiceDossier.value = current;
+    }
+  }
+
+  function fillForm(invoice) {
+    document.getElementById("invoiceNumber").value = invoice.number || "";
+    document.getElementById("invoiceDate").value = invoice.date || "";
+    document.getElementById("invoiceClient").value = invoice.clientId || "";
+    fillDossierSelect(invoice.clientId || "");
+    document.getElementById("invoiceDossier").value = invoice.dossierId || "";
+    document.getElementById("invoiceAmount").value = invoice.amount ?? "";
+    document.getElementById("invoiceDueDate").value = invoice.dueDate || "";
+    document.getElementById("invoiceStatus").value = invoice.status || "BROUILLON";
+    document.getElementById("invoiceMode").value = invoice.mode || "VIREMENT";
+    document.getElementById("invoiceLabel").value = invoice.label || "";
+    document.getElementById("invoiceNotes").value = invoice.notes || "";
+  }
+
+  function renderStats(invoices) {
+    totalInvoices.textContent = invoices.length;
+    totalOpen.textContent = invoices.filter(i =>
+      i.status === "BROUILLON" || i.status === "ENVOYEE" || i.status === "RETARD"
+    ).length;
+    totalPaid.textContent = invoices.filter(i => i.status === "PAYEE").length;
+
+    const sum = invoices.reduce((acc, item) => acc + Number(item.amount || 0), 0);
+    totalAmount.textContent = formatMoney(sum);
+  }
+
+  function renderInvoices() {
+    const clientMap = Object.fromEntries(allClients.map(c => [c.id, c]));
+    const dossierMap = Object.fromEntries(allDossiers.map(d => [d.id, d]));
+    const q = (searchInput.value || "").trim().toLowerCase();
+    const filter = statusFilter.value;
+
+    const filtered = allInvoices.filter(invoice => {
+      const clientName = clientMap[invoice.clientId]?.name || "";
+      const dossierTitle = dossierMap[invoice.dossierId]?.title || "";
+
+      const blob = [
+        invoice.number || "",
+        invoice.label || "",
+        invoice.status || "",
+        invoice.mode || "",
+        invoice.notes || "",
+        clientName,
+        dossierTitle
+      ].join(" ").toLowerCase();
+
+      const matchesSearch = blob.includes(q);
+      const matchesStatus = !filter || invoice.status === filter;
+      return matchesSearch && matchesStatus;
+    });
+
+    renderStats(allInvoices);
+
+    if (!allClients.length) {
+      invoiceList.innerHTML = '<div class="empty">Ajoute d’abord au moins un client dans clients.html.</div>';
+      return;
     }
 
-    function loadDossiers() {
-      try { return JSON.parse(localStorage.getItem(DOSSIERS_KEY)) || []; }
-      catch (e) { return []; }
+    if (!filtered.length) {
+      invoiceList.innerHTML = '<div class="empty">Aucune facture pour le moment.</div>';
+      return;
     }
 
-    function loadInvoices() {
-      try { return JSON.parse(localStorage.getItem(INVOICES_KEY)) || []; }
-      catch (e) { return []; }
-    }
+    invoiceList.innerHTML = filtered.map(invoice => {
+      const clientName = clientMap[invoice.clientId]?.name || "Client supprimé";
+      const dossierTitle = invoice.dossierId
+        ? (dossierMap[invoice.dossierId]?.title || "Dossier supprimé")
+        : "Aucun dossier";
 
-    function saveInvoices(items) {
-      localStorage.setItem(INVOICES_KEY, JSON.stringify(items));
-    }
-
-    function escapeHtml(text = "") {
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    function formatMoney(value) {
-      const num = Number(value || 0);
-      return num.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
-    }
-
-    function statusBadgeClass(status = "") {
-      if (status === "BROUILLON") return "brouillon";
-      if (status === "ENVOYEE") return "envoyee";
-      if (status === "PAYEE") return "payee";
-      if (status === "RETARD") return "retard";
-      if (status === "ANNULEE") return "annulee";
-      return "";
-    }
-
-    function fillClientSelect() {
-      const clients = loadClients();
-      const current = invoiceClient.value;
-      const options = ['<option value="">Sélectionner un client</option>']
-        .concat(clients.map(client => `<option value="${client.id}">${escapeHtml(client.name)}</option>`));
-      invoiceClient.innerHTML = options.join("");
-      if (current) invoiceClient.value = current;
-    }
-
-    function fillDossierSelect(clientId = "") {
-      const dossiers = loadDossiers();
-      const current = invoiceDossier.value;
-      const filtered = clientId ? dossiers.filter(d => d.clientId === clientId) : dossiers;
-      const options = ['<option value="">Aucun dossier</option>']
-        .concat(filtered.map(dossier => `<option value="${dossier.id}">${escapeHtml(dossier.title)}</option>`));
-      invoiceDossier.innerHTML = options.join("");
-      if (current && filtered.some(d => d.id === current)) invoiceDossier.value = current;
-    }
-
-    function renderStats(invoices) {
-      totalInvoices.textContent = invoices.length;
-      totalOpen.textContent = invoices.filter(i => i.status === "BROUILLON" || i.status === "ENVOYEE" || i.status === "RETARD").length;
-      totalPaid.textContent = invoices.filter(i => i.status === "PAYEE").length;
-      const sum = invoices.reduce((acc, item) => acc + Number(item.amount || 0), 0);
-      totalAmount.textContent = formatMoney(sum);
-    }
-
-    function renderInvoices() {
-      const clients = loadClients();
-      const dossiers = loadDossiers();
-      const invoices = loadInvoices();
-      const clientMap = Object.fromEntries(clients.map(c => [c.id, c]));
-      const dossierMap = Object.fromEntries(dossiers.map(d => [d.id, d]));
-      const q = (searchInput.value || "").trim().toLowerCase();
-      const filter = statusFilter.value;
-
-      const filtered = invoices.filter(invoice => {
-        const clientName = clientMap[invoice.clientId]?.name || "";
-        const dossierTitle = dossierMap[invoice.dossierId]?.title || "";
-        const blob = [
-          invoice.number,
-          invoice.label,
-          invoice.status,
-          invoice.mode,
-          invoice.notes,
-          clientName,
-          dossierTitle
-        ].join(" ").toLowerCase();
-
-        const matchesSearch = blob.includes(q);
-        const matchesStatus = !filter || invoice.status === filter;
-        return matchesSearch && matchesStatus;
-      });
-
-      renderStats(invoices);
-
-      if (!clients.length) {
-        invoiceList.innerHTML = '<div class="empty">Ajoute d’abord au moins un client dans clients.html.</div>';
-        return;
-      }
-
-      if (!filtered.length) {
-        invoiceList.innerHTML = '<div class="empty">Aucune facture pour le moment.</div>';
-        return;
-      }
-
-      invoiceList.innerHTML = filtered
-        .slice()
-        .reverse()
-        .map(invoice => {
-          const clientName = clientMap[invoice.clientId]?.name || "Client supprimé";
-          const dossierTitle = invoice.dossierId ? (dossierMap[invoice.dossierId]?.title || "Dossier supprimé") : "Aucun dossier";
-          return `
-            <article class="invoice-item">
-              <div class="invoice-top">
-                <div>
-                  <div class="invoice-title">${escapeHtml(invoice.number)}</div>
-                  <div class="invoice-meta">
-                    <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
-                    <span><strong>Dossier :</strong> ${escapeHtml(dossierTitle)}</span>
-                    ${invoice.date ? `<span><strong>Date :</strong> ${escapeHtml(invoice.date)}</span>` : ""}
-                    ${invoice.dueDate ? `<span><strong>Échéance :</strong> ${escapeHtml(invoice.dueDate)}</span>` : ""}
-                  </div>
-                </div>
-                <div class="badges">
-                  <span class="badge ${statusBadgeClass(invoice.status)}">${escapeHtml(invoice.status)}</span>
-                  <span class="badge">${escapeHtml(invoice.mode)}</span>
-                </div>
-              </div>
-
+      return `
+        <article class="invoice-item">
+          <div class="invoice-top">
+            <div>
+              <div class="invoice-title">${escapeHtml(invoice.number || "")}</div>
               <div class="invoice-meta">
-                ${invoice.label ? `<span><strong>Libellé :</strong> ${escapeHtml(invoice.label)}</span>` : ""}
-                <span class="amount">${formatMoney(invoice.amount)}</span>
+                <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
+                <span><strong>Dossier :</strong> ${escapeHtml(dossierTitle)}</span>
+                ${invoice.date ? `<span><strong>Date :</strong> ${escapeHtml(invoice.date)}</span>` : ""}
+                ${invoice.dueDate ? `<span><strong>Échéance :</strong> ${escapeHtml(invoice.dueDate)}</span>` : ""}
               </div>
+            </div>
+            <div class="badges">
+              <span class="badge ${statusBadgeClass(invoice.status)}">${escapeHtml(invoice.status || "")}</span>
+              <span class="badge">${escapeHtml(invoice.mode || "")}</span>
+            </div>
+          </div>
 
-              ${invoice.notes ? `<div class="invoice-notes">${escapeHtml(invoice.notes).replace(/\n/g, "<br>")}</div>` : ""}
+          <div class="invoice-meta">
+            ${invoice.label ? `<span><strong>Libellé :</strong> ${escapeHtml(invoice.label)}</span>` : ""}
+            <span class="amount">${formatMoney(invoice.amount)}</span>
+          </div>
 
-              <div class="mini-actions">
-                <button class="mini-btn" type="button" onclick="deleteInvoice('${invoice.id}')">Supprimer</button>
-              </div>
-            </article>
-          `;
-        })
-        .join("");
-    }
+          ${invoice.notes ? `<div class="invoice-notes">${escapeHtml(invoice.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
-    function createInvoice(data) {
-      return {
-        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-        number: data.get("invoiceNumber")?.trim() || "",
-        date: data.get("invoiceDate") || "",
-        clientId: data.get("invoiceClient") || "",
-        dossierId: data.get("invoiceDossier") || "",
-        amount: Number(data.get("invoiceAmount") || 0),
-        dueDate: data.get("invoiceDueDate") || "",
-        status: data.get("invoiceStatus") || "BROUILLON",
-        mode: data.get("invoiceMode") || "VIREMENT",
-        label: data.get("invoiceLabel")?.trim() || "",
-        notes: data.get("invoiceNotes")?.trim() || "",
-        createdAt: Date.now()
-      };
-    }
+          <div class="mini-actions">
+            <button class="mini-btn" type="button" data-edit-id="${invoice.id}">Modifier</button>
+            <button class="mini-btn" type="button" data-delete-id="${invoice.id}">Supprimer</button>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
 
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const data = new FormData(form);
-      const invoice = createInvoice(data);
+  function createInvoice(data) {
+    return {
+      number: (data.get("invoiceNumber") || "").trim(),
+      date: data.get("invoiceDate") || "",
+      clientId: data.get("invoiceClient") || "",
+      dossierId: data.get("invoiceDossier") || "",
+      amount: Number(data.get("invoiceAmount") || 0),
+      dueDate: data.get("invoiceDueDate") || "",
+      status: data.get("invoiceStatus") || "BROUILLON",
+      mode: data.get("invoiceMode") || "VIREMENT",
+      label: (data.get("invoiceLabel") || "").trim(),
+      notes: (data.get("invoiceNotes") || "").trim(),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+  }
 
-      if (!invoice.number || !invoice.clientId || !invoice.amount) return;
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      const invoices = loadInvoices();
-      invoices.push(invoice);
-      saveInvoices(invoices);
+    const data = new FormData(form);
+    const payload = createInvoice(data);
+
+    if (!payload.number || !payload.clientId || !payload.amount) return;
+
+    try {
+      if (editingInvoiceId) {
+        await updateDoc(doc(db, "factures", editingInvoiceId), {
+          number: payload.number,
+          date: payload.date,
+          clientId: payload.clientId,
+          dossierId: payload.dossierId,
+          amount: payload.amount,
+          dueDate: payload.dueDate,
+          status: payload.status,
+          mode: payload.mode,
+          label: payload.label,
+          notes: payload.notes,
+          updatedAt: serverTimestamp()
+        });
+        editingInvoiceId = null;
+      } else {
+        await addDoc(invoicesRef, payload);
+      }
+
       form.reset();
       document.getElementById("invoiceStatus").value = "BROUILLON";
       document.getElementById("invoiceMode").value = "VIREMENT";
       fillDossierSelect("");
+    } catch (err) {
+      console.error("Erreur enregistrement facture :", err);
+      alert("Impossible d’enregistrer la facture.");
+    }
+  });
+
+  invoiceClient.addEventListener("change", (e) => {
+    fillDossierSelect(e.target.value);
+  });
+
+  searchInput.addEventListener("input", renderInvoices);
+  statusFilter.addEventListener("change", renderInvoices);
+
+  invoiceList.addEventListener("click", async (e) => {
+    const editBtn = e.target.closest("[data-edit-id]");
+    if (editBtn) {
+      const id = editBtn.getAttribute("data-edit-id");
+      const invoice = allInvoices.find(i => i.id === id);
+      if (!invoice) return;
+
+      editingInvoiceId = id;
+      fillForm(invoice);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const deleteBtn = e.target.closest("[data-delete-id]");
+    if (!deleteBtn) return;
+
+    const id = deleteBtn.getAttribute("data-delete-id");
+    const ok = confirm("Supprimer cette facture ?");
+    if (!ok) return;
+
+    try {
+      await deleteDoc(doc(db, "factures", id));
+
+      if (editingInvoiceId === id) {
+        editingInvoiceId = null;
+        form.reset();
+        document.getElementById("invoiceStatus").value = "BROUILLON";
+        document.getElementById("invoiceMode").value = "VIREMENT";
+        fillDossierSelect("");
+      }
+    } catch (err) {
+      console.error("Erreur suppression facture :", err);
+      alert("Impossible de supprimer la facture.");
+    }
+  });
+
+  onSnapshot(
+    query(clientsRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allClients = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      fillClientSelect();
       renderInvoices();
-    });
+    },
+    (err) => {
+      console.error("Erreur chargement clients :", err);
+    }
+  );
 
-    invoiceClient.addEventListener("change", (e) => {
-      fillDossierSelect(e.target.value);
-    });
-
-    searchInput.addEventListener("input", renderInvoices);
-    statusFilter.addEventListener("change", renderInvoices);
-
-    window.deleteInvoice = function(id) {
-      const ok = confirm("Supprimer cette facture ?");
-      if (!ok) return;
-      const invoices = loadInvoices().filter(invoice => invoice.id !== id);
-      saveInvoices(invoices);
+  onSnapshot(
+    query(dossiersRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allDossiers = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      fillDossierSelect(invoiceClient.value || "");
       renderInvoices();
-    };
+    },
+    (err) => {
+      console.error("Erreur chargement dossiers :", err);
+    }
+  );
 
-    fillClientSelect();
-    fillDossierSelect("");
-    renderInvoices();
-  </script>
-<script type="module" src="./auth-guard.js"></script>
+  onSnapshot(
+    query(invoicesRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allInvoices = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      renderInvoices();
+    },
+    (err) => {
+      console.error("Erreur chargement factures :", err);
+      invoiceList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
+      renderStats([]);
+    }
+  );
+</script>
 </body>
 </html>
