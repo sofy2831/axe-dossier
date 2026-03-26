@@ -488,7 +488,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
 </div>
 
   </main> 
-  <script type="module">
+ <script type="module">
   import "./auth-guard.js";
   import { db } from "./firebase-config.js";
   import {
@@ -666,7 +666,9 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
         "";
 
       const dossierTitle =
-        dossierMap[invoice.dossierId]?.title || "";
+        invoice.dossierTitleSnapshot ||
+        dossierMap[invoice.dossierId]?.title ||
+        "";
 
       const blob = [
         invoice.number || "",
@@ -702,7 +704,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
         "Client supprimé";
 
       const dossierTitle = invoice.dossierId
-        ? (dossierMap[invoice.dossierId]?.title || "Dossier supprimé")
+        ? (invoice.dossierTitleSnapshot || dossierMap[invoice.dossierId]?.title || "Dossier supprimé")
         : "Aucun dossier";
 
       const amountTTC = invoice.amountTTC ?? invoice.amount ?? 0;
@@ -736,12 +738,11 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
 
           ${invoice.notes ? `<div class="invoice-notes">${escapeHtml(invoice.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
-
-         <div class="mini-actions">
-  <a class="mini-btn" href="facture-apercu.html?id=${invoice.id}" target="_blank" rel="noopener noreferrer">Aperçu</a>
-  <button class="mini-btn" type="button" data-edit-id="${invoice.id}">Modifier</button>
-  <button class="mini-btn" type="button" data-delete-id="${invoice.id}">Supprimer</button>
-</div>
+          <div class="mini-actions">
+            <a class="mini-btn" href="facture-apercu.html?id=${invoice.id}" target="_blank" rel="noopener noreferrer">Aperçu</a>
+            <button class="mini-btn" type="button" data-edit-id="${invoice.id}">Modifier</button>
+            <button class="mini-btn" type="button" data-delete-id="${invoice.id}">Supprimer</button>
+          </div>
         </article>
       `;
     }).join("");
@@ -829,6 +830,8 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     const amountInput = Number(data.get("invoiceAmount") || 0);
 
     const client = allClients.find(c => c.id === clientId);
+    const dossier = allDossiers.find(d => d.id === dossierId);
+
     const businessSnapshot = buildBusinessSnapshot(currentSettings);
     const clientSnapshot = buildClientSnapshot(client);
     const amounts = computeAmounts(amountInput, businessSnapshot);
@@ -846,6 +849,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       date: data.get("invoiceDate") || "",
       clientId,
       dossierId,
+      dossierTitleSnapshot: dossier?.title || "",
       dueDate: data.get("invoiceDueDate") || "",
       status: data.get("invoiceStatus") || "BROUILLON",
       mode: data.get("invoiceMode") || "VIREMENT",
@@ -883,6 +887,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
           date: payload.date,
           clientId: payload.clientId,
           dossierId: payload.dossierId,
+          dossierTitleSnapshot: payload.dossierTitleSnapshot,
           dueDate: payload.dueDate,
           status: payload.status,
           mode: payload.mode,
