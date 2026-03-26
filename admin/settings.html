@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="fr">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,242 +16,258 @@
       --radius:18px;
       --shadow:0 16px 40px rgba(0,0,0,0.06);
       --max:1180px;
-    }*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
+    }
 
-a{text-decoration:none;color:inherit}
-.wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+    *{box-sizing:border-box}
 
-.topbar{
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:rgba(243,239,232,0.85);
-  backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--line);
-}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-.topbar-inner{
-  min-height:72px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-}
+    a{text-decoration:none;color:inherit}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-weight:800;
-  letter-spacing:.02em;
-}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,0.85);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
 
-.brand-mark{
-  width:42px;
-  height:42px;
-  border-radius:14px;
-  background:var(--accent);
-  color:#fff;
-  display:grid;
-  place-items:center;
-  font-weight:900;
-  box-shadow:var(--shadow);
-}
+    .topbar-inner{
+      min-height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
 
-.nav{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
 
-.pill{
-  padding:10px 14px;
-  border-radius:999px;
-  background:rgba(255,255,255,.7);
-  border:1px solid var(--line);
-  font-size:.94rem;
-}
+    .brand-mark{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:var(--accent);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
 
-main{padding:32px 0 56px}
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
 
-.hero{
-  display:flex;
-  align-items:end;
-  justify-content:space-between;
-  gap:16px;
-  margin-bottom:22px;
-}
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--line);
+      font-size:.94rem;
+    }
 
-h1,h2,h3,p{margin:0}
-h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
-.hero p{color:var(--muted);max-width:72ch;margin-top:8px}
+    main{padding:32px 0 56px}
 
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:20px;
-  align-items:start;
-}
+    .hero{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:22px;
+    }
 
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:24px;
-  box-shadow:var(--shadow);
-  padding:24px;
-}
+    h1,h2,h3,p{margin:0}
+    h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
+    .hero p{color:var(--muted);max-width:72ch;margin-top:8px}
 
-.card h2{
-  font-size:1.2rem;
-  margin-bottom:14px;
-  letter-spacing:-.02em;
-}
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+      align-items:start;
+    }
 
-.field{margin-bottom:14px}
-.field label{
-  display:block;
-  font-size:.92rem;
-  font-weight:700;
-  margin-bottom:6px;
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:24px;
+    }
 
-.field input,
-.field textarea,
-.field select{
-  width:100%;
-  min-height:48px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:12px 14px;
-  font:inherit;
-  color:var(--text);
-  background:#fff;
-}
+    .card h2{
+      font-size:1.2rem;
+      margin-bottom:14px;
+      letter-spacing:-.02em;
+    }
 
-.field textarea{min-height:110px;resize:vertical}
+    .card-section{
+      margin:18px 0 10px;
+      padding:16px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fcfbf8;
+    }
 
-.row-2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
+    .card-section h3{
+      font-size:1rem;
+      margin-bottom:12px;
+      letter-spacing:-.02em;
+    }
 
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:18px;
-}
+    .field{margin-bottom:14px}
+    .field label{
+      display:block;
+      font-size:.92rem;
+      font-weight:700;
+      margin-bottom:6px;
+    }
 
-.btn{
-  min-height:48px;
-  padding:0 18px;
-  border-radius:999px;
-  border:1px solid var(--accent);
-  background:var(--accent);
-  color:#fff;
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
-}
+    .field input,
+    .field textarea,
+    .field select{
+      width:100%;
+      min-height:48px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      font:inherit;
+      color:var(--text);
+      background:#fff;
+    }
 
-.btn-secondary{
-  background:#fff;
-  color:var(--accent);
-  border-color:var(--line);
-}
+    .field textarea{min-height:110px;resize:vertical}
 
-.note{
-  margin-top:12px;
-  padding:14px 16px;
-  border-radius:14px;
-  background:#faf7f1;
-  border:1px solid var(--line);
-  color:#4f4942;
-  font-size:.92rem;
-  line-height:1.5;
-}
+    .row-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
 
-.preview{
-  display:grid;
-  gap:12px;
-  margin-top:12px;
-}
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
 
-.preview-box{
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:18px;
-  background:#fcfbf8;
-}
+    .btn{
+      min-height:48px;
+      padding:0 18px;
+      border-radius:999px;
+      border:1px solid var(--accent);
+      background:var(--accent);
+      color:#fff;
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+    }
 
-.preview-box strong{
-  display:block;
-  margin-bottom:8px;
-  font-size:1rem;
-}
+    .btn-secondary{
+      background:#fff;
+      color:var(--accent);
+      border-color:var(--line);
+    }
 
-.mini-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr 1fr;
-  gap:12px;
-}
+    .note{
+      margin-top:12px;
+      padding:14px 16px;
+      border-radius:14px;
+      background:#faf7f1;
+      border:1px solid var(--line);
+      color:#4f4942;
+      font-size:.92rem;
+      line-height:1.5;
+    }
 
-.mini-stat{
-  border:1px solid var(--line);
-  border-radius:16px;
-  background:#faf7f1;
-  padding:16px;
-}
+    .preview{
+      display:grid;
+      gap:12px;
+      margin-top:12px;
+    }
 
-.mini-stat strong{
-  display:block;
-  font-size:1.3rem;
-  letter-spacing:-.04em;
-  margin-bottom:4px;
-}
+    .preview-box{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      background:#fcfbf8;
+    }
 
-.mini-stat span{color:var(--muted);font-size:.92rem}
+    .preview-box strong{
+      display:block;
+      margin-bottom:8px;
+      font-size:1rem;
+    }
 
-.saved{
-  display:none;
-  margin-top:12px;
-  padding:12px 14px;
-  border-radius:14px;
-  background:#e8efe4;
-  border:1px solid rgba(23,23,23,0.08);
-  color:#304127;
-  font-size:.92rem;
-  font-weight:700;
-}
+    .mini-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      gap:12px;
+    }
 
-.saved.show{display:block}
+    .mini-stat{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#faf7f1;
+      padding:16px;
+    }
 
-@media (max-width: 980px){
-  .grid,.mini-grid{grid-template-columns:1fr}
-}
+    .mini-stat strong{
+      display:block;
+      font-size:1.3rem;
+      letter-spacing:-.04em;
+      margin-bottom:4px;
+    }
 
-@media (max-width: 720px){
-  .topbar-inner{
-    min-height:auto;
-    padding:14px 0;
-    flex-direction:column;
-    align-items:stretch;
-  }
-  .brand,.nav{justify-content:center}
-  .hero{flex-direction:column;align-items:start}
-  .card{padding:20px}
-  .row-2{grid-template-columns:1fr}
-  .actions .btn{width:100%}
-}
+    .mini-stat span{color:var(--muted);font-size:.92rem}
 
+    .saved{
+      display:none;
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#e8efe4;
+      border:1px solid rgba(23,23,23,0.08);
+      color:#304127;
+      font-size:.92rem;
+      font-weight:700;
+    }
+
+    .saved.show{display:block}
+
+    @media (max-width: 980px){
+      .grid,.mini-grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width: 720px){
+      .topbar-inner{
+        min-height:auto;
+        padding:14px 0;
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .brand,.nav{justify-content:center}
+      .hero{flex-direction:column;align-items:start}
+      .card{padding:20px}
+      .row-2{grid-template-columns:1fr}
+      .actions .btn{width:100%}
+    }
   </style>
 </head>
 <body>
@@ -259,438 +276,451 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       <a class="brand" href="index.html" aria-label="Retour admin">
         <span class="brand-mark">AD</span>
         <span>Axe Dossier · Settings</span>
-      </a><nav class="nav" aria-label="Navigation admin">
-    <a class="pill" href="index.html">Admin</a>
-    <a class="pill" href="clients.html">Clients</a>
-    <a class="pill" href="dossiers.html">Dossiers</a>
-    <a class="pill" href="documents.html">Documents</a>
-    <a class="pill" href="factures.html">Factures</a>
-    <a class="pill" href="paiements.html">Paiements</a>
-    <a class="pill" href="settings.html">Settings</a>
-  </nav>
-</div>
+      </a>
 
-  </header>  <main>
+      <nav class="nav" aria-label="Navigation admin">
+        <a class="pill" href="index.html">Admin</a>
+        <a class="pill" href="clients.html">Clients</a>
+        <a class="pill" href="dossiers.html">Dossiers</a>
+        <a class="pill" href="documents.html">Documents</a>
+        <a class="pill" href="factures.html">Factures</a>
+        <a class="pill" href="paiements.html">Paiements</a>
+        <a class="pill" href="settings.html">Settings</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
     <div class="wrap">
       <section class="hero">
         <div>
           <h1>Settings</h1>
-          <p>Tu centralises ici l’identité de ton activité, tes coordonnées de facturation, tes mentions, et tes compteurs. C’est plus propre que de disperser ça partout.</p>
+          <p>Tu centralises ici l’identité de ton activité, tes coordonnées de facturation, tes mentions, la TVA et les compteurs.</p>
         </div>
-      </section><section class="grid">
-    <article class="card">
-      <h2>Identité & facturation</h2>
-      <form id="settingsForm">
-        <div class="field">
-          <label for="businessName">Nom affiché</label>
-          <input id="businessName" name="businessName" type="text" placeholder="Ex. Axe Dossier" />
-        </div>
+      </section>
 
-        <div class="row-2">
-          <div class="field">
-            <label for="ownerName">Nom / exploitant</label>
-            <input id="ownerName" name="ownerName" type="text" placeholder="Ex. Sophie Dumas" />
-          </div>
-          <div class="field">
-            <label for="legalForm">Statut</label>
-            <input id="legalForm" name="legalForm" type="text" placeholder="Ex. EI" />
-          </div>
-        </div>
+      <section class="grid">
+        <article class="card">
+          <h2>Identité & facturation</h2>
 
-        <div class="field">
-          <label for="address">Adresse</label>
-          <textarea id="address" name="address" placeholder="Adresse complète"></textarea>
-        </div>
+          <form id="settingsForm">
+            <div class="field">
+              <label for="businessName">Nom affiché</label>
+              <input id="businessName" name="businessName" type="text" placeholder="Ex. Axe Dossier" />
+            </div>
 
-        <div class="row-2">
-          <div class="field">
-            <label for="email">Email</label>
-            <input id="email" name="email" type="email" placeholder="contact@axe-dossier.fr" />
-          </div>
-          <div class="field">
-            <label for="phone">Téléphone</label>
-            <input id="phone" name="phone" type="text" placeholder="06 ..." />
-          </div>
-        </div>
+            <div class="row-2">
+              <div class="field">
+                <label for="ownerName">Nom / exploitant</label>
+                <input id="ownerName" name="ownerName" type="text" placeholder="Ex. Sophie Dumas" />
+              </div>
+              <div class="field">
+                <label for="legalForm">Statut</label>
+                <input id="legalForm" name="legalForm" type="text" placeholder="Ex. EI" />
+              </div>
+            </div>
 
-        <div class="row-2">
-          <div class="field">
-            <label for="siret">SIRET</label>
-            <input id="siret" name="siret" type="text" placeholder="SIRET" />
-          </div>
-          <div class="field">
-            <label for="ape">APE</label>
-            <input id="ape" name="ape" type="text" placeholder="APE" />
-          </div>
-        </div>
+            <div class="field">
+              <label for="address">Adresse</label>
+              <textarea id="address" name="address" placeholder="Adresse complète"></textarea>
+            </div>
 
-<div class="card-section">
-  <h3>TVA</h3>
+            <div class="row-2">
+              <div class="field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" placeholder="contact@axe-dossier.fr" />
+              </div>
+              <div class="field">
+                <label for="phone">Téléphone</label>
+                <input id="phone" name="phone" type="text" placeholder="06 ..." />
+              </div>
+            </div>
 
-  <div class="row-2">
-    <div class="field">
-      <label for="vatMode">Régime TVA</label>
-      <select id="vatMode" name="vatMode">
-        <option value="EXEMPT">EXEMPT</option>
-        <option value="SUBJECT">SUBJECT</option>
-      </select>
+            <div class="row-2">
+              <div class="field">
+                <label for="siret">SIRET</label>
+                <input id="siret" name="siret" type="text" placeholder="SIRET" />
+              </div>
+              <div class="field">
+                <label for="ape">APE</label>
+                <input id="ape" name="ape" type="text" placeholder="APE" />
+              </div>
+            </div>
+
+            <div class="card-section">
+              <h3>TVA</h3>
+
+              <div class="field">
+                <label for="vatMode">Soumis à la TVA</label>
+                <select id="vatMode" name="vatMode">
+                  <option value="NO">Non</option>
+                  <option value="YES">Oui</option>
+                </select>
+              </div>
+
+              <div id="vatRateField" class="field">
+                <label for="vatRate">Taux TVA (%)</label>
+                <input id="vatRate" name="vatRate" type="number" step="0.01" min="0" placeholder="20" />
+              </div>
+
+              <div id="vatNumberField" class="field">
+                <label for="vatNumber">Numéro TVA intracommunautaire</label>
+                <input id="vatNumber" name="vatNumber" type="text" placeholder="FR..." />
+              </div>
+
+              <div id="tvaExemptionField" class="field">
+                <label for="tvaExemptionText">Mention si non soumis à la TVA</label>
+                <textarea id="tvaExemptionText" name="tvaExemptionText" placeholder="Ex. TVA non applicable, art. 293 B du CGI"></textarea>
+              </div>
+            </div>
+
+            <div class="row-2">
+              <div class="field">
+                <label for="iban">IBAN</label>
+                <input id="iban" name="iban" type="text" placeholder="FR76..." />
+              </div>
+              <div class="field">
+                <label for="bic">BIC</label>
+                <input id="bic" name="bic" type="text" placeholder="BIC" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="legalNotice">Mentions / pied de facture</label>
+              <textarea id="legalNotice" name="legalNotice" placeholder="Mentions à afficher sur les factures"></textarea>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="btn">Enregistrer</button>
+              <button type="button" id="resetSettings" class="btn btn-secondary">Réinitialiser</button>
+            </div>
+
+            <div id="savedMessage" class="saved">Paramètres enregistrés.</div>
+          </form>
+        </article>
+
+        <article class="card">
+          <h2>Compteurs</h2>
+
+          <div class="mini-grid">
+            <div class="mini-stat">
+              <strong id="nextDevis">DEV-2026-001</strong>
+              <span>Prochain devis</span>
+            </div>
+            <div class="mini-stat">
+              <strong id="nextFacture">FAC-2026-001</strong>
+              <span>Prochaine facture</span>
+            </div>
+            <div class="mini-stat">
+              <strong id="nextPaiement">PAY-2026-001</strong>
+              <span>Prochain paiement</span>
+            </div>
+          </div>
+
+          <div class="note">
+            Base propre pour la suite. Les numéros seront utilisés ensuite dans les factures et paiements.
+          </div>
+
+          <div class="preview">
+            <div class="preview-box">
+              <strong>Aperçu identité</strong>
+              <div id="previewIdentity">Aucun paramètre enregistré.</div>
+            </div>
+
+            <div class="preview-box">
+              <strong>Aperçu mentions</strong>
+              <div id="previewTerms">Aucune mention enregistrée.</div>
+            </div>
+          </div>
+        </article>
+      </section>
     </div>
+  </main>
 
-    <div class="field">
-      <label for="vatRate">Taux TVA (%)</label>
-      <input id="vatRate" name="vatRate" type="number" step="0.01" min="0" placeholder="20" />
-    </div>
-  </div>
+  <script type="module">
+    import "./auth-guard.js";
+    import { db } from "./firebase-config.js";
+    import {
+      doc,
+      setDoc,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  <div class="field">
-    <label for="vatNumber">Numéro TVA intracommunautaire</label>
-    <input id="vatNumber" name="vatNumber" type="text" placeholder="FR..." />
-  </div>
+    const form = document.getElementById("settingsForm");
+    const savedMessage = document.getElementById("savedMessage");
+    const resetSettingsBtn = document.getElementById("resetSettings");
 
-  <div class="field">
-    <label for="tvaExemptionText">Mention d’exonération TVA</label>
-    <textarea id="tvaExemptionText" name="tvaExemptionText" placeholder="Ex. TVA non applicable, art. 293 B du CGI"></textarea>
-  </div>
-</div>
-        
-        <div class="row-2">
-          <div class="field">
-            <label for="iban">IBAN</label>
-            <input id="iban" name="iban" type="text" placeholder="FR76..." />
-          </div>
-          <div class="field">
-            <label for="bic">BIC</label>
-            <input id="bic" name="bic" type="text" placeholder="BIC" />
-          </div>
-        </div>
+    const previewIdentity = document.getElementById("previewIdentity");
+    const previewTerms = document.getElementById("previewTerms");
+    const nextDevis = document.getElementById("nextDevis");
+    const nextFacture = document.getElementById("nextFacture");
+    const nextPaiement = document.getElementById("nextPaiement");
 
-        <div class="field">
-          <label for="legalNotice">Mentions / pied de facture</label>
-          <textarea id="legalNotice" name="legalNotice" placeholder="Ex. TVA non applicable, art. 293 B du CGI"></textarea>
-        </div>
+    const settingsRef = doc(db, "settings", "main");
+    const countersRef = doc(db, "counters", "main");
 
-        <div class="field">
-          <label for="paymentTerms">Conditions de règlement</label>
-          <textarea id="paymentTerms" name="paymentTerms" placeholder="Ex. Paiement à réception. Virement bancaire."></textarea>
-        </div>
+    let currentSettings = {};
+    let currentCounters = {};
 
-        <div class="actions">
-          <button type="submit" class="btn">Enregistrer</button>
-          <button type="button" id="resetSettings" class="btn btn-secondary">Réinitialiser</button>
-        </div>
-
-        <div id="savedMessage" class="saved">Paramètres enregistrés.</div>
-      </form>
-    </article>
-
-    <article class="card">
-      <h2>Compteurs</h2>
-
-      <div class="mini-grid">
-        <div class="mini-stat">
-          <strong id="nextDevis">DEV-2026-001</strong>
-          <span>Prochain devis</span>
-        </div>
-        <div class="mini-stat">
-          <strong id="nextFacture">FAC-2026-001</strong>
-          <span>Prochaine facture</span>
-        </div>
-        <div class="mini-stat">
-          <strong id="nextPaiement">PAY-2026-001</strong>
-          <span>Prochain paiement</span>
-        </div>
-      </div>
-
-      <div class="note">
-        Pour l’instant, c’est une base manuelle propre. Ensuite, avec Firebase, on stockera ça dans <strong>counters/</strong> pour générer automatiquement des numéros chronologiques fiables.
-      </div>
-
-      <div class="preview">
-        <div class="preview-box">
-          <strong>Aperçu identité</strong>
-          <div id="previewIdentity">Aucun paramètre enregistré.</div>
-        </div>
-
-        <div class="preview-box">
-          <strong>Aperçu règlement</strong>
-          <div id="previewTerms">Aucune condition enregistrée.</div>
-        </div>
-      </div>
-    </article>
-  </section>
-</div>
-
-  </main>  
-  
-<script type="module">
-  import "./auth-guard.js";
-  import { db } from "./firebase-config.js";
-  import {
-    doc,
-    setDoc,
-    onSnapshot,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-  const form = document.getElementById("settingsForm");
-  const savedMessage = document.getElementById("savedMessage");
-  const resetSettingsBtn = document.getElementById("resetSettings");
-
-  const previewIdentity = document.getElementById("previewIdentity");
-  const previewTerms = document.getElementById("previewTerms");
-  const nextDevis = document.getElementById("nextDevis");
-  const nextFacture = document.getElementById("nextFacture");
-  const nextPaiement = document.getElementById("nextPaiement");
-
-  const settingsRef = doc(db, "settings", "main");
-  const countersRef = doc(db, "counters", "main");
-
-  let currentSettings = {};
-  let currentCounters = {};
-
-  function escapeHtml(text = "") {
-    return String(text)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-
-  function currentYear() {
-    return new Date().getFullYear();
-  }
-
-  function getEl(id) {
-    return document.getElementById(id);
-  }
-
-  function getValue(id, fallback = "") {
-    const el = getEl(id);
-    return el ? (el.value ?? fallback) : fallback;
-  }
-
-  function setValue(id, value) {
-    const el = getEl(id);
-    if (el) el.value = value ?? "";
-  }
-
-  function defaultSettings() {
-    return {
-      businessName: "Axe Dossier",
-      ownerName: "Sophie Dumas",
-      legalForm: "EI",
-      address: "24 hameau de danis\n09700 Saverdun",
-      email: "contact@axe-dossier.fr",
-      phone: "",
-      siret: "",
-      ape: "",
-      iban: "",
-      bic: "",
-      legalNotice: "TVA non applicable, art. 293 B du CGI",
-      paymentTerms: "Paiement à réception. Virement bancaire.",
-      vatMode: "EXEMPT",              // EXEMPT ou SUBJECT
-      vatRate: 20,                    // prévu pour plus tard
-      vatNumber: "",
-      tvaExemptionText: "TVA non applicable, art. 293 B du CGI"
-    };
-  }
-
-  function defaultCounters() {
-    return {
-      quotePrefix: "DEV",
-      invoicePrefix: "FAC",
-      paymentPrefix: "PAY",
-      nextQuoteNumber: 1,
-      nextInvoiceNumber: 1,
-      nextPaymentNumber: 1
-    };
-  }
-
-  function padNumber(n) {
-    return String(Number(n || 1)).padStart(3, "0");
-  }
-
-  function renderCounters() {
-    const year = currentYear();
-    const c = { ...defaultCounters(), ...currentCounters };
-
-    nextDevis.textContent = `${c.quotePrefix}-${year}-${padNumber(c.nextQuoteNumber)}`;
-    nextFacture.textContent = `${c.invoicePrefix}-${year}-${padNumber(c.nextInvoiceNumber)}`;
-    nextPaiement.textContent = `${c.paymentPrefix}-${year}-${padNumber(c.nextPaymentNumber)}`;
-  }
-
-  function fillForm() {
-    const s = { ...defaultSettings(), ...currentSettings };
-
-    setValue("businessName", s.businessName);
-    setValue("ownerName", s.ownerName);
-    setValue("legalForm", s.legalForm);
-    setValue("address", s.address);
-    setValue("email", s.email);
-    setValue("phone", s.phone);
-    setValue("siret", s.siret);
-    setValue("ape", s.ape);
-    setValue("iban", s.iban);
-    setValue("bic", s.bic);
-    setValue("legalNotice", s.legalNotice);
-    setValue("paymentTerms", s.paymentTerms);
-
-    // Champs TVA prévus pour plus tard si tu les ajoutes dans le HTML
-    setValue("vatMode", s.vatMode);
-    setValue("vatRate", s.vatRate);
-    setValue("vatNumber", s.vatNumber);
-    setValue("tvaExemptionText", s.tvaExemptionText);
-
-    renderPreview();
-    renderCounters();
-  }
-
-  function renderPreview() {
-    const s = { ...defaultSettings(), ...currentSettings };
-
-    const identityParts = [
-      s.businessName,
-      s.ownerName,
-      s.legalForm,
-      s.address,
-      s.email,
-      s.phone,
-      s.siret ? `SIRET : ${s.siret}` : "",
-      s.ape ? `APE : ${s.ape}` : "",
-      s.vatMode === "SUBJECT" && s.vatNumber ? `TVA : ${s.vatNumber}` : "",
-      s.iban ? `IBAN : ${s.iban}` : "",
-      s.bic ? `BIC : ${s.bic}` : ""
-    ].filter(Boolean);
-
-    previewIdentity.innerHTML = identityParts.length
-      ? identityParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("")
-      : "Aucun paramètre enregistré.";
-
-    const termsParts = [];
-
-    if (s.vatMode === "EXEMPT") {
-      termsParts.push(s.tvaExemptionText || "TVA non applicable, art. 293 B du CGI");
-    } else {
-      termsParts.push(`TVA applicable${s.vatRate !== "" && s.vatRate != null ? ` : ${s.vatRate} %` : ""}`);
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    if (s.paymentTerms) termsParts.push(s.paymentTerms);
-
-    previewTerms.innerHTML = termsParts.length
-      ? termsParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("<br>")
-      : "Aucune condition enregistrée.";
-  }
-
-  function showSaved() {
-    savedMessage.classList.add("show");
-    setTimeout(() => savedMessage.classList.remove("show"), 1800);
-  }
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const settings = {
-      businessName: getValue("businessName").trim(),
-      ownerName: getValue("ownerName").trim(),
-      legalForm: getValue("legalForm").trim(),
-      address: getValue("address").trim(),
-      email: getValue("email").trim(),
-      phone: getValue("phone").trim(),
-      siret: getValue("siret").trim(),
-      ape: getValue("ape").trim(),
-      iban: getValue("iban").trim(),
-      bic: getValue("bic").trim(),
-      legalNotice: getValue("legalNotice").trim(),
-      paymentTerms: getValue("paymentTerms").trim(),
-
-      // TVA prévue pour futur passage au régime soumis
-      vatMode: getValue("vatMode", currentSettings.vatMode || "EXEMPT").trim() || "EXEMPT",
-      vatRate: Number(getValue("vatRate", currentSettings.vatRate ?? 20)) || 20,
-      vatNumber: getValue("vatNumber", currentSettings.vatNumber || "").trim(),
-      tvaExemptionText: getValue(
-        "tvaExemptionText",
-        currentSettings.tvaExemptionText || "TVA non applicable, art. 293 B du CGI"
-      ).trim() || "TVA non applicable, art. 293 B du CGI",
-
-      updatedAt: serverTimestamp()
-    };
-
-    try {
-      await setDoc(settingsRef, settings, { merge: true });
-
-      // On initialise aussi counters si absent
-      await setDoc(
-        countersRef,
-        {
-          quotePrefix: currentCounters.quotePrefix || "DEV",
-          invoicePrefix: currentCounters.invoicePrefix || "FAC",
-          paymentPrefix: currentCounters.paymentPrefix || "PAY",
-          nextQuoteNumber: currentCounters.nextQuoteNumber || 1,
-          nextInvoiceNumber: currentCounters.nextInvoiceNumber || 1,
-          nextPaymentNumber: currentCounters.nextPaymentNumber || 1,
-          updatedAt: serverTimestamp()
-        },
-        { merge: true }
-      );
-
-      showSaved();
-    } catch (err) {
-      console.error("Erreur enregistrement settings :", err);
-      alert("Impossible d’enregistrer les paramètres.");
+    function currentYear() {
+      return new Date().getFullYear();
     }
-  });
 
-  resetSettingsBtn.addEventListener("click", async () => {
-    const ok = confirm("Réinitialiser les paramètres avec les valeurs par défaut ?");
-    if (!ok) return;
-
-    try {
-      await setDoc(
-        settingsRef,
-        {
-          ...defaultSettings(),
-          updatedAt: serverTimestamp()
-        },
-        { merge: true }
-      );
-
-      await setDoc(
-        countersRef,
-        {
-          ...defaultCounters(),
-          updatedAt: serverTimestamp()
-        },
-        { merge: true }
-      );
-    } catch (err) {
-      console.error("Erreur reset settings :", err);
-      alert("Impossible de réinitialiser les paramètres.");
+    function getEl(id) {
+      return document.getElementById(id);
     }
-  });
 
-  onSnapshot(
-    settingsRef,
-    (snap) => {
-      currentSettings = snap.exists() ? snap.data() : defaultSettings();
-      fillForm();
-    },
-    (err) => {
-      console.error("Erreur chargement settings :", err);
+    function getValue(id, fallback = "") {
+      const el = getEl(id);
+      return el ? (el.value ?? fallback) : fallback;
     }
-  );
 
-  onSnapshot(
-    countersRef,
-    (snap) => {
-      currentCounters = snap.exists() ? snap.data() : defaultCounters();
+    function setValue(id, value) {
+      const el = getEl(id);
+      if (el) el.value = value ?? "";
+    }
+
+    function defaultSettings() {
+      return {
+        businessName: "Axe Dossier",
+        ownerName: "Sophie Dumas",
+        legalForm: "EI",
+        address: "24 hameau de danis\n09700 Saverdun",
+        email: "contact@axe-dossier.fr",
+        phone: "",
+        siret: "",
+        ape: "",
+        iban: "",
+        bic: "",
+        legalNotice: "",
+        vatMode: "NO",
+        vatRate: 20,
+        vatNumber: "",
+        tvaExemptionText: "TVA non applicable, art. 293 B du CGI"
+      };
+    }
+
+    function defaultCounters() {
+      return {
+        quotePrefix: "DEV",
+        invoicePrefix: "FAC",
+        paymentPrefix: "PAY",
+        nextQuoteNumber: 1,
+        nextInvoiceNumber: 1,
+        nextPaymentNumber: 1
+      };
+    }
+
+    function padNumber(n) {
+      return String(Number(n || 1)).padStart(3, "0");
+    }
+
+    function renderCounters() {
+      const year = currentYear();
+      const c = { ...defaultCounters(), ...currentCounters };
+
+      nextDevis.textContent = `${c.quotePrefix}-${year}-${padNumber(c.nextQuoteNumber)}`;
+      nextFacture.textContent = `${c.invoicePrefix}-${year}-${padNumber(c.nextInvoiceNumber)}`;
+      nextPaiement.textContent = `${c.paymentPrefix}-${year}-${padNumber(c.nextPaymentNumber)}`;
+    }
+
+    function toggleVatFields() {
+      const vatMode = getValue("vatMode", "NO");
+
+      const vatRateField = getEl("vatRateField");
+      const vatNumberField = getEl("vatNumberField");
+      const tvaExemptionField = getEl("tvaExemptionField");
+
+      if (vatMode === "YES") {
+        if (vatRateField) vatRateField.style.display = "";
+        if (vatNumberField) vatNumberField.style.display = "";
+        if (tvaExemptionField) tvaExemptionField.style.display = "none";
+      } else {
+        if (vatRateField) vatRateField.style.display = "none";
+        if (vatNumberField) vatNumberField.style.display = "none";
+        if (tvaExemptionField) tvaExemptionField.style.display = "";
+      }
+    }
+
+    function fillForm() {
+      const s = { ...defaultSettings(), ...currentSettings };
+
+      setValue("businessName", s.businessName);
+      setValue("ownerName", s.ownerName);
+      setValue("legalForm", s.legalForm);
+      setValue("address", s.address);
+      setValue("email", s.email);
+      setValue("phone", s.phone);
+      setValue("siret", s.siret);
+      setValue("ape", s.ape);
+      setValue("iban", s.iban);
+      setValue("bic", s.bic);
+      setValue("legalNotice", s.legalNotice);
+      setValue("vatMode", s.vatMode);
+      setValue("vatRate", s.vatRate);
+      setValue("vatNumber", s.vatNumber);
+      setValue("tvaExemptionText", s.tvaExemptionText);
+
+      toggleVatFields();
+      renderPreview();
       renderCounters();
-    },
-    (err) => {
-      console.error("Erreur chargement counters :", err);
     }
-  );
-</script>
-  
+
+    function renderPreview() {
+      const s = { ...defaultSettings(), ...currentSettings };
+
+      const identityParts = [
+        s.businessName,
+        s.ownerName,
+        s.legalForm,
+        s.address,
+        s.email,
+        s.phone,
+        s.siret ? `SIRET : ${s.siret}` : "",
+        s.ape ? `APE : ${s.ape}` : "",
+        s.vatMode === "YES" && s.vatNumber ? `TVA : ${s.vatNumber}` : "",
+        s.iban ? `IBAN : ${s.iban}` : "",
+        s.bic ? `BIC : ${s.bic}` : ""
+      ].filter(Boolean);
+
+      previewIdentity.innerHTML = identityParts.length
+        ? identityParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("")
+        : "Aucun paramètre enregistré.";
+
+      const termsParts = [];
+
+      if (s.vatMode === "YES") {
+        termsParts.push(`Soumis à la TVA${s.vatRate !== "" && s.vatRate != null ? ` : ${s.vatRate} %` : ""}`);
+        if (s.vatNumber) termsParts.push(`N° TVA : ${s.vatNumber}`);
+      } else {
+        termsParts.push(s.tvaExemptionText || "TVA non applicable, art. 293 B du CGI");
+      }
+
+      if (s.legalNotice) termsParts.push(s.legalNotice);
+
+      previewTerms.innerHTML = termsParts.length
+        ? termsParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("<br>")
+        : "Aucune mention enregistrée.";
+    }
+
+    function showSaved() {
+      savedMessage.classList.add("show");
+      setTimeout(() => savedMessage.classList.remove("show"), 1800);
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const settings = {
+        businessName: getValue("businessName").trim(),
+        ownerName: getValue("ownerName").trim(),
+        legalForm: getValue("legalForm").trim(),
+        address: getValue("address").trim(),
+        email: getValue("email").trim(),
+        phone: getValue("phone").trim(),
+        siret: getValue("siret").trim(),
+        ape: getValue("ape").trim(),
+        iban: getValue("iban").trim(),
+        bic: getValue("bic").trim(),
+        legalNotice: getValue("legalNotice").trim(),
+        vatMode: getValue("vatMode", currentSettings.vatMode || "NO").trim() || "NO",
+        vatRate: Number(getValue("vatRate", currentSettings.vatRate ?? 20)) || 20,
+        vatNumber: getValue("vatNumber", currentSettings.vatNumber || "").trim(),
+        tvaExemptionText: getValue(
+          "tvaExemptionText",
+          currentSettings.tvaExemptionText || "TVA non applicable, art. 293 B du CGI"
+        ).trim() || "TVA non applicable, art. 293 B du CGI",
+        updatedAt: serverTimestamp()
+      };
+
+      try {
+        await setDoc(settingsRef, settings, { merge: true });
+
+        await setDoc(
+          countersRef,
+          {
+            quotePrefix: currentCounters.quotePrefix || "DEV",
+            invoicePrefix: currentCounters.invoicePrefix || "FAC",
+            paymentPrefix: currentCounters.paymentPrefix || "PAY",
+            nextQuoteNumber: currentCounters.nextQuoteNumber || 1,
+            nextInvoiceNumber: currentCounters.nextInvoiceNumber || 1,
+            nextPaymentNumber: currentCounters.nextPaymentNumber || 1,
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+
+        showSaved();
+      } catch (err) {
+        console.error("Erreur enregistrement settings :", err);
+        alert("Impossible d’enregistrer les paramètres.");
+      }
+    });
+
+    resetSettingsBtn.addEventListener("click", async () => {
+      const ok = confirm("Réinitialiser les paramètres avec les valeurs par défaut ?");
+      if (!ok) return;
+
+      try {
+        await setDoc(
+          settingsRef,
+          {
+            ...defaultSettings(),
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+
+        await setDoc(
+          countersRef,
+          {
+            ...defaultCounters(),
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+      } catch (err) {
+        console.error("Erreur reset settings :", err);
+        alert("Impossible de réinitialiser les paramètres.");
+      }
+    });
+
+    getEl("vatMode")?.addEventListener("change", () => {
+      toggleVatFields();
+      renderPreview();
+    });
+
+    onSnapshot(
+      settingsRef,
+      (snap) => {
+        currentSettings = snap.exists() ? snap.data() : defaultSettings();
+        fillForm();
+      },
+      (err) => {
+        console.error("Erreur chargement settings :", err);
+      }
+    );
+
+    onSnapshot(
+      countersRef,
+      (snap) => {
+        currentCounters = snap.exists() ? snap.data() : defaultCounters();
+        renderCounters();
+      },
+      (err) => {
+        console.error("Erreur chargement counters :", err);
+      }
+    );
+  </script>
 </body>
 </html>
