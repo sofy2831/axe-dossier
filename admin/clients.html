@@ -425,7 +425,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     onSnapshot,
     query,
     orderBy,
-    serverTimestamp
+    serverTimestamp,
     updateDoc
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -439,9 +439,8 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   const clientsRef = collection(db, "clients");
 
   let allClients = [];
-  
-let editingClientId = null;
-  
+  let editingClientId = null;
+
   function escapeHtml(text = "") {
     return String(text)
       .replace(/&/g, "&amp;")
@@ -455,6 +454,15 @@ let editingClientId = null;
     totalClients.textContent = clients.length;
     totalParticuliers.textContent = clients.filter(c => c.type === "Particulier").length;
     totalPros.textContent = clients.filter(c => c.type === "Professionnel").length;
+  }
+
+  function fillForm(client) {
+    document.getElementById("clientName").value = client.name || "";
+    document.getElementById("clientType").value = client.type || "Particulier";
+    document.getElementById("clientEmail").value = client.email || "";
+    document.getElementById("clientPhone").value = client.phone || "";
+    document.getElementById("clientAddress").value = client.address || "";
+    document.getElementById("clientNotes").value = client.notes || "";
   }
 
   function renderClients() {
@@ -496,11 +504,10 @@ let editingClientId = null;
         ${client.address ? `<div class="client-meta"><span>${escapeHtml(client.address).replace(/\n/g, "<br>")}</span></div>` : ""}
         ${client.notes ? `<div class="client-notes">${escapeHtml(client.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
-       <div class="mini-actions">
-  <button class="mini-btn" type="button" data-edit-id="${client.id}">Modifier</button>
-  <button class="mini-btn" type="button" data-delete-id="${client.id}">Supprimer</button>
-</div>
-        
+        <div class="mini-actions">
+          <button class="mini-btn" type="button" data-edit-id="${client.id}">Modifier</button>
+          <button class="mini-btn" type="button" data-delete-id="${client.id}">Supprimer</button>
+        </div>
       </article>
     `).join("");
   }
@@ -518,68 +525,74 @@ let editingClientId = null;
     };
   }
 
- form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const data = new FormData(form);
-  const payload = createClient(data);
+    const data = new FormData(form);
+    const payload = createClient(data);
 
-  if (!payload.name) return;
+    if (!payload.name) return;
 
-  try {
-    if (editingClientId) {
-      await updateDoc(doc(db, "clients", editingClientId), {
-        ...payload,
-        updatedAt: serverTimestamp()
-      });
-      editingClientId = null;
-    } else {
-      await addDoc(clientsRef, payload);
+    try {
+      if (editingClientId) {
+        await updateDoc(doc(db, "clients", editingClientId), {
+          name: payload.name,
+          type: payload.type,
+          email: payload.email,
+          phone: payload.phone,
+          address: payload.address,
+          notes: payload.notes,
+          updatedAt: serverTimestamp()
+        });
+        editingClientId = null;
+      } else {
+        await addDoc(clientsRef, payload);
+      }
+
+      form.reset();
+      document.getElementById("clientType").value = "Particulier";
+    } catch (err) {
+      console.error("Erreur enregistrement client :", err);
+      alert("Impossible d’enregistrer le client.");
     }
-
-    form.reset();
-    document.getElementById("clientType").value = "Particulier";
-  } catch (err) {
-    console.error("Erreur enregistrement client :", err);
-    alert("Impossible d’enregistrer le client.");
-  }
-});
+  });
 
   searchInput.addEventListener("input", renderClients);
 
-clientList.addEventListener("click", async (e) => {
-  const editBtn = e.target.closest("[data-edit-id]");
-  if (editBtn) {
-    const id = editBtn.getAttribute("data-edit-id");
-    const client = allClients.find(c => c.id === id);
-    if (!client) return;
+  clientList.addEventListener("click", async (e) => {
+    const editBtn = e.target.closest("[data-edit-id]");
+    if (editBtn) {
+      const id = editBtn.getAttribute("data-edit-id");
+      const client = allClients.find(c => c.id === id);
+      if (!client) return;
 
-    editingClientId = id;
-    fillForm(client);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    return;
-  }
-
-  const deleteBtn = e.target.closest("[data-delete-id]");
-  if (!deleteBtn) return;
-
-  const id = deleteBtn.getAttribute("data-delete-id");
-  const ok = confirm("Supprimer ce client ?");
-  if (!ok) return;
-
-  try {
-    await deleteDoc(doc(db, "clients", id));
-    if (editingClientId === id) {
-      editingClientId = null;
-      form.reset();
-      document.getElementById("clientType").value = "Particulier";
+      editingClientId = id;
+      fillForm(client);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
     }
-  } catch (err) {
-    console.error("Erreur suppression client :", err);
-    alert("Impossible de supprimer le client.");
-  }
-});
-  
+
+    const deleteBtn = e.target.closest("[data-delete-id]");
+    if (!deleteBtn) return;
+
+    const id = deleteBtn.getAttribute("data-delete-id");
+    const ok = confirm("Supprimer ce client ?");
+    if (!ok) return;
+
+    try {
+      await deleteDoc(doc(db, "clients", id));
+
+      if (editingClientId === id) {
+        editingClientId = null;
+        form.reset();
+        document.getElementById("clientType").value = "Particulier";
+      }
+    } catch (err) {
+      console.error("Erreur suppression client :", err);
+      alert("Impossible de supprimer le client.");
+    }
+  });
+
   const clientsQuery = query(clientsRef, orderBy("createdAt", "desc"));
 
   onSnapshot(
