@@ -13,8 +13,9 @@
       --line:rgba(23,23,23,0.08);
       --accent:#111111;
       --soft:#e9e1d4;
+      --soft-2:#faf7f1;
       --shadow:0 16px 40px rgba(0,0,0,0.06);
-      --max:1100px;
+      --max:1120px;
     }
 
     *{box-sizing:border-box}
@@ -103,36 +104,80 @@
       border:1px solid var(--line);
       border-radius:24px;
       box-shadow:var(--shadow);
-      padding:34px;
+      padding:30px;
     }
 
-    .header{
+    .top-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:24px;
-      align-items:start;
-      margin-bottom:28px;
+      gap:18px;
+      align-items:stretch;
     }
 
-    .title{
+    .panel{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      padding:18px;
+      min-height:100%;
+    }
+
+    .panel h2{
+      margin:0 0 10px;
+      font-size:1rem;
+      letter-spacing:-.02em;
+    }
+
+    .logo-wrap{
+      margin-bottom:14px;
+      min-height:88px;
+      display:flex;
+      align-items:flex-start;
+    }
+
+    .logo-box{
+      width:132px;
+      height:132px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--soft-2);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .logo-box img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .logo-placeholder{
+      color:var(--muted);
+      font-size:.88rem;
+      text-align:center;
+      padding:10px;
+      line-height:1.4;
+    }
+
+    .invoice-head{
+      display:grid;
+      gap:6px;
+      margin-bottom:14px;
+    }
+
+    .invoice-title{
       font-size:2rem;
       font-weight:900;
       letter-spacing:-.05em;
-      margin-bottom:8px;
+      margin:0;
     }
 
-    .muted{color:var(--muted)}
-
-    .block{
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:18px;
-      background:#fcfbf8;
-    }
-
-    .block h2{
-      margin:0 0 10px;
-      font-size:1rem;
+    .invoice-number{
+      font-size:1.2rem;
+      font-weight:800;
       letter-spacing:-.02em;
     }
 
@@ -144,44 +189,52 @@
     }
 
     .section{
-      margin-top:18px;
+      margin-top:22px;
     }
 
-    .label{
+    .section-label{
       font-size:.86rem;
       font-weight:800;
-      letter-spacing:.02em;
+      letter-spacing:.03em;
       text-transform:uppercase;
       color:#4f4942;
-      margin-bottom:8px;
+      margin:0 0 10px;
     }
 
-    .desc{
+    .table-wrap{
       border:1px solid var(--line);
       border-radius:18px;
       overflow:hidden;
-      margin-top:14px;
+      background:#fff;
     }
 
-    .desc table{
+    table{
       width:100%;
       border-collapse:collapse;
     }
 
-    .desc th,
-    .desc td{
+    th, td{
       padding:14px 16px;
       border-bottom:1px solid var(--line);
       text-align:left;
       vertical-align:top;
+      font-size:.96rem;
     }
 
-    .desc th{
-      background:#faf7f1;
+    thead th{
+      background:var(--soft-2);
       font-size:.9rem;
+      font-weight:800;
     }
 
-    .desc tr:last-child td{border-bottom:none}
+    tbody tr:last-child td{
+      border-bottom:none;
+    }
+
+    .num{
+      text-align:right;
+      white-space:nowrap;
+    }
 
     .hidden-col{
       display:none;
@@ -189,17 +242,17 @@
 
     .summary-grid{
       display:grid;
-      grid-template-columns:1fr 420px;
+      grid-template-columns:1fr 360px;
       gap:18px;
-      align-items:start;
       margin-top:18px;
+      align-items:start;
     }
 
     .totals{
       border:1px solid var(--line);
       border-radius:18px;
       overflow:hidden;
-      background:#fcfbf8;
+      background:#fff;
     }
 
     .totals-row{
@@ -212,13 +265,28 @@
 
     .totals-row:last-child{border-bottom:none}
 
-    .totals-row strong{
-      font-size:1.06rem;
+    .grand-total{
+      background:var(--soft);
+      font-weight:900;
     }
 
-    .grand-total{
-      background:#f3eee6;
-      font-weight:900;
+    .refs-box,
+    .mentions-box,
+    .bank-box,
+    .notes-box{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      padding:18px;
+    }
+
+    .refs-box h2,
+    .mentions-box h2,
+    .bank-box h2,
+    .notes-box h2{
+      margin:0 0 10px;
+      font-size:1rem;
+      letter-spacing:-.02em;
     }
 
     .footer-grid{
@@ -228,12 +296,16 @@
       margin-top:20px;
     }
 
-    .bank{
+    .bank-content{
       white-space:pre-line;
       line-height:1.55;
     }
 
-    .invoice-footer{
+    .notes-box{
+      margin-top:18px;
+    }
+
+    .footer{
       margin-top:22px;
       padding-top:16px;
       border-top:1px solid var(--line);
@@ -254,14 +326,16 @@
 
     .error{color:#7a1f1f}
 
-    @media (max-width: 860px){
-      .header,
-      .footer-grid,
-      .summary-grid{
+    @media (max-width: 900px){
+      .top-grid,
+      .summary-grid,
+      .footer-grid{
         grid-template-columns:1fr;
       }
 
-      .sheet{padding:22px}
+      .sheet{
+        padding:22px;
+      }
     }
 
     @media print{
@@ -297,43 +371,48 @@
     <div id="error" class="error" style="display:none;"></div>
 
     <article id="sheet" class="sheet" style="display:none;">
-      <section class="header">
-        <div class="block">
+      <section class="top-grid">
+        <div class="panel">
+          <div class="logo-wrap">
+            <div id="logoBox" class="logo-box">
+              <div class="logo-placeholder">Logo non renseigné</div>
+            </div>
+          </div>
+
           <h2>Émetteur</h2>
           <div id="businessBlock" class="meta"></div>
         </div>
 
-        <div>
-          <div class="title">Facture</div>
-          <div class="meta" style="margin-bottom:18px;">
-            <div><strong id="invoiceNumber">—</strong></div>
+        <div class="panel">
+          <div class="invoice-head">
+            <h1 class="invoice-title">Facture</h1>
+            <div id="invoiceNumber" class="invoice-number">—</div>
             <div>Date : <span id="invoiceDate">—</span></div>
             <div>Échéance : <span id="invoiceDueDate">—</span></div>
           </div>
 
-          <div class="block">
-            <h2>Client</h2>
-            <div id="clientBlock" class="meta"></div>
-          </div>
+          <h2>Client</h2>
+          <div id="clientBlock" class="meta"></div>
         </div>
       </section>
 
       <section class="section">
-        <div class="label">Objet</div>
-        <div class="desc">
+        <h2 class="section-label">Objet</h2>
+
+        <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th style="width:70%;">Désignation</th>
-                <th id="vatHeader" style="width:12%;">TVA</th>
-                <th style="width:18%;">Montant</th>
+                <th style="width:46%;">Désignation</th>
+                <th class="num" style="width:12%;">Qté</th>
+                <th class="num" style="width:18%;">PU TTC</th>
+                <th id="vatHeader" class="num" style="width:12%;">TVA</th>
+                <th class="num" style="width:12%;">Total TTC</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="linesBody">
               <tr>
-                <td id="invoiceLabel">—</td>
-                <td id="invoiceVatCell">—</td>
-                <td id="invoiceAmountCell">—</td>
+                <td colspan="5">Aucune ligne.</td>
               </tr>
             </tbody>
           </table>
@@ -360,7 +439,7 @@
               </div>
             </div>
 
-            <div class="block" style="margin-top:18px;">
+            <div class="refs-box" style="margin-top:18px;">
               <h2>Références</h2>
               <div id="refsBlock" class="meta"></div>
             </div>
@@ -369,25 +448,23 @@
       </section>
 
       <section class="footer-grid">
-        <div class="block">
+        <div class="mentions-box">
           <h2>Mentions</h2>
           <div id="mentionsBlock" class="meta"></div>
         </div>
 
-        <div class="block">
+        <div class="bank-box">
           <h2>Coordonnées bancaires</h2>
-          <div id="bankBlock" class="bank">Non renseignées.</div>
+          <div id="bankBlock" class="bank-content">Non renseignées.</div>
         </div>
       </section>
 
-      <section class="section">
-        <div class="block">
-          <h2>Notes internes</h2>
-          <div id="notesBlock" class="meta muted">Aucune note.</div>
-        </div>
+      <section class="notes-box">
+        <h2>Notes internes</h2>
+        <div id="notesBlock" class="meta">Aucune note.</div>
       </section>
 
-      <footer class="invoice-footer" id="footerBlock"></footer>
+      <footer id="footerBlock" class="footer"></footer>
     </article>
   </main>
 
@@ -418,6 +495,10 @@
         .replace(/'/g, "&#039;");
     }
 
+    function cleanSingleLine(text = "") {
+      return String(text).replace(/\n/g, " ").trim();
+    }
+
     function formatMoney(value) {
       const num = Number(value || 0);
       return num.toLocaleString("fr-FR", {
@@ -430,17 +511,12 @@
       return `<div>${escapeHtml(text)}</div>`;
     }
 
-    function cleanSingleLine(text = "") {
-      return String(text).replace(/\n/g, " ").trim();
-    }
-
     function renderBusiness(snapshot = {}) {
-      const address = cleanSingleLine(snapshot.address || "");
       const parts = [
         snapshot.businessName || "",
         snapshot.ownerName || "",
         snapshot.legalForm || "",
-        address,
+        cleanSingleLine(snapshot.address || ""),
         snapshot.email || "",
         snapshot.phone || "",
         snapshot.siret ? `SIRET : ${snapshot.siret}` : "",
@@ -453,11 +529,10 @@
     }
 
     function renderClient(snapshot = {}) {
-      const address = cleanSingleLine(snapshot.address || "");
       const parts = [
         snapshot.name || "",
         snapshot.type || "",
-        address,
+        cleanSingleLine(snapshot.address || ""),
         snapshot.email || "",
         snapshot.phone || ""
       ].filter(Boolean);
@@ -467,28 +542,89 @@
         : "<div>Aucune donnée client.</div>";
     }
 
-    async function renderRefs(data = {}) {
-      const parts = [];
+    function numberToFrenchUnder100(n) {
+      const units = ["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize"];
+      if (n < 17) return units[n];
+      if (n < 20) return "dix-" + units[n - 10];
+      if (n < 70) {
+        const tens = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante"];
+        const ten = Math.floor(n / 10);
+        const unit = n % 10;
+        if (unit === 0) return tens[ten];
+        if (unit === 1) return tens[ten] + "-et-un";
+        return tens[ten] + "-" + units[unit];
+      }
+      if (n < 80) {
+        if (n === 71) return "soixante-et-onze";
+        return "soixante-" + numberToFrenchUnder100(n - 60);
+      }
+      if (n === 80) return "quatre-vingts";
+      if (n < 100) {
+        return "quatre-vingt-" + numberToFrenchUnder100(n - 80);
+      }
+      return "";
+    }
 
-      if (data.dossierId) {
-        try {
-          const dossierSnap = await getDoc(doc(db, "dossiers", data.dossierId));
-          if (dossierSnap.exists()) {
-            const dossier = dossierSnap.data();
-            parts.push(`Dossier : ${dossier.title || data.dossierId}`);
-          }
-        } catch (e) {
-          parts.push("Dossier : non chargé");
-        }
+    function numberToFrench(n) {
+      n = Math.floor(Number(n || 0));
+
+      if (n === 0) return "zéro";
+      if (n < 100) return numberToFrenchUnder100(n);
+
+      if (n < 1000) {
+        const hundreds = Math.floor(n / 100);
+        const rest = n % 100;
+        let text = "";
+        if (hundreds === 1) text = "cent";
+        else text = numberToFrench(hundreds) + " cent";
+        if (hundreds > 1 && rest === 0) text += "s";
+        if (rest > 0) text += " " + numberToFrench(rest);
+        return text;
       }
 
-      if (data.mode) {
-        parts.push(`Mode prévu : ${data.mode}`);
+      if (n < 1000000) {
+        const thousands = Math.floor(n / 1000);
+        const rest = n % 1000;
+        let text = thousands === 1 ? "mille" : numberToFrench(thousands) + " mille";
+        if (rest > 0) text += " " + numberToFrench(rest);
+        return text;
       }
 
-      return parts.length
-        ? parts.map(p => line(p)).join("")
-        : "<div>Aucune référence.</div>";
+      if (n < 1000000000) {
+        const millions = Math.floor(n / 1000000);
+        const rest = n % 1000000;
+        let text = millions === 1 ? "un million" : numberToFrench(millions) + " millions";
+        if (rest > 0) text += " " + numberToFrench(rest);
+        return text;
+      }
+
+      return String(n);
+    }
+
+    function amountToWords(value) {
+      const amount = Number(value || 0);
+      const euros = Math.floor(amount);
+      const cents = Math.round((amount - euros) * 100);
+
+      let text = numberToFrench(euros) + (euros > 1 ? " euros" : " euro");
+
+      if (cents > 0) {
+        text += " et " + numberToFrench(cents) + (cents > 1 ? " centimes" : " centime");
+      }
+
+      return text;
+    }
+
+    function renderLogo(snapshot = {}) {
+      const box = document.getElementById("logoBox");
+      const logoUrl = snapshot.logoUrl || "";
+
+      if (!logoUrl) {
+        box.innerHTML = '<div class="logo-placeholder">Logo non renseigné</div>';
+        return;
+      }
+
+      box.innerHTML = `<img src="${escapeHtml(logoUrl)}" alt="Logo émetteur" />`;
     }
 
     function renderMentions(snapshot = {}) {
@@ -516,17 +652,16 @@
 
     function renderBank(snapshot = {}) {
       const parts = [];
+      if (snapshot.bankName) parts.push(`Banque : ${snapshot.bankName}`);
       if (snapshot.iban) parts.push(`IBAN : ${snapshot.iban}`);
       if (snapshot.bic) parts.push(`BIC : ${snapshot.bic}`);
-
       return parts.length ? parts.join("\n") : "Non renseignées.";
     }
 
     function renderFooter(snapshot = {}) {
-      const address = cleanSingleLine(snapshot.address || "");
       const parts = [
         snapshot.businessName || "Axe Dossier",
-        address,
+        cleanSingleLine(snapshot.address || ""),
         snapshot.siret ? `SIRET : ${snapshot.siret}` : "",
         snapshot.ape ? `APE : ${snapshot.ape}` : ""
       ].filter(Boolean);
@@ -540,20 +675,69 @@
       const hasTVA = vatMode === "YES" && vatRate > 0;
 
       const vatHeader = document.getElementById("vatHeader");
-      const vatCell = document.getElementById("invoiceVatCell");
       const vatTotalsRow = document.getElementById("vatTotalsRow");
 
       if (hasTVA) {
         vatHeader.classList.remove("hidden-col");
-        vatCell.classList.remove("hidden-col");
         vatTotalsRow.style.display = "";
-        vatCell.textContent = `${vatRate} %`;
       } else {
         vatHeader.classList.add("hidden-col");
-        vatCell.classList.add("hidden-col");
         vatTotalsRow.style.display = "none";
-        vatCell.textContent = "";
       }
+
+      return hasTVA;
+    }
+
+    function renderLines(data = {}, business = {}) {
+      const body = document.getElementById("linesBody");
+      const hasTVA = applyTVADisplay(business);
+      const lines = Array.isArray(data.lines) && data.lines.length
+        ? data.lines
+        : [{
+            designation: data.label || "Prestation",
+            quantity: 1,
+            unitPriceTTC: Number(data.amountTTC ?? data.amount ?? 0),
+            totalTTC: Number(data.amountTTC ?? data.amount ?? 0)
+          }];
+
+      body.innerHTML = lines.map(lineItem => {
+        const qty = Number(lineItem.quantity || 0);
+        const unitPriceTTC = Number(lineItem.unitPriceTTC || 0);
+        const totalTTC = Number(lineItem.totalTTC || 0);
+
+        return `
+          <tr>
+            <td>${escapeHtml(lineItem.designation || "")}</td>
+            <td class="num">${qty}</td>
+            <td class="num">${formatMoney(unitPriceTTC)}</td>
+            ${hasTVA ? `<td class="num">${Number(business.vatRate || 0)} %</td>` : ""}
+            <td class="num">${formatMoney(totalTTC)}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function buildPaymentLimitLabel(data = {}) {
+      if (data.dueDate) return data.dueDate;
+      return "À réception";
+    }
+
+    function renderRefs(data = {}) {
+      const parts = [];
+
+      if (data.dossierTitleSnapshot) {
+        parts.push(`Dossier : ${data.dossierTitleSnapshot}`);
+      }
+
+      if (data.mode) {
+        parts.push(`Mode prévu : ${data.mode}`);
+      }
+
+      parts.push(`À payer : ${formatMoney(data.amountTTC ?? data.amount ?? 0)}`);
+      parts.push(`En lettres : ${amountToWords(data.amountTTC ?? data.amount ?? 0)}`);
+      parts.push(`Date limite de règlement : ${buildPaymentLimitLabel(data)}`);
+
+      return parts.map(p => line(p)).join("");
     }
 
     function showError(message) {
@@ -583,19 +767,17 @@
         const business = data.businessSnapshot || {};
         const client = data.clientSnapshot || {};
 
-        document.getElementById("invoiceNumber").textContent = data.number || "—";
-        document.getElementById("invoiceDate").textContent = data.date || "—";
-        document.getElementById("invoiceDueDate").textContent = data.dueDate || "—";
-
         document.title = `${data.number || "Facture"} — Axe Dossier`;
 
+        document.getElementById("invoiceNumber").textContent = data.number || "—";
+        document.getElementById("invoiceDate").textContent = data.date || "—";
+        document.getElementById("invoiceDueDate").textContent = buildPaymentLimitLabel(data);
+
+        renderLogo(business);
         document.getElementById("businessBlock").innerHTML = renderBusiness(business);
         document.getElementById("clientBlock").innerHTML = renderClient(client);
-        document.getElementById("refsBlock").innerHTML = await renderRefs(data);
 
-        document.getElementById("invoiceLabel").textContent = data.label || "Prestation";
-        document.getElementById("invoiceAmountCell").textContent =
-          formatMoney(data.amountTTC ?? data.amount ?? 0);
+        renderLines(data, business);
 
         document.getElementById("amountHT").textContent =
           formatMoney(data.amountHT ?? data.amountTTC ?? data.amount ?? 0);
@@ -606,8 +788,7 @@
         document.getElementById("amountTTC").textContent =
           formatMoney(data.amountTTC ?? data.amount ?? 0);
 
-        applyTVADisplay(business);
-
+        document.getElementById("refsBlock").innerHTML = renderRefs(data);
         document.getElementById("mentionsBlock").innerHTML = renderMentions(business);
         document.getElementById("bankBlock").textContent = renderBank(business);
         document.getElementById("footerBlock").textContent = renderFooter(business);
