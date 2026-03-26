@@ -297,6 +297,11 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   background:#fff;
   font:inherit;
   cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  text-decoration:none;
+  color:var(--text);
 }
 
 .amount{
@@ -731,10 +736,12 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
 
           ${invoice.notes ? `<div class="invoice-notes">${escapeHtml(invoice.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
-          <div class="mini-actions">
-            <button class="mini-btn" type="button" data-edit-id="${invoice.id}">Modifier</button>
-            <button class="mini-btn" type="button" data-delete-id="${invoice.id}">Supprimer</button>
-          </div>
+
+         <div class="mini-actions">
+  <a class="mini-btn" href="facture-apercu.html?id=${invoice.id}" target="_blank" rel="noopener noreferrer">Aperçu</a>
+  <button class="mini-btn" type="button" data-edit-id="${invoice.id}">Modifier</button>
+  <button class="mini-btn" type="button" data-delete-id="${invoice.id}">Supprimer</button>
+</div>
         </article>
       `;
     }).join("");
