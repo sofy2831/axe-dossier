@@ -473,6 +473,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     addDoc,
     deleteDoc,
     doc,
+    updateDoc,
     onSnapshot,
     query,
     orderBy,
@@ -495,6 +496,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
 
   let allClients = [];
   let allDossiers = [];
+  let editingDossierId = null;
 
   function escapeHtml(text = "") {
     return String(text)
@@ -524,6 +526,17 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     if (current && allClients.some(c => c.id === current)) {
       clientSelect.value = current;
     }
+  }
+
+  function fillForm(dossier) {
+    document.getElementById("dossierTitle").value = dossier.title || "";
+    document.getElementById("dossierClient").value = dossier.clientId || "";
+    document.getElementById("dossierType").value = dossier.type || "Autre";
+    document.getElementById("dossierStatus").value = dossier.status || "EN_COURS";
+    document.getElementById("dossierOpenedAt").value = dossier.openedAt || "";
+    document.getElementById("dossierReference").value = dossier.reference || "";
+    document.getElementById("dossierSummary").value = dossier.summary || "";
+    document.getElementById("dossierNotes").value = dossier.notes || "";
   }
 
   function renderStats(dossiers) {
@@ -591,6 +604,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
           ${dossier.notes ? `<div class="dossier-notes">${escapeHtml(dossier.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
           <div class="mini-actions">
+            <button class="mini-btn" type="button" data-edit-id="${dossier.id}">Modifier</button>
             <button class="mini-btn" type="button" data-delete-id="${dossier.id}">Supprimer</button>
           </div>
         </article>
@@ -617,16 +631,33 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     e.preventDefault();
 
     const data = new FormData(form);
-    const dossier = createDossier(data);
+    const payload = createDossier(data);
 
-    if (!dossier.title || !dossier.clientId) return;
+    if (!payload.title || !payload.clientId) return;
 
     try {
-      await addDoc(dossiersRef, dossier);
+      if (editingDossierId) {
+        await updateDoc(doc(db, "dossiers", editingDossierId), {
+          title: payload.title,
+          clientId: payload.clientId,
+          type: payload.type,
+          status: payload.status,
+          openedAt: payload.openedAt,
+          reference: payload.reference,
+          summary: payload.summary,
+          notes: payload.notes,
+          updatedAt: serverTimestamp()
+        });
+        editingDossierId = null;
+      } else {
+        await addDoc(dossiersRef, payload);
+      }
+
       form.reset();
       document.getElementById("dossierStatus").value = "EN_COURS";
+      document.getElementById("dossierType").value = "Succession";
     } catch (err) {
-      console.error("Erreur ajout dossier :", err);
+      console.error("Erreur enregistrement dossier :", err);
       alert("Impossible d’enregistrer le dossier.");
     }
   });
@@ -635,15 +666,34 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   statusFilter.addEventListener("change", renderDossiers);
 
   dossierList.addEventListener("click", async (e) => {
-    const btn = e.target.closest("[data-delete-id]");
-    if (!btn) return;
+    const editBtn = e.target.closest("[data-edit-id]");
+    if (editBtn) {
+      const id = editBtn.getAttribute("data-edit-id");
+      const dossier = allDossiers.find(d => d.id === id);
+      if (!dossier) return;
 
-    const id = btn.getAttribute("data-delete-id");
+      editingDossierId = id;
+      fillForm(dossier);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const deleteBtn = e.target.closest("[data-delete-id]");
+    if (!deleteBtn) return;
+
+    const id = deleteBtn.getAttribute("data-delete-id");
     const ok = confirm("Supprimer ce dossier ?");
     if (!ok) return;
 
     try {
       await deleteDoc(doc(db, "dossiers", id));
+
+      if (editingDossierId === id) {
+        editingDossierId = null;
+        form.reset();
+        document.getElementById("dossierStatus").value = "EN_COURS";
+        document.getElementById("dossierType").value = "Succession";
+      }
     } catch (err) {
       console.error("Erreur suppression dossier :", err);
       alert("Impossible de supprimer le dossier.");
