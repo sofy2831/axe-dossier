@@ -1,0 +1,622 @@
+<!DOCTYPE html><html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axe Dossier — Documents</title>
+  <style>
+    :root{
+      --bg:#f3efe8;
+      --card:#ffffff;
+      --text:#171717;
+      --muted:#66615a;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --soft:#e9e1d4;
+      --radius:18px;
+      --shadow:0 16px 40px rgba(0,0,0,0.06);
+      --max:1180px;
+    }*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+a{text-decoration:none;color:inherit}
+.wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:rgba(243,239,232,0.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+}
+
+.topbar-inner{
+  min-height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:800;
+  letter-spacing:.02em;
+}
+
+.brand-mark{
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  background:var(--accent);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font-weight:900;
+  box-shadow:var(--shadow);
+}
+
+.nav{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.pill{
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.7);
+  border:1px solid var(--line);
+  font-size:.94rem;
+}
+
+main{padding:32px 0 56px}
+
+.hero{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:22px;
+}
+
+h1,h2,h3,p{margin:0}
+h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
+.hero p{color:var(--muted);max-width:68ch;margin-top:8px}
+
+.grid{
+  display:grid;
+  grid-template-columns:400px 1fr;
+  gap:20px;
+  align-items:start;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+  padding:24px;
+}
+
+.card h2{
+  font-size:1.2rem;
+  margin-bottom:14px;
+  letter-spacing:-.02em;
+}
+
+.field{margin-bottom:14px}
+.field label{
+  display:block;
+  font-size:.92rem;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.field input,
+.field textarea,
+.field select{
+  width:100%;
+  min-height:48px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:12px 14px;
+  font:inherit;
+  color:var(--text);
+  background:#fff;
+}
+
+.field textarea{min-height:110px;resize:vertical}
+
+.row-2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:18px;
+}
+
+.btn{
+  min-height:48px;
+  padding:0 18px;
+  border-radius:999px;
+  border:1px solid var(--accent);
+  background:var(--accent);
+  color:#fff;
+  font:inherit;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.btn-secondary{
+  background:#fff;
+  color:var(--accent);
+  border-color:var(--line);
+}
+
+.toolbar{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+
+.search,
+.filter{
+  min-height:48px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:0 16px;
+  font:inherit;
+  background:#fff;
+}
+
+.search{flex:1 1 260px}
+.filter{min-width:180px}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+
+.stat{
+  background:#faf7f1;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+}
+
+.stat strong{
+  display:block;
+  font-size:1.35rem;
+  letter-spacing:-.04em;
+  margin-bottom:4px;
+}
+
+.stat span{color:var(--muted);font-size:.92rem}
+
+.empty{
+  padding:24px;
+  border:1px dashed var(--line);
+  border-radius:18px;
+  color:var(--muted);
+  text-align:center;
+  background:#fcfbf8;
+}
+
+.doc-list{display:grid;gap:14px}
+
+.doc-item{
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:18px;
+  background:#fff;
+  display:grid;
+  gap:12px;
+}
+
+.doc-top{
+  display:flex;
+  align-items:start;
+  justify-content:space-between;
+  gap:16px;
+}
+
+.doc-title{
+  font-size:1.08rem;
+  font-weight:800;
+  letter-spacing:-.02em;
+  margin-bottom:4px;
+}
+
+.doc-meta{
+  display:grid;
+  gap:6px;
+  color:#4f4942;
+  font-size:.95rem;
+}
+
+.badges{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  min-height:28px;
+  padding:0 10px;
+  border-radius:999px;
+  background:var(--soft);
+  font-size:.82rem;
+  font-weight:700;
+  color:#4f493f;
+  border:1px solid rgba(23,23,23,0.06);
+}
+
+.doc-notes{
+  color:var(--muted);
+  font-size:.94rem;
+  line-height:1.5;
+}
+
+.mini-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.mini-btn{
+  min-height:36px;
+  padding:0 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:#fff;
+  font:inherit;
+  cursor:pointer;
+}
+
+.note{
+  margin-top:12px;
+  padding:14px 16px;
+  border-radius:14px;
+  background:#faf7f1;
+  border:1px solid var(--line);
+  color:#4f4942;
+  font-size:.92rem;
+}
+
+@media (max-width: 980px){
+  .grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+}
+
+@media (max-width: 720px){
+  .topbar-inner{
+    min-height:auto;
+    padding:14px 0;
+    flex-direction:column;
+    align-items:stretch;
+  }
+  .brand,.nav{justify-content:center}
+  .hero{flex-direction:column;align-items:start}
+  .card{padding:20px}
+  .doc-top{flex-direction:column}
+  .row-2{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr}
+  .actions .btn{width:100%}
+}
+
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="index.html" aria-label="Retour admin">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier · Documents</span>
+      </a><nav class="nav" aria-label="Navigation admin">
+    <a class="pill" href="index.html">Admin</a>
+    <a class="pill" href="clients.html">Clients</a>
+    <a class="pill" href="dossiers.html">Dossiers</a>
+    <a class="pill" href="documents.html">Documents</a>
+    <a class="pill" href="factures.html">Factures</a>
+    <a class="pill" href="paiements.html">Paiements</a>
+    <a class="pill" href="settings.html">Settings</a>
+  </nav>
+</div>
+
+  </header>  <main>
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <h1>Documents</h1>
+          <p>Ici tu attaches les pièces utiles à un dossier : courrier, mail, pièce client, note interne, preuve ou document de travail.</p>
+        </div>
+      </section><section class="grid">
+    <article class="card">
+      <h2>Ajouter un document</h2>
+      <form id="documentForm">
+        <div class="field">
+          <label for="documentTitle">Titre du document</label>
+          <input id="documentTitle" name="documentTitle" type="text" placeholder="Ex. Courrier de relance notaire" required />
+        </div>
+
+        <div class="field">
+          <label for="documentDossier">Dossier</label>
+          <select id="documentDossier" name="documentDossier" required>
+            <option value="">Sélectionner un dossier</option>
+          </select>
+        </div>
+
+        <div class="row-2">
+          <div class="field">
+            <label for="documentType">Type</label>
+            <select id="documentType" name="documentType">
+              <option value="Courrier">Courrier</option>
+              <option value="Email">Email</option>
+              <option value="Pièce client">Pièce client</option>
+              <option value="Preuve">Preuve</option>
+              <option value="Note interne">Note interne</option>
+              <option value="Document de travail">Document de travail</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="documentDate">Date du document</label>
+            <input id="documentDate" name="documentDate" type="date" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="documentUrl">Lien / URL (optionnel)</label>
+          <input id="documentUrl" name="documentUrl" type="text" placeholder="Ex. https://... ou chemin futur Storage" />
+        </div>
+
+        <div class="field">
+          <label for="documentNotes">Notes</label>
+          <textarea id="documentNotes" name="documentNotes" placeholder="Ce que contient le document, pourquoi il compte, ce qu’il faut retenir..."></textarea>
+        </div>
+
+        <div class="actions">
+          <button type="submit" class="btn">Enregistrer</button>
+          <button type="reset" class="btn btn-secondary">Vider</button>
+        </div>
+      </form>
+
+      <div class="note">
+        Version 1 : stockage local pour valider la logique. Le vrai upload de fichier viendra ensuite avec Firebase Storage.
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="stats">
+        <div class="stat">
+          <strong id="totalDocuments">0</strong>
+          <span>Documents</span>
+        </div>
+        <div class="stat">
+          <strong id="totalCourriers">0</strong>
+          <span>Courriers</span>
+        </div>
+        <div class="stat">
+          <strong id="totalEmails">0</strong>
+          <span>Emails</span>
+        </div>
+        <div class="stat">
+          <strong id="totalPieces">0</strong>
+          <span>Pièces / preuves</span>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input id="searchInput" class="search" type="text" placeholder="Rechercher un document..." />
+        <select id="typeFilter" class="filter">
+          <option value="">Tous les types</option>
+          <option value="Courrier">Courrier</option>
+          <option value="Email">Email</option>
+          <option value="Pièce client">Pièce client</option>
+          <option value="Preuve">Preuve</option>
+          <option value="Note interne">Note interne</option>
+          <option value="Document de travail">Document de travail</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+
+      <div id="documentList" class="doc-list"></div>
+    </article>
+  </section>
+</div>
+
+  </main>  <script>
+    const DOSSIERS_KEY = "axe_dossier_dossiers_v1";
+    const CLIENTS_KEY = "axe_dossier_clients_v1";
+    const DOCUMENTS_KEY = "axe_dossier_documents_v1";
+
+    const form = document.getElementById("documentForm");
+    const dossierSelect = document.getElementById("documentDossier");
+    const documentList = document.getElementById("documentList");
+    const searchInput = document.getElementById("searchInput");
+    const typeFilter = document.getElementById("typeFilter");
+
+    const totalDocuments = document.getElementById("totalDocuments");
+    const totalCourriers = document.getElementById("totalCourriers");
+    const totalEmails = document.getElementById("totalEmails");
+    const totalPieces = document.getElementById("totalPieces");
+
+    function loadClients() {
+      try { return JSON.parse(localStorage.getItem(CLIENTS_KEY)) || []; }
+      catch (e) { return []; }
+    }
+
+    function loadDossiers() {
+      try { return JSON.parse(localStorage.getItem(DOSSIERS_KEY)) || []; }
+      catch (e) { return []; }
+    }
+
+    function loadDocuments() {
+      try { return JSON.parse(localStorage.getItem(DOCUMENTS_KEY)) || []; }
+      catch (e) { return []; }
+    }
+
+    function saveDocuments(items) {
+      localStorage.setItem(DOCUMENTS_KEY, JSON.stringify(items));
+    }
+
+    function escapeHtml(text = "") {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function fillDossierSelect() {
+      const dossiers = loadDossiers();
+      const current = dossierSelect.value;
+      const options = ['<option value="">Sélectionner un dossier</option>']
+        .concat(dossiers.map(dossier => `<option value="${dossier.id}">${escapeHtml(dossier.title)}</option>`));
+      dossierSelect.innerHTML = options.join("");
+      if (current) dossierSelect.value = current;
+    }
+
+    function renderStats(documents) {
+      totalDocuments.textContent = documents.length;
+      totalCourriers.textContent = documents.filter(d => d.type === "Courrier").length;
+      totalEmails.textContent = documents.filter(d => d.type === "Email").length;
+      totalPieces.textContent = documents.filter(d => d.type === "Pièce client" || d.type === "Preuve").length;
+    }
+
+    function renderDocuments() {
+      const dossiers = loadDossiers();
+      const clients = loadClients();
+      const documents = loadDocuments();
+      const dossierMap = Object.fromEntries(dossiers.map(dossier => [dossier.id, dossier]));
+      const clientMap = Object.fromEntries(clients.map(client => [client.id, client]));
+      const q = (searchInput.value || "").trim().toLowerCase();
+      const filter = typeFilter.value;
+
+      const filtered = documents.filter(doc => {
+        const dossier = dossierMap[doc.dossierId];
+        const clientName = dossier ? (clientMap[dossier.clientId]?.name || "") : "";
+        const blob = [
+          doc.title,
+          doc.type,
+          doc.notes,
+          doc.url,
+          dossier?.title || "",
+          clientName
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = blob.includes(q);
+        const matchesType = !filter || doc.type === filter;
+        return matchesSearch && matchesType;
+      });
+
+      renderStats(documents);
+
+      if (!dossiers.length) {
+        documentList.innerHTML = '<div class="empty">Ajoute d’abord au moins un dossier dans dossiers.html.</div>';
+        return;
+      }
+
+      if (!filtered.length) {
+        documentList.innerHTML = '<div class="empty">Aucun document pour le moment.</div>';
+        return;
+      }
+
+      documentList.innerHTML = filtered
+        .slice()
+        .reverse()
+        .map(doc => {
+          const dossier = dossierMap[doc.dossierId];
+          const clientName = dossier ? (clientMap[dossier.clientId]?.name || "Client supprimé") : "Dossier supprimé";
+          return `
+            <article class="doc-item">
+              <div class="doc-top">
+                <div>
+                  <div class="doc-title">${escapeHtml(doc.title)}</div>
+                  <div class="doc-meta">
+                    <span><strong>Dossier :</strong> ${escapeHtml(dossier?.title || "Dossier supprimé")}</span>
+                    <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
+                    ${doc.date ? `<span><strong>Date :</strong> ${escapeHtml(doc.date)}</span>` : ""}
+                  </div>
+                </div>
+                <div class="badges">
+                  <span class="badge">${escapeHtml(doc.type)}</span>
+                </div>
+              </div>
+
+              ${doc.url ? `<div class="doc-meta"><span><strong>Lien :</strong> ${escapeHtml(doc.url)}</span></div>` : ""}
+              ${doc.notes ? `<div class="doc-notes">${escapeHtml(doc.notes).replace(/\n/g, "<br>")}</div>` : ""}
+
+              <div class="mini-actions">
+                <button class="mini-btn" type="button" onclick="deleteDocument('${doc.id}')">Supprimer</button>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+    }
+
+    function createDocument(data) {
+      return {
+        id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
+        title: data.get("documentTitle")?.trim() || "",
+        dossierId: data.get("documentDossier") || "",
+        type: data.get("documentType") || "Autre",
+        date: data.get("documentDate") || "",
+        url: data.get("documentUrl")?.trim() || "",
+        notes: data.get("documentNotes")?.trim() || "",
+        createdAt: Date.now()
+      };
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const doc = createDocument(data);
+
+      if (!doc.title || !doc.dossierId) return;
+
+      const documents = loadDocuments();
+      documents.push(doc);
+      saveDocuments(documents);
+      form.reset();
+      renderDocuments();
+    });
+
+    searchInput.addEventListener("input", renderDocuments);
+    typeFilter.addEventListener("change", renderDocuments);
+
+    window.deleteDocument = function(id) {
+      const ok = confirm("Supprimer ce document ?");
+      if (!ok) return;
+      const documents = loadDocuments().filter(doc => doc.id !== id);
+      saveDocuments(documents);
+      renderDocuments();
+    };
+
+    fillDossierSelect();
+    renderDocuments();
+  </script></body>
+</html>
