@@ -129,6 +129,16 @@
       line-height:1.5;
     }
 
+    .warning-box{
+      background:#f7e3df;
+      border:1px solid rgba(23,23,23,0.08);
+      border-radius:18px;
+      padding:16px;
+      color:#6b241f;
+      font-size:.94rem;
+      line-height:1.5;
+    }
+
     .relance-list{
       display:grid;
       gap:18px;
@@ -232,6 +242,14 @@
       border-color:var(--line);
     }
 
+    .btn[aria-disabled="true"]{
+      background:#ececec !important;
+      border-color:#d8d8d8 !important;
+      color:#777 !important;
+      pointer-events:none;
+      cursor:not-allowed;
+    }
+
     .empty,
     .error{
       background:#fff;
@@ -319,6 +337,8 @@
                 <div><strong>Reste dû :</strong> <span id="remainingTTC">—</span></div>
               </div>
             </div>
+
+            <div id="warningBox" class="warning-box" style="display:none;"></div>
           </div>
         </article>
 
@@ -347,6 +367,10 @@
     const errorEl = document.getElementById("error");
     const contentEl = document.getElementById("content");
     const relanceList = document.getElementById("relanceList");
+    const warningBox = document.getElementById("warningBox");
+
+    let renderedTemplates = [];
+    let renderedBaseData = null;
 
     function qs(name) {
       return new URL(window.location.href).searchParams.get(name);
@@ -516,7 +540,7 @@ Malgré nos précédents messages, la facture ${invoiceNumber}, arrivée à éch
 
 Le solde restant dû est de ${montant} (${montantEnLettres}).
 
-Nous vous mettons en conséquence en demeure officieuse de procéder au règlement sous 48 heures.
+Nous vous demandons de procéder au règlement sous 48 heures.
 
 À défaut, une mise en demeure formelle pourra être adressée.
 
@@ -570,8 +594,15 @@ ${commonFooter}`
     }
 
     function renderTemplates(baseData, templates) {
+      const hasEmail = !!String(baseData.clientEmail || "").trim();
+
+      renderedTemplates = templates;
+      renderedBaseData = baseData;
+
       relanceList.innerHTML = templates.map((tpl, index) => {
-        const mailto = `mailto:${encodeMailto(baseData.clientEmail)}?subject=${encodeMailto(tpl.subject)}&body=${encodeMailto(tpl.body)}`;
+        const mailto = hasEmail
+          ? `mailto:${baseData.clientEmail}?subject=${encodeMailto(tpl.subject)}&body=${encodeMailto(tpl.body)}`
+          : "#";
 
         return `
           <article class="relance-item">
@@ -596,63 +627,81 @@ ${commonFooter}`
               <div class="actions">
                 <button class="btn btn-secondary" type="button" data-copy-index="${index}">Copier</button>
                 <button class="btn btn-secondary" type="button" data-save-index="${index}">Préparer</button>
-                <a class="btn" href="${mailto}" data-send-index="${index}">Envoyer par mail</a>
+                <a
+                  class="btn"
+                  href="${mailto}"
+                  data-send-index="${index}"
+                  ${hasEmail ? "" : 'aria-disabled="true"'}
+                >Envoyer par mail</a>
               </div>
             </div>
           </article>
         `;
       }).join("");
-
-      relanceList.addEventListener("click", async (e) => {
-        const copyBtn = e.target.closest("[data-copy-index]");
-        if (copyBtn) {
-          const i = Number(copyBtn.getAttribute("data-copy-index"));
-          const tpl = templates[i];
-          try {
-            await navigator.clipboard.writeText(`Sujet : ${tpl.subject}\n\n${tpl.body}`);
-            alert("Relance copiée.");
-          } catch {
-            alert("Impossible de copier.");
-          }
-          return;
-        }
-
-        const saveBtn = e.target.closest("[data-save-index]");
-        if (saveBtn) {
-          const i = Number(saveBtn.getAttribute("data-save-index"));
-          const tpl = templates[i];
-          try {
-            await saveRelance({
-              ...baseData,
-              type: tpl.type,
-              subject: tpl.subject,
-              body: tpl.body
-            }, false);
-            alert("Relance enregistrée comme PREPARED.");
-          } catch (err) {
-            console.error(err);
-            alert("Impossible d’enregistrer la relance.");
-          }
-          return;
-        }
-
-        const sendLink = e.target.closest("[data-send-index]");
-        if (sendLink) {
-          const i = Number(sendLink.getAttribute("data-send-index"));
-          const tpl = templates[i];
-          try {
-            await saveRelance({
-              ...baseData,
-              type: tpl.type,
-              subject: tpl.subject,
-              body: tpl.body
-            }, true);
-          } catch (err) {
-            console.error(err);
-          }
-        }
-      }, { once: true });
     }
+
+    relanceList.addEventListener("click", async (e) => {
+      const copyBtn = e.target.closest("[data-copy-index]");
+      if (copyBtn) {
+        const i = Number(copyBtn.getAttribute("data-copy-index"));
+        const tpl = renderedTemplates[i];
+        if (!tpl) return;
+
+        try {
+          await navigator.clipboard.writeText(`Sujet : ${tpl.subject}\n\n${tpl.body}`);
+          alert("Relance copiée.");
+        } catch {
+          alert("Impossible de copier.");
+        }
+        return;
+      }
+
+      const saveBtn = e.target.closest("[data-save-index]");
+      if (saveBtn) {
+        const i = Number(saveBtn.getAttribute("data-save-index"));
+        const tpl = renderedTemplates[i];
+        if (!tpl || !renderedBaseData) return;
+
+        try {
+          await saveRelance({
+            ...renderedBaseData,
+            type: tpl.type,
+            subject: tpl.subject,
+            body: tpl.body
+          }, false);
+          alert("Relance enregistrée comme PREPARED.");
+        } catch (err) {
+          console.error(err);
+          alert("Impossible d’enregistrer la relance.");
+        }
+        return;
+      }
+
+      const sendLink = e.target.closest("[data-send-index]");
+      if (sendLink) {
+        const i = Number(sendLink.getAttribute("data-send-index"));
+        const tpl = renderedTemplates[i];
+        if (!tpl || !renderedBaseData) return;
+
+        const email = String(renderedBaseData.clientEmail || "").trim();
+        if (!email) {
+          e.preventDefault();
+          alert("Aucun email client renseigné.");
+          return;
+        }
+
+        try {
+          await saveRelance({
+            ...renderedBaseData,
+            type: tpl.type,
+            subject: tpl.subject,
+            body: tpl.body
+          }, true);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    });
 
     async function init() {
       const invoiceId = qs("id");
@@ -705,6 +754,16 @@ ${commonFooter}`
         document.getElementById("creditsTTC").textContent = formatMoney(creditsTTC);
         document.getElementById("paidTTC").textContent = formatMoney(paidTTC);
         document.getElementById("remainingTTC").textContent = formatMoney(remainingTTC);
+
+        if (!clientEmail) {
+          warningBox.style.display = "";
+          warningBox.textContent = "Aucun email client n’est présent dans le snapshot de la facture. Les modèles sont utilisables, mais le bouton “Envoyer par mail” sera bloqué.";
+        }
+
+        if (remainingTTC <= 0) {
+          warningBox.style.display = "";
+          warningBox.textContent = "Cette facture ne présente plus de reste dû. Les relances n’ont pas vraiment de sens ici.";
+        }
 
         const baseData = {
           invoiceId: invoice.id,
