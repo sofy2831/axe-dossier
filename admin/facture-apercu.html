@@ -119,10 +119,11 @@
       border-radius:18px;
       background:#fff;
       padding:18px;
-      min-height:220%;
+      min-height:220px;
       display:flex;
       flex-direction:column;
-      }
+      justify-content:flex-start;
+    }
 
     .panel h2{
       margin:0 0 10px;
@@ -132,22 +133,22 @@
 
     .logo-wrap{
       flex:1;
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-}
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
 
     .logo-box{
       width:132px;
-  height:132px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:var(--soft-2);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
+      height:132px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--soft-2);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
 
     .logo-box img{
       max-width:100%;
@@ -167,14 +168,14 @@
     .invoice-head{
       display:grid;
       gap:8px;
-          }
+    }
 
     .invoice-title{
       font-size:1.6rem;
-  font-weight:900;
-  letter-spacing:-.05em;
-  margin:0;
-}
+      font-weight:900;
+      letter-spacing:-.05em;
+      margin:0;
+    }
 
     .invoice-number{
       font-size:1.2rem;
@@ -328,90 +329,94 @@
       .sheet{
         padding:22px;
       }
+
+      .panel{
+        min-height:auto;
+      }
     }
 
-  @media print{
+    @media print{
+      @page{
+        size:A4;
+        margin:10mm;
+      }
 
-  body{
-    background:#fff;
-    font-size:12px;
-  }
+      body{
+        background:#fff;
+        font-size:12px;
+      }
 
-  .topbar{
-    display:none !important;
-  }
+      .topbar{
+        display:none !important;
+      }
 
-  .wrap{
-    width:100%;
-    margin:0;
-  }
+      .wrap{
+        width:100%;
+        margin:0;
+      }
 
-  .sheet{
-    box-shadow:none;
-    border:none;
-    border-radius:0;
-    padding:10px;
-  }
+      .sheet{
+        box-shadow:none;
+        border:none;
+        border-radius:0;
+        padding:8px;
+      }
 
-  /* 🔥 garde la même structure qu’écran */
-  .top-grid{
-    grid-template-columns:1fr 1fr !important;
-  }
+      .top-grid{
+        grid-template-columns:1fr 1fr !important;
+        gap:10px;
+      }
 
-  .summary-grid{
-    grid-template-columns:1fr 1fr !important;
-    gap:10px;
-  }
+      .summary-grid{
+        grid-template-columns:1fr 320px !important;
+        gap:10px;
+      }
 
-  .footer-grid{
-    grid-template-columns:1fr 1fr !important;
-    gap:10px;
-  }
+      .footer-grid{
+        grid-template-columns:1fr 1fr !important;
+        gap:10px;
+      }
 
-  /* 🔥 compresser les blocs */
-  .panel,
-  .refs-box,
-  .mentions-box,
-  .bank-box,
-  .notes-box{
-    padding:10px;
-  }
+      .panel{
+        min-height:160px;
+        padding:10px;
+      }
 
-  /* 🔥 tableau plus compact */
-  th, td{
-    padding:8px 10px;
-    font-size:11px;
-  }
+      .refs-box,
+      .mentions-box,
+      .bank-box,
+      .notes-box{
+        padding:10px;
+      }
 
-  .invoice-title{
-    font-size:18px;
-  }
+      th, td{
+        padding:8px 10px;
+        font-size:11px;
+      }
 
-  .invoice-number{
-    font-size:13px;
-  }
+      .invoice-title{
+        font-size:18px;
+      }
 
-  .amount{
-    font-size:16px;
-  }
+      .invoice-number{
+        font-size:13px;
+      }
 
-  /* 🔥 éviter les coupures moches */
-  .panel,
-  .table-wrap,
-  .totals,
-  .refs-box,
-  .mentions-box,
-  .bank-box,
-  .notes-box{
-    page-break-inside: avoid;
-  }
+      .panel,
+      .table-wrap,
+      .totals,
+      .refs-box,
+      .mentions-box,
+      .bank-box,
+      .notes-box{
+        page-break-inside:avoid;
+        break-inside:avoid;
+      }
 
-  /* 🔥 limiter à 1 page si possible */
-  html, body{
-    height:auto;
-  }
-
-}
+      html, body{
+        height:auto;
+      }
+    }
   </style>
 </head>
 <body>
@@ -434,35 +439,36 @@
     <div id="error" class="error" style="display:none;"></div>
 
     <article id="sheet" class="sheet" style="display:none;">
-     <section class="top-grid">
-  <div class="panel">
-    <h2>Logo</h2>
-    <div class="logo-wrap">
-      <div id="logoBox" class="logo-box">
-        <div class="logo-placeholder">Logo non renseigné</div>
-      </div>
-    </div>
-  </div>
+      <section class="top-grid">
+        <div class="panel">
+          <h2>Logo</h2>
+          <div class="logo-wrap">
+            <div id="logoBox" class="logo-box">
+              <div class="logo-placeholder">Logo non renseigné</div>
+            </div>
+          </div>
+        </div>
 
-  <div class="panel">
-    <h2>Facture</h2>
-    <div class="invoice-head">
-      <div id="invoiceNumber" class="invoice-number">—</div>
-      <div>Date : <span id="invoiceDate">—</span></div>
-      <div>Échéance : <span id="invoiceDueDate">—</span></div>
-    </div>
-  </div>
+        <div class="panel">
+          <h2>Facture</h2>
+          <div class="invoice-head">
+            <h1 class="invoice-title">Facture</h1>
+            <div id="invoiceNumber" class="invoice-number">—</div>
+            <div>Date : <span id="invoiceDate">—</span></div>
+            <div>Échéance : <span id="invoiceDueDate">—</span></div>
+          </div>
+        </div>
 
-  <div class="panel">
-    <h2>Émetteur</h2>
-    <div id="businessBlock" class="meta"></div>
-  </div>
+        <div class="panel">
+          <h2>Émetteur</h2>
+          <div id="businessBlock" class="meta"></div>
+        </div>
 
-  <div class="panel">
-    <h2>Client</h2>
-    <div id="clientBlock" class="meta"></div>
-  </div>
-</section>
+        <div class="panel">
+          <h2>Client</h2>
+          <div id="clientBlock" class="meta"></div>
+        </div>
+      </section>
 
       <section class="section">
         <div class="table-wrap">
