@@ -716,8 +716,8 @@
     }
 
     function buildValidityLabel(data = {}) {
-      if (data.validityDelayLabel) return data.validityDelayLabel;
       if (data.dueDate) return `Jusqu’au ${data.dueDate}`;
+      if (data.validityDelayLabel) return data.validityDelayLabel;
       return "—";
     }
 
