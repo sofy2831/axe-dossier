@@ -441,7 +441,6 @@
     <article id="sheet" class="sheet" style="display:none;">
       <section class="top-grid">
         <div class="panel">
-         
           <div class="logo-wrap">
             <div id="logoBox" class="logo-box">
               <div class="logo-placeholder">Logo non renseigné</div>
@@ -450,7 +449,6 @@
         </div>
 
         <div class="panel">
-          
           <div class="credit-head">
             <h1 class="credit-title">Avoir</h1>
             <div id="creditNumber" class="credit-number">—</div>
@@ -579,6 +577,14 @@
       }) + " €";
     }
 
+    function formatMoneyNegative(value) {
+      const num = Math.abs(Number(value || 0));
+      return "-" + num.toLocaleString("fr-FR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " €";
+    }
+
     function line(text) {
       return `<div>${escapeHtml(text)}</div>`;
     }
@@ -607,6 +613,79 @@
       return parts.length
         ? parts.map(p => line(p)).join("")
         : "<div>Aucune donnée client.</div>";
+    }
+
+    function numberToFrenchUnder100(n) {
+      const units = ["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize"];
+      if (n < 17) return units[n];
+      if (n < 20) return "dix-" + units[n - 10];
+      if (n < 70) {
+        const tens = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante"];
+        const ten = Math.floor(n / 10);
+        const unit = n % 10;
+        if (unit === 0) return tens[ten];
+        if (unit === 1) return tens[ten] + "-et-un";
+        return tens[ten] + "-" + units[unit];
+      }
+      if (n < 80) {
+        if (n === 71) return "soixante-et-onze";
+        return "soixante-" + numberToFrenchUnder100(n - 60);
+      }
+      if (n === 80) return "quatre-vingts";
+      if (n < 100) {
+        return "quatre-vingt-" + numberToFrenchUnder100(n - 80);
+      }
+      return "";
+    }
+
+    function numberToFrench(n) {
+      n = Math.floor(Number(n || 0));
+
+      if (n === 0) return "zéro";
+      if (n < 100) return numberToFrenchUnder100(n);
+
+      if (n < 1000) {
+        const hundreds = Math.floor(n / 100);
+        const rest = n % 100;
+        let text = "";
+        if (hundreds === 1) text = "cent";
+        else text = numberToFrench(hundreds) + " cent";
+        if (hundreds > 1 && rest === 0) text += "s";
+        if (rest > 0) text += " " + numberToFrench(rest);
+        return text;
+      }
+
+      if (n < 1000000) {
+        const thousands = Math.floor(n / 1000);
+        const rest = n % 1000;
+        let text = thousands === 1 ? "mille" : numberToFrench(thousands) + " mille";
+        if (rest > 0) text += " " + numberToFrench(rest);
+        return text;
+      }
+
+      if (n < 1000000000) {
+        const millions = Math.floor(n / 1000000);
+        const rest = n % 1000000;
+        let text = millions === 1 ? "un million" : numberToFrench(millions) + " millions";
+        if (rest > 0) text += " " + numberToFrench(rest);
+        return text;
+      }
+
+      return String(n);
+    }
+
+    function amountToWordsNegative(value) {
+      const amount = Math.abs(Number(value || 0));
+      const euros = Math.floor(amount);
+      const cents = Math.round((amount - euros) * 100);
+
+      let text = "moins " + numberToFrench(euros) + (euros > 1 ? " euros" : " euro");
+
+      if (cents > 0) {
+        text += " et " + numberToFrench(cents) + (cents > 1 ? " centimes" : " centime");
+      }
+
+      return text;
     }
 
     function renderLogo(snapshot = {}) {
@@ -701,7 +780,7 @@
                 <td class="num">${qty}</td>
                 <td class="num">${formatMoney(unitPriceTTC)}</td>
                 ${hasTVA ? `<td class="num">${Number(business.vatRate || 0)} %</td>` : ""}
-                <td class="num">${formatMoney(totalTTC)}</td>
+                <td class="num">${formatMoneyNegative(totalTTC)}</td>
               </tr>
             `;
           }).join("")
@@ -719,11 +798,8 @@
         parts.push(`Dossier : ${data.dossierTitleSnapshot}`);
       }
 
-      if (data.status) {
-        parts.push(`Statut : ${data.status}`);
-      }
-
-      parts.push(`Montant de l’avoir : ${formatMoney(data.amountTTC ?? data.total ?? 0)}`);
+      parts.push(`Montant de l’avoir : ${formatMoneyNegative(data.amountTTC ?? data.total ?? 0)}`);
+      parts.push(`En lettres : ${amountToWordsNegative(data.amountTTC ?? data.total ?? 0)}`);
 
       return parts.map(p => line(p)).join("");
     }
@@ -768,13 +844,13 @@
         renderLines(data, business);
 
         document.getElementById("amountHT").textContent =
-          formatMoney(data.amountHT ?? data.amountTTC ?? data.total ?? 0);
+          formatMoneyNegative(data.amountHT ?? data.amountTTC ?? data.total ?? 0);
 
         document.getElementById("amountVAT").textContent =
-          formatMoney(data.amountVAT ?? 0);
+          formatMoneyNegative(data.amountVAT ?? 0);
 
         document.getElementById("amountTTC").textContent =
-          formatMoney(data.amountTTC ?? data.total ?? 0);
+          formatMoneyNegative(data.amountTTC ?? data.total ?? 0);
 
         document.getElementById("refsBlock").innerHTML = renderRefs(data);
         document.getElementById("mentionsBlock").innerHTML = renderMentions(business);
