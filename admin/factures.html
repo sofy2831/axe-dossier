@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="fr">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,331 +17,407 @@
       --shadow:0 16px 40px rgba(0,0,0,0.06);
       --max:1180px;
     }*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-a{text-decoration:none;color:inherit}
-.wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+    a{text-decoration:none;color:inherit}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
 
-.topbar{
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:rgba(243,239,232,0.85);
-  backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--line);
-}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,0.85);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
 
-.topbar-inner{
-  min-height:72px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-}
+    .topbar-inner{
+      min-height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-weight:800;
-  letter-spacing:.02em;
-}
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
 
-.brand-mark{
-  width:42px;
-  height:42px;
-  border-radius:14px;
-  background:var(--accent);
-  color:#fff;
-  display:grid;
-  place-items:center;
-  font-weight:900;
-  box-shadow:var(--shadow);
-}
+    .brand-mark{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:var(--accent);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
 
-.nav{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
 
-.pill{
-  padding:10px 14px;
-  border-radius:999px;
-  background:rgba(255,255,255,.7);
-  border:1px solid var(--line);
-  font-size:.94rem;
-}
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--line);
+      font-size:.94rem;
+    }
 
-main{padding:32px 0 56px}
+    main{padding:32px 0 56px}
 
-.hero{
-  display:flex;
-  align-items:end;
-  justify-content:space-between;
-  gap:16px;
-  margin-bottom:22px;
-}
+    .hero{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:22px;
+    }
 
-h1,h2,h3,p{margin:0}
-h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
-.hero p{color:var(--muted);max-width:68ch;margin-top:8px}
+    h1,h2,h3,p{margin:0}
+    h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
+    .hero p{color:var(--muted);max-width:68ch;margin-top:8px}
 
-.grid{
-  display:grid;
-  grid-template-columns:420px 1fr;
-  gap:20px;
-  align-items:start;
-}
+    .grid{
+      display:grid;
+      grid-template-columns:460px 1fr;
+      gap:20px;
+      align-items:start;
+    }
 
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:24px;
-  box-shadow:var(--shadow);
-  padding:24px;
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:24px;
+    }
 
-.card h2{
-  font-size:1.2rem;
-  margin-bottom:14px;
-  letter-spacing:-.02em;
-}
+    .card h2{
+      font-size:1.2rem;
+      margin-bottom:14px;
+      letter-spacing:-.02em;
+    }
 
-.field{margin-bottom:14px}
-.field label{
-  display:block;
-  font-size:.92rem;
-  font-weight:700;
-  margin-bottom:6px;
-}
+    .field{margin-bottom:14px}
+    .field label{
+      display:block;
+      font-size:.92rem;
+      font-weight:700;
+      margin-bottom:6px;
+    }
 
-.field input,
-.field textarea,
-.field select{
-  width:100%;
-  min-height:48px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:12px 14px;
-  font:inherit;
-  color:var(--text);
-  background:#fff;
-}
+    .field input,
+    .field textarea,
+    .field select{
+      width:100%;
+      min-height:48px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      font:inherit;
+      color:var(--text);
+      background:#fff;
+    }
 
-.field textarea{min-height:100px;resize:vertical}
+    .field textarea{min-height:100px;resize:vertical}
 
-.row-2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
+    .row-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
 
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:18px;
-}
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
 
-.btn{
-  min-height:48px;
-  padding:0 18px;
-  border-radius:999px;
-  border:1px solid var(--accent);
-  background:var(--accent);
-  color:#fff;
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
-}
+    .btn{
+      min-height:48px;
+      padding:0 18px;
+      border-radius:999px;
+      border:1px solid var(--accent);
+      background:var(--accent);
+      color:#fff;
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+    }
 
-.btn-secondary{
-  background:#fff;
-  color:var(--accent);
-  border-color:var(--line);
-}
+    .btn-secondary{
+      background:#fff;
+      color:var(--accent);
+      border-color:var(--line);
+    }
 
-.toolbar{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom:18px;
-}
+    .btn-line{
+      min-height:40px;
+      padding:0 14px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      font:inherit;
+      cursor:pointer;
+    }
 
-.search,
-.filter{
-  min-height:48px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  padding:0 16px;
-  font:inherit;
-  background:#fff;
-}
+    .toolbar{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
 
-.search{flex:1 1 260px}
-.filter{min-width:190px}
+    .search,
+    .filter{
+      min-height:48px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:0 16px;
+      font:inherit;
+      background:#fff;
+    }
 
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:12px;
-  margin-bottom:18px;
-}
+    .search{flex:1 1 260px}
+    .filter{min-width:190px}
 
-.stat{
-  background:#faf7f1;
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:16px;
-}
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-bottom:18px;
+    }
 
-.stat strong{
-  display:block;
-  font-size:1.35rem;
-  letter-spacing:-.04em;
-  margin-bottom:4px;
-}
+    .stat{
+      background:#faf7f1;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+    }
 
-.stat span{color:var(--muted);font-size:.92rem}
+    .stat strong{
+      display:block;
+      font-size:1.35rem;
+      letter-spacing:-.04em;
+      margin-bottom:4px;
+    }
 
-.empty{
-  padding:24px;
-  border:1px dashed var(--line);
-  border-radius:18px;
-  color:var(--muted);
-  text-align:center;
-  background:#fcfbf8;
-}
+    .stat span{color:var(--muted);font-size:.92rem}
 
-.invoice-list{display:grid;gap:14px}
+    .empty{
+      padding:24px;
+      border:1px dashed var(--line);
+      border-radius:18px;
+      color:var(--muted);
+      text-align:center;
+      background:#fcfbf8;
+    }
 
-.invoice-item{
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:18px;
-  background:#fff;
-  display:grid;
-  gap:12px;
-}
+    .invoice-list{display:grid;gap:14px}
 
-.invoice-top{
-  display:flex;
-  align-items:start;
-  justify-content:space-between;
-  gap:16px;
-}
+    .invoice-item{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      background:#fff;
+      display:grid;
+      gap:12px;
+    }
 
-.invoice-title{
-  font-size:1.08rem;
-  font-weight:800;
-  letter-spacing:-.02em;
-  margin-bottom:4px;
-}
+    .invoice-top{
+      display:flex;
+      align-items:start;
+      justify-content:space-between;
+      gap:16px;
+    }
 
-.invoice-meta{
-  display:grid;
-  gap:6px;
-  color:#4f4942;
-  font-size:.95rem;
-}
+    .invoice-title{
+      font-size:1.08rem;
+      font-weight:800;
+      letter-spacing:-.02em;
+      margin-bottom:4px;
+    }
 
-.badges{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
+    .invoice-meta{
+      display:grid;
+      gap:6px;
+      color:#4f4942;
+      font-size:.95rem;
+    }
 
-.badge{
-  display:inline-flex;
-  align-items:center;
-  min-height:28px;
-  padding:0 10px;
-  border-radius:999px;
-  background:var(--soft);
-  font-size:.82rem;
-  font-weight:700;
-  color:#4f493f;
-  border:1px solid rgba(23,23,23,0.06);
-}
+    .badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
 
-.badge.brouillon{background:#f0ebe4}
-.badge.envoyee{background:#efe8dd}
-.badge.payee{background:#e8efe4}
-.badge.retard{background:#f7e3df}
-.badge.annulee{background:#ececec}
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      background:var(--soft);
+      font-size:.82rem;
+      font-weight:700;
+      color:#4f493f;
+      border:1px solid rgba(23,23,23,0.06);
+    }
 
-.invoice-notes{
-  color:var(--muted);
-  font-size:.94rem;
-  line-height:1.5;
-}
+    .badge.envoyee{background:#efe8dd}
+    .badge.payee{background:#e8efe4}
+    .badge.retard{background:#f7e3df}
+    .badge.annulee{background:#ececec}
 
-.mini-actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
+    .invoice-notes{
+      color:var(--muted);
+      font-size:.94rem;
+      line-height:1.5;
+    }
 
-.mini-btn{
-  min-height:36px;
-  padding:0 12px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background:#fff;
-  font:inherit;
-  cursor:pointer;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  text-decoration:none;
-  color:var(--text);
-}
+    .mini-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
 
-.amount{
-  font-size:1.35rem;
-  font-weight:800;
-  letter-spacing:-.04em;
-}
+    .mini-btn{
+      min-height:36px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      font:inherit;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      color:var(--text);
+    }
 
-.note{
-  margin-top:12px;
-  padding:14px 16px;
-  border-radius:14px;
-  background:#faf7f1;
-  border:1px solid var(--line);
-  color:#4f4942;
-  font-size:.92rem;
-}
+    .amount{
+      font-size:1.35rem;
+      font-weight:800;
+      letter-spacing:-.04em;
+    }
 
-@media (max-width: 980px){
-  .grid{grid-template-columns:1fr}
-  .stats{grid-template-columns:1fr 1fr}
-}
+    .note{
+      margin-top:12px;
+      padding:14px 16px;
+      border-radius:14px;
+      background:#faf7f1;
+      border:1px solid var(--line);
+      color:#4f4942;
+      font-size:.92rem;
+    }
 
-@media (max-width: 720px){
-  .topbar-inner{
-    min-height:auto;
-    padding:14px 0;
-    flex-direction:column;
-    align-items:stretch;
-  }
-  .brand,.nav{justify-content:center}
-  .hero{flex-direction:column;align-items:start}
-  .card{padding:20px}
-  .invoice-top{flex-direction:column}
-  .row-2{grid-template-columns:1fr}
-  .stats{grid-template-columns:1fr}
-  .actions .btn{width:100%}
-}
+    .auto-note{
+      margin-bottom:14px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#faf7f1;
+      border:1px solid var(--line);
+      color:#4f4942;
+      font-size:.92rem;
+      line-height:1.5;
+    }
 
+    .lines-wrap{
+      display:grid;
+      gap:12px;
+      margin-bottom:16px;
+    }
+
+    .line-item{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fcfbf8;
+      padding:14px;
+      display:grid;
+      gap:12px;
+    }
+
+    .line-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+
+    .line-title{
+      font-size:.92rem;
+      font-weight:700;
+      color:#4f4942;
+    }
+
+    .line-total{
+      margin-top:4px;
+      font-size:.9rem;
+      color:#4f4942;
+      text-align:right;
+    }
+
+    .summary-box{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fcfbf8;
+      padding:16px;
+      display:grid;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .summary-row{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      font-size:.95rem;
+    }
+
+    .summary-row strong{
+      font-size:1rem;
+    }
+
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr 1fr}
+    }
+
+    @media (max-width: 720px){
+      .topbar-inner{
+        min-height:auto;
+        padding:14px 0;
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .brand,.nav{justify-content:center}
+      .hero{flex-direction:column;align-items:start}
+      .card{padding:20px}
+      .invoice-top{flex-direction:column}
+      .row-2{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr}
+      .actions .btn{width:100%}
+    }
   </style>
 </head>
 <body>
@@ -349,751 +426,896 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       <a class="brand" href="index.html" aria-label="Retour admin">
         <span class="brand-mark">AD</span>
         <span>Axe Dossier · Factures</span>
-      </a><nav class="nav" aria-label="Navigation admin">
-    <a class="pill" href="index.html">Admin</a>
-    <a class="pill" href="clients.html">Clients</a>
-    <a class="pill" href="dossiers.html">Dossiers</a>
-    <a class="pill" href="documents.html">Documents</a>
-    <a class="pill" href="factures.html">Factures</a>
-    <a class="pill" href="paiements.html">Paiements</a>
-    <a class="pill" href="settings.html">Settings</a>
-  </nav>
-</div>
+      </a>
+      <nav class="nav" aria-label="Navigation admin">
+        <a class="pill" href="index.html">Admin</a>
+        <a class="pill" href="clients.html">Clients</a>
+        <a class="pill" href="dossiers.html">Dossiers</a>
+        <a class="pill" href="documents.html">Documents</a>
+        <a class="pill" href="factures.html">Factures</a>
+        <a class="pill" href="paiements.html">Paiements</a>
+        <a class="pill" href="settings.html">Settings</a>
+      </nav>
+    </div>
+  </header>
 
-  </header>  <main>
+  <main>
     <div class="wrap">
       <section class="hero">
         <div>
           <h1>Factures</h1>
-          <p>Version simple pour cadrer la logique : client, dossier, numéro, montant, statut et échéance. Ensuite on branchera le vrai compteur chronologique.</p>
+          <p>Création propre avec numéro chronologique automatique, facture émise à l’enregistrement, lignes multiples et délai de règlement.</p>
         </div>
-      </section><section class="grid">
-    <article class="card">
-      <h2>Créer une facture</h2>
-      <form id="invoiceForm">
-        <div class="row-2">
-          <div class="field">
-            <label for="invoiceNumber">Numéro</label>
-            <input id="invoiceNumber" name="invoiceNumber" type="text" placeholder="Ex. FAC-2026-001" />
+      </section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Créer une facture</h2>
+
+          <div class="auto-note">
+            Le numéro de facture est généré automatiquement à l’enregistrement.  
+            La facture est créée directement au statut <strong>ENVOYEE</strong>.
           </div>
-          <div class="field">
-            <label for="invoiceDate">Date</label>
-            <input id="invoiceDate" name="invoiceDate" type="date" />
+
+          <form id="invoiceForm">
+            <div class="field">
+              <label for="invoiceDate">Date</label>
+              <input id="invoiceDate" name="invoiceDate" type="date" />
+            </div>
+
+            <div class="field">
+              <label for="invoiceClient">Client</label>
+              <select id="invoiceClient" name="invoiceClient" required>
+                <option value="">Sélectionner un client</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="invoiceDossier">Dossier (optionnel)</label>
+              <select id="invoiceDossier" name="invoiceDossier">
+                <option value="">Aucun dossier</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label>Lignes de facture</label>
+              <div id="invoiceLines" class="lines-wrap"></div>
+              <button id="addLineBtn" type="button" class="btn-line">Ajouter une ligne</button>
+            </div>
+
+            <div class="summary-box">
+              <div class="summary-row">
+                <span>Total HT</span>
+                <span id="summaryHT">0,00 €</span>
+              </div>
+              <div class="summary-row">
+                <span>TVA</span>
+                <span id="summaryVAT">0,00 €</span>
+              </div>
+              <div class="summary-row">
+                <strong>Total TTC</strong>
+                <strong id="summaryTTC">0,00 €</strong>
+              </div>
+            </div>
+
+            <div class="row-2" style="margin-top:14px;">
+              <div class="field">
+                <label for="invoiceMode">Mode prévu</label>
+                <select id="invoiceMode" name="invoiceMode">
+                  <option value="VIREMENT">VIREMENT</option>
+                  <option value="CHEQUE">CHEQUE</option>
+                  <option value="ESPECES">ESPECES</option>
+                  <option value="AUTRE">AUTRE</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="invoicePaymentDelay">Délai de règlement</label>
+                <select id="invoicePaymentDelay" name="invoicePaymentDelay">
+                  <option value="A_RECEPTION">À réception</option>
+                  <option value="8_DAYS">8 jours</option>
+                  <option value="15_DAYS">15 jours</option>
+                  <option value="30_DAYS">30 jours</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="invoiceNotes">Notes internes</label>
+              <textarea id="invoiceNotes" name="invoiceNotes" placeholder="Ex. envoyée par mail, à relancer, acompte reçu..."></textarea>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="btn">Enregistrer</button>
+              <button type="reset" class="btn btn-secondary">Vider</button>
+            </div>
+          </form>
+
+          <div class="note">
+            Le numéro chronologique est attribué automatiquement via <strong>counters/</strong>.  
+            En création : <strong>ENVOYEE</strong>. En modification : le statut existant est conservé.
           </div>
-        </div>
+        </article>
 
-        <div class="field">
-          <label for="invoiceClient">Client</label>
-          <select id="invoiceClient" name="invoiceClient" required>
-            <option value="">Sélectionner un client</option>
-          </select>
-        </div>
+        <article class="card">
+          <div class="stats">
+            <div class="stat">
+              <strong id="totalInvoices">0</strong>
+              <span>Factures</span>
+            </div>
+            <div class="stat">
+              <strong id="totalOpen">0</strong>
+              <span>À encaisser</span>
+            </div>
+            <div class="stat">
+              <strong id="totalPaid">0</strong>
+              <span>Payées</span>
+            </div>
+            <div class="stat">
+              <strong id="totalAmount">0 €</strong>
+              <span>Total TTC</span>
+            </div>
+          </div>
 
-        <div class="field">
-          <label for="invoiceDossier">Dossier (optionnel)</label>
-          <select id="invoiceDossier" name="invoiceDossier">
-            <option value="">Aucun dossier</option>
-          </select>
-        </div>
-
-        <div class="field">
-  <label for="invoiceLineDesignation">Désignation</label>
-  <input id="invoiceLineDesignation" type="text" placeholder="Ex. Analyse + synthèse écrite" />
-</div>
-
-<div class="row-2">
-  <div class="field">
-    <label for="invoiceLineQty">Quantité</label>
-    <input id="invoiceLineQty" type="number" step="1" min="1" value="1" />
-  </div>
-  <div class="field">
-    <label for="invoiceLineUnitPrice">Prix unitaire TTC (€)</label>
-    <input id="invoiceLineUnitPrice" type="number" step="0.01" min="0" placeholder="75.00" />
-  </div>
-</div>
-
-<div class="field">
-  <label for="invoiceDueDate">Échéance</label>
-  <input id="invoiceDueDate" name="invoiceDueDate" type="date" />
-</div>
-
-        <div class="row-2">
-          <div class="field">
-            <label for="invoiceStatus">Statut</label>
-            <select id="invoiceStatus" name="invoiceStatus">
-              <option value="BROUILLON">BROUILLON</option>
+          <div class="toolbar">
+            <input id="searchInput" class="search" type="text" placeholder="Rechercher une facture..." />
+            <select id="statusFilter" class="filter">
+              <option value="">Tous les statuts</option>
               <option value="ENVOYEE">ENVOYEE</option>
               <option value="PAYEE">PAYEE</option>
               <option value="RETARD">RETARD</option>
               <option value="ANNULEE">ANNULEE</option>
             </select>
           </div>
-          <div class="field">
-            <label for="invoiceMode">Mode prévu</label>
-            <select id="invoiceMode" name="invoiceMode">
-              <option value="VIREMENT">VIREMENT</option>
-              <option value="CHEQUE">CHEQUE</option>
-              <option value="ESPECES">ESPECES</option>
-              <option value="AUTRE">AUTRE</option>
-            </select>
+
+          <div id="invoiceList" class="invoice-list"></div>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <script type="module">
+    import "./auth-guard.js";
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      addDoc,
+      deleteDoc,
+      doc,
+      updateDoc,
+      setDoc,
+      getDoc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const form = document.getElementById("invoiceForm");
+    const invoiceClient = document.getElementById("invoiceClient");
+    const invoiceDossier = document.getElementById("invoiceDossier");
+    const invoiceList = document.getElementById("invoiceList");
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const addLineBtn = document.getElementById("addLineBtn");
+    const invoiceLines = document.getElementById("invoiceLines");
+
+    const totalInvoices = document.getElementById("totalInvoices");
+    const totalOpen = document.getElementById("totalOpen");
+    const totalPaid = document.getElementById("totalPaid");
+    const totalAmount = document.getElementById("totalAmount");
+
+    const summaryHT = document.getElementById("summaryHT");
+    const summaryVAT = document.getElementById("summaryVAT");
+    const summaryTTC = document.getElementById("summaryTTC");
+
+    const clientsRef = collection(db, "clients");
+    const dossiersRef = collection(db, "dossiers");
+    const invoicesRef = collection(db, "factures");
+
+    const settingsRef = doc(db, "settings", "main");
+    const countersRef = doc(db, "counters", "main");
+
+    let allClients = [];
+    let allDossiers = [];
+    let allInvoices = [];
+    let currentSettings = {};
+    let currentCounters = {};
+    let editingInvoiceId = null;
+    let lineCounter = 0;
+
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatMoney(value) {
+      const num = Number(value || 0);
+      return num.toLocaleString("fr-FR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " €";
+    }
+
+    function statusBadgeClass(status = "") {
+      if (status === "ENVOYEE") return "envoyee";
+      if (status === "PAYEE") return "payee";
+      if (status === "RETARD") return "retard";
+      if (status === "ANNULEE") return "annulee";
+      return "";
+    }
+
+    function currentYear() {
+      return new Date().getFullYear();
+    }
+
+    function padNumber(n) {
+      return String(Number(n || 1)).padStart(3, "0");
+    }
+
+    function defaultSettings() {
+      return {
+        businessName: "Axe Dossier",
+        ownerName: "Sophie Dumas",
+        legalForm: "EI",
+        address: "24 hameau de danis\n09700 Saverdun",
+        email: "contact@axe-dossier.fr",
+        phone: "",
+        siret: "",
+        ape: "",
+        logoUrl: "",
+        bankName: "",
+        iban: "",
+        bic: "",
+        legalNotice: "",
+        vatMode: "NO",
+        vatRate: 20,
+        vatNumber: "",
+        tvaExemptionText: "TVA non applicable, art. 293 B du CGI"
+      };
+    }
+
+    function defaultCounters() {
+      return {
+        invoicePrefix: "FAC",
+        nextInvoiceNumber: 1
+      };
+    }
+
+    function fillClientSelect() {
+      const current = invoiceClient.value;
+      const options = ['<option value="">Sélectionner un client</option>']
+        .concat(
+          allClients.map(client => `<option value="${client.id}">${escapeHtml(client.name || "")}</option>`)
+        );
+
+      invoiceClient.innerHTML = options.join("");
+
+      if (current && allClients.some(c => c.id === current)) {
+        invoiceClient.value = current;
+      }
+    }
+
+    function fillDossierSelect(clientId = "") {
+      const current = invoiceDossier.value;
+      const filtered = clientId
+        ? allDossiers.filter(d => d.clientId === clientId)
+        : allDossiers;
+
+      const options = ['<option value="">Aucun dossier</option>']
+        .concat(
+          filtered.map(dossier => `<option value="${dossier.id}">${escapeHtml(dossier.title || "")}</option>`)
+        );
+
+      invoiceDossier.innerHTML = options.join("");
+
+      if (current && filtered.some(d => d.id === current)) {
+        invoiceDossier.value = current;
+      }
+    }
+
+    function paymentDelayToLabel(value = "A_RECEPTION") {
+      if (value === "8_DAYS") return "8 jours";
+      if (value === "15_DAYS") return "15 jours";
+      if (value === "30_DAYS") return "30 jours";
+      return "À réception";
+    }
+
+    function paymentDelayToDays(value = "A_RECEPTION") {
+      if (value === "8_DAYS") return 8;
+      if (value === "15_DAYS") return 15;
+      if (value === "30_DAYS") return 30;
+      return 0;
+    }
+
+    function addDays(dateStr, days) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr + "T00:00:00");
+      if (Number.isNaN(d.getTime())) return "";
+      d.setDate(d.getDate() + Number(days || 0));
+      return d.toISOString().slice(0, 10);
+    }
+
+    function ensureInvoiceDate() {
+      const input = document.getElementById("invoiceDate");
+      if (!input.value) {
+        input.value = new Date().toISOString().slice(0, 10);
+      }
+    }
+
+    function createLineElement(line = {}) {
+      lineCounter += 1;
+      const id = lineCounter;
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "line-item";
+      wrapper.dataset.lineId = String(id);
+
+      wrapper.innerHTML = `
+        <div class="line-head">
+          <div class="line-title">Ligne ${id}</div>
+          <button type="button" class="btn-line" data-remove-line="${id}">Supprimer</button>
+        </div>
+
+        <div class="field" style="margin-bottom:0;">
+          <label>Désignation</label>
+          <input type="text" class="line-designation" placeholder="Ex. Analyse + synthèse écrite" value="${escapeHtml(line.designation || "")}" />
+        </div>
+
+        <div class="row-2">
+          <div class="field" style="margin-bottom:0;">
+            <label>Quantité</label>
+            <input type="number" class="line-qty" step="1" min="1" value="${escapeHtml(String(line.quantity ?? 1))}" />
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Prix unitaire TTC (€)</label>
+            <input type="number" class="line-unit-price" step="0.01" min="0" placeholder="75.00" value="${escapeHtml(String(line.unitPriceTTC ?? ""))}" />
           </div>
         </div>
 
-                <div class="field">
-          <label for="invoiceNotes">Notes internes</label>
-          <textarea id="invoiceNotes" name="invoiceNotes" placeholder="Ex. envoyée par mail, à relancer le 15, acompte reçu..." ></textarea>
-        </div>
+        <div class="line-total">Total ligne : <strong class="line-total-value">0,00 €</strong></div>
+      `;
 
-        <div class="actions">
-          <button type="submit" class="btn">Enregistrer</button>
-          <button type="reset" class="btn btn-secondary">Vider</button>
-        </div>
-      </form>
+      invoiceLines.appendChild(wrapper);
+      updateSingleLineTotal(wrapper);
+      bindLineEvents(wrapper);
+    }
 
-      <div class="note">
-        Version 1 : numéro saisi à la main. Ensuite on passe sur <strong>counters/</strong> pour un vrai numéro chronologique comptable.
-      </div>
-    </article>
+    function bindLineEvents(wrapper) {
+      const qty = wrapper.querySelector(".line-qty");
+      const unit = wrapper.querySelector(".line-unit-price");
+      const removeBtn = wrapper.querySelector("[data-remove-line]");
 
-    <article class="card">
-      <div class="stats">
-        <div class="stat">
-          <strong id="totalInvoices">0</strong>
-          <span>Factures</span>
-        </div>
-        <div class="stat">
-          <strong id="totalOpen">0</strong>
-          <span>À encaisser</span>
-        </div>
-        <div class="stat">
-          <strong id="totalPaid">0</strong>
-          <span>Payées</span>
-        </div>
-        <div class="stat">
-          <strong id="totalAmount">0 €</strong>
-          <span>Total TTC</span>
-        </div>
-      </div>
+      qty.addEventListener("input", () => {
+        updateSingleLineTotal(wrapper);
+        updateInvoiceSummary();
+      });
 
-      <div class="toolbar">
-        <input id="searchInput" class="search" type="text" placeholder="Rechercher une facture..." />
-        <select id="statusFilter" class="filter">
-          <option value="">Tous les statuts</option>
-          <option value="BROUILLON">BROUILLON</option>
-          <option value="ENVOYEE">ENVOYEE</option>
-          <option value="PAYEE">PAYEE</option>
-          <option value="RETARD">RETARD</option>
-          <option value="ANNULEE">ANNULEE</option>
-        </select>
-      </div>
+      unit.addEventListener("input", () => {
+        updateSingleLineTotal(wrapper);
+        updateInvoiceSummary();
+      });
 
-      <div id="invoiceList" class="invoice-list"></div>
-    </article>
-  </section>
-</div>
+      removeBtn.addEventListener("click", () => {
+        if (invoiceLines.children.length <= 1) return;
+        wrapper.remove();
+        refreshLineTitles();
+        updateInvoiceSummary();
+      });
+    }
 
-  </main> 
- <script type="module">
-  import "./auth-guard.js";
-  import { db } from "./firebase-config.js";
-  import {
-    collection,
-    addDoc,
-    deleteDoc,
-    doc,
-    updateDoc,
-    setDoc,
-    getDoc,
-    onSnapshot,
-    query,
-    orderBy,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    function refreshLineTitles() {
+      [...invoiceLines.children].forEach((item, index) => {
+        const title = item.querySelector(".line-title");
+        if (title) title.textContent = `Ligne ${index + 1}`;
+      });
+    }
 
-  const form = document.getElementById("invoiceForm");
-  const invoiceClient = document.getElementById("invoiceClient");
-  const invoiceDossier = document.getElementById("invoiceDossier");
-  const invoiceList = document.getElementById("invoiceList");
-  const searchInput = document.getElementById("searchInput");
-  const statusFilter = document.getElementById("statusFilter");
+    function updateSingleLineTotal(wrapper) {
+      const qty = Number(wrapper.querySelector(".line-qty")?.value || 0);
+      const unit = Number(wrapper.querySelector(".line-unit-price")?.value || 0);
+      const total = Number((qty * unit).toFixed(2));
+      const output = wrapper.querySelector(".line-total-value");
+      if (output) output.textContent = formatMoney(total);
+    }
 
-  const totalInvoices = document.getElementById("totalInvoices");
-  const totalOpen = document.getElementById("totalOpen");
-  const totalPaid = document.getElementById("totalPaid");
-  const totalAmount = document.getElementById("totalAmount");
+    function buildInvoiceLinesFromForm() {
+      const rows = [...invoiceLines.querySelectorAll(".line-item")];
 
-  const clientsRef = collection(db, "clients");
-  const dossiersRef = collection(db, "dossiers");
-  const invoicesRef = collection(db, "factures");
+      return rows.map(row => {
+        const designation = (row.querySelector(".line-designation")?.value || "").trim();
+        const quantity = Number(row.querySelector(".line-qty")?.value || 0);
+        const unitPriceTTC = Number(row.querySelector(".line-unit-price")?.value || 0);
+        const totalTTC = Number((quantity * unitPriceTTC).toFixed(2));
 
-  const settingsRef = doc(db, "settings", "main");
-  const countersRef = doc(db, "counters", "main");
+        return {
+          designation,
+          quantity,
+          unitPriceTTC,
+          totalTTC
+        };
+      }).filter(line => line.designation && line.quantity > 0 && line.unitPriceTTC > 0);
+    }
 
-  let allClients = [];
-  let allDossiers = [];
-  let allInvoices = [];
-  let currentSettings = {};
-  let currentCounters = {};
-  let editingInvoiceId = null;
+    function computeAmounts(amountTTC, businessSnapshot) {
+      const totalTTC = Number(amountTTC || 0);
+      const vatMode = businessSnapshot.vatMode || "NO";
+      const vatRate = Number(businessSnapshot.vatRate || 0);
 
-  function escapeHtml(text = "") {
-    return String(text)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
+      if (vatMode === "YES" && vatRate > 0) {
+        const amountHT = Number((totalTTC / (1 + vatRate / 100)).toFixed(2));
+        const amountVAT = Number((totalTTC - amountHT).toFixed(2));
+        return { amountHT, amountVAT, amountTTC: totalTTC };
+      }
 
-  function formatMoney(value) {
-    const num = Number(value || 0);
-    return num.toLocaleString("fr-FR", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }) + " €";
-  }
+      return {
+        amountHT: totalTTC,
+        amountVAT: 0,
+        amountTTC: totalTTC
+      };
+    }
 
-  function statusBadgeClass(status = "") {
-    if (status === "BROUILLON") return "brouillon";
-    if (status === "ENVOYEE") return "envoyee";
-    if (status === "PAYEE") return "payee";
-    if (status === "RETARD") return "retard";
-    if (status === "ANNULEE") return "annulee";
-    return "";
-  }
+    function updateInvoiceSummary() {
+      const lines = buildInvoiceLinesFromForm();
+      const totalTTC = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
+      const amounts = computeAmounts(totalTTC, currentSettings);
 
-  function currentYear() {
-    return new Date().getFullYear();
-  }
+      summaryHT.textContent = formatMoney(amounts.amountHT);
+      summaryVAT.textContent = formatMoney(amounts.amountVAT);
+      summaryTTC.textContent = formatMoney(amounts.amountTTC);
+    }
 
-  function padNumber(n) {
-    return String(Number(n || 1)).padStart(3, "0");
-  }
+    function buildClientSnapshot(client) {
+      return {
+        name: client?.name || "",
+        type: client?.type || "",
+        email: client?.email || "",
+        phone: client?.phone || "",
+        address: client?.address || ""
+      };
+    }
 
-  function defaultSettings() {
-    return {
-      businessName: "Axe Dossier",
-      ownerName: "Sophie Dumas",
-      legalForm: "EI",
-      address: "24 hameau de danis\n09700 Saverdun",
-      email: "contact@axe-dossier.fr",
-      phone: "",
-      siret: "",
-      ape: "",
-      logoUrl: "",
-      bankName: "",
-      iban: "",
-      bic: "",
-      legalNotice: "",
-      vatMode: "NO",
-      vatRate: 20,
-      vatNumber: "",
-      tvaExemptionText: "TVA non applicable, art. 293 B du CGI"
-    };
-  }
+    function buildBusinessSnapshot(settings) {
+      const s = { ...defaultSettings(), ...settings };
 
-  function defaultCounters() {
-    return {
-      invoicePrefix: "FAC",
-      nextInvoiceNumber: 1
-    };
-  }
+      return {
+        businessName: s.businessName || "",
+        ownerName: s.ownerName || "",
+        legalForm: s.legalForm || "",
+        address: s.address || "",
+        email: s.email || "",
+        phone: s.phone || "",
+        siret: s.siret || "",
+        ape: s.ape || "",
+        logoUrl: s.logoUrl || "",
+        bankName: s.bankName || "",
+        iban: s.iban || "",
+        bic: s.bic || "",
+        legalNotice: s.legalNotice || "",
+        vatMode: s.vatMode || "NO",
+        vatRate: Number(s.vatRate || 0),
+        vatNumber: s.vatNumber || "",
+        tvaExemptionText: s.tvaExemptionText || "TVA non applicable, art. 293 B du CGI"
+      };
+    }
 
-  function fillClientSelect() {
-    const current = invoiceClient.value;
-    const options = ['<option value="">Sélectionner un client</option>']
-      .concat(
-        allClients.map(client => `<option value="${client.id}">${escapeHtml(client.name || "")}</option>`)
+    async function getNextInvoiceNumber() {
+      const countersSnap = await getDoc(countersRef);
+      const counters = countersSnap.exists()
+        ? { ...defaultCounters(), ...countersSnap.data() }
+        : defaultCounters();
+
+      const nextNumber = counters.nextInvoiceNumber || 1;
+      const prefix = counters.invoicePrefix || "FAC";
+      const generated = `${prefix}-${currentYear()}-${padNumber(nextNumber)}`;
+
+      await setDoc(
+        countersRef,
+        {
+          invoicePrefix: prefix,
+          nextInvoiceNumber: nextNumber + 1,
+          updatedAt: serverTimestamp()
+        },
+        { merge: true }
       );
 
-    invoiceClient.innerHTML = options.join("");
-
-    if (current && allClients.some(c => c.id === current)) {
-      invoiceClient.value = current;
+      return generated;
     }
-  }
 
-  function fillDossierSelect(clientId = "") {
-    const current = invoiceDossier.value;
-    const filtered = clientId
-      ? allDossiers.filter(d => d.clientId === clientId)
-      : allDossiers;
+    function fillForm(invoice) {
+      ensureInvoiceDate();
+      document.getElementById("invoiceDate").value = invoice.date || "";
+      document.getElementById("invoiceClient").value = invoice.clientId || "";
+      fillDossierSelect(invoice.clientId || "");
+      document.getElementById("invoiceDossier").value = invoice.dossierId || "";
+      document.getElementById("invoiceMode").value = invoice.mode || "VIREMENT";
+      document.getElementById("invoicePaymentDelay").value = invoice.paymentDelay || "A_RECEPTION";
+      document.getElementById("invoiceNotes").value = invoice.notes || "";
 
-    const options = ['<option value="">Aucun dossier</option>']
-      .concat(
-        filtered.map(dossier => `<option value="${dossier.id}">${escapeHtml(dossier.title || "")}</option>`)
+      invoiceLines.innerHTML = "";
+      lineCounter = 0;
+
+      const lines = Array.isArray(invoice.lines) && invoice.lines.length
+        ? invoice.lines
+        : [{ designation: invoice.label || "", quantity: 1, unitPriceTTC: invoice.amountTTC ?? invoice.amount ?? "" }];
+
+      lines.forEach(line => createLineElement(line));
+
+      if (!invoiceLines.children.length) {
+        createLineElement();
+      }
+
+      updateInvoiceSummary();
+    }
+
+    function renderStats(invoices) {
+      totalInvoices.textContent = invoices.length;
+      totalOpen.textContent = invoices.filter(i =>
+        i.status === "ENVOYEE" || i.status === "RETARD"
+      ).length;
+      totalPaid.textContent = invoices.filter(i => i.status === "PAYEE").length;
+
+      const sum = invoices.reduce(
+        (acc, item) => acc + Number(item.amountTTC ?? item.amount ?? 0),
+        0
       );
-
-    invoiceDossier.innerHTML = options.join("");
-
-    if (current && filtered.some(d => d.id === current)) {
-      invoiceDossier.value = current;
-    }
-  }
-
-  function fillForm(invoice) {
-    document.getElementById("invoiceNumber").value = invoice.number || "";
-    document.getElementById("invoiceDate").value = invoice.date || "";
-    document.getElementById("invoiceClient").value = invoice.clientId || "";
-    fillDossierSelect(invoice.clientId || "");
-    document.getElementById("invoiceDossier").value = invoice.dossierId || "";
-    document.getElementById("invoiceDueDate").value = invoice.dueDate || "";
-    document.getElementById("invoiceStatus").value = invoice.status || "BROUILLON";
-    document.getElementById("invoiceMode").value = invoice.mode || "VIREMENT";
-    document.getElementById("invoiceNotes").value = invoice.notes || "";
-
-    const firstLine = Array.isArray(invoice.lines) && invoice.lines.length
-      ? invoice.lines[0]
-      : null;
-
-    if (document.getElementById("invoiceLineDesignation")) {
-      document.getElementById("invoiceLineDesignation").value =
-        firstLine?.designation || invoice.label || "";
+      totalAmount.textContent = formatMoney(sum);
     }
 
-    if (document.getElementById("invoiceLineQty")) {
-      document.getElementById("invoiceLineQty").value =
-        firstLine?.quantity ?? 1;
-    }
+    function renderInvoices() {
+      const clientMap = Object.fromEntries(allClients.map(c => [c.id, c]));
+      const dossierMap = Object.fromEntries(allDossiers.map(d => [d.id, d]));
+      const q = (searchInput.value || "").trim().toLowerCase();
+      const filter = statusFilter.value;
 
-    if (document.getElementById("invoiceLineUnitPrice")) {
-      document.getElementById("invoiceLineUnitPrice").value =
-        firstLine?.unitPriceTTC ?? invoice.amountTTC ?? invoice.amount ?? "";
-    }
-  }
+      const filtered = allInvoices.filter(invoice => {
+        const clientName =
+          invoice.clientSnapshot?.name ||
+          clientMap[invoice.clientId]?.name ||
+          "";
 
-  function renderStats(invoices) {
-    totalInvoices.textContent = invoices.length;
-    totalOpen.textContent = invoices.filter(i =>
-      i.status === "BROUILLON" || i.status === "ENVOYEE" || i.status === "RETARD"
-    ).length;
-    totalPaid.textContent = invoices.filter(i => i.status === "PAYEE").length;
+        const dossierTitle =
+          invoice.dossierTitleSnapshot ||
+          dossierMap[invoice.dossierId]?.title ||
+          "";
 
-    const sum = invoices.reduce(
-      (acc, item) => acc + Number(item.amountTTC ?? item.amount ?? 0),
-      0
-    );
-    totalAmount.textContent = formatMoney(sum);
-  }
+        const firstLabel = Array.isArray(invoice.lines) && invoice.lines.length
+          ? invoice.lines[0].designation || ""
+          : (invoice.label || "");
 
-  function renderInvoices() {
-    const clientMap = Object.fromEntries(allClients.map(c => [c.id, c]));
-    const dossierMap = Object.fromEntries(allDossiers.map(d => [d.id, d]));
-    const q = (searchInput.value || "").trim().toLowerCase();
-    const filter = statusFilter.value;
+        const blob = [
+          invoice.number || "",
+          firstLabel,
+          invoice.status || "",
+          invoice.mode || "",
+          invoice.notes || "",
+          invoice.paymentDelayLabel || "",
+          clientName,
+          dossierTitle
+        ].join(" ").toLowerCase();
 
-    const filtered = allInvoices.filter(invoice => {
-      const clientName =
-        invoice.clientSnapshot?.name ||
-        clientMap[invoice.clientId]?.name ||
-        "";
+        const matchesSearch = blob.includes(q);
+        const matchesStatus = !filter || invoice.status === filter;
+        return matchesSearch && matchesStatus;
+      });
 
-      const dossierTitle =
-        invoice.dossierTitleSnapshot ||
-        dossierMap[invoice.dossierId]?.title ||
-        "";
+      renderStats(allInvoices);
 
-      const firstLabel = Array.isArray(invoice.lines) && invoice.lines.length
-        ? invoice.lines[0].designation || ""
-        : (invoice.label || "");
+      if (!allClients.length) {
+        invoiceList.innerHTML = '<div class="empty">Ajoute d’abord au moins un client dans clients.html.</div>';
+        return;
+      }
 
-      const blob = [
-        invoice.number || "",
-        firstLabel,
-        invoice.status || "",
-        invoice.mode || "",
-        invoice.notes || "",
-        clientName,
-        dossierTitle
-      ].join(" ").toLowerCase();
+      if (!filtered.length) {
+        invoiceList.innerHTML = '<div class="empty">Aucune facture pour le moment.</div>';
+        return;
+      }
 
-      const matchesSearch = blob.includes(q);
-      const matchesStatus = !filter || invoice.status === filter;
-      return matchesSearch && matchesStatus;
-    });
+      invoiceList.innerHTML = filtered.map(invoice => {
+        const clientName =
+          invoice.clientSnapshot?.name ||
+          clientMap[invoice.clientId]?.name ||
+          "Client supprimé";
 
-    renderStats(allInvoices);
+        const dossierTitle = invoice.dossierId
+          ? (invoice.dossierTitleSnapshot || dossierMap[invoice.dossierId]?.title || "Dossier supprimé")
+          : "Aucun dossier";
 
-    if (!allClients.length) {
-      invoiceList.innerHTML = '<div class="empty">Ajoute d’abord au moins un client dans clients.html.</div>';
-      return;
-    }
+        const amountTTC = invoice.amountTTC ?? invoice.amount ?? 0;
+        const amountHT = invoice.amountHT ?? amountTTC;
+        const amountVAT = invoice.amountVAT ?? 0;
 
-    if (!filtered.length) {
-      invoiceList.innerHTML = '<div class="empty">Aucune facture pour le moment.</div>';
-      return;
-    }
+        const firstLabel = Array.isArray(invoice.lines) && invoice.lines.length
+          ? invoice.lines[0].designation || ""
+          : (invoice.label || "");
 
-    invoiceList.innerHTML = filtered.map(invoice => {
-      const clientName =
-        invoice.clientSnapshot?.name ||
-        clientMap[invoice.clientId]?.name ||
-        "Client supprimé";
+        const extraLinesCount = Array.isArray(invoice.lines) && invoice.lines.length > 1
+          ? ` (+${invoice.lines.length - 1} ligne${invoice.lines.length - 1 > 1 ? "s" : ""})`
+          : "";
 
-      const dossierTitle = invoice.dossierId
-        ? (invoice.dossierTitleSnapshot || dossierMap[invoice.dossierId]?.title || "Dossier supprimé")
-        : "Aucun dossier";
-
-      const amountTTC = invoice.amountTTC ?? invoice.amount ?? 0;
-      const amountHT = invoice.amountHT ?? amountTTC;
-      const amountVAT = invoice.amountVAT ?? 0;
-
-      const firstLabel = Array.isArray(invoice.lines) && invoice.lines.length
-        ? invoice.lines[0].designation || ""
-        : (invoice.label || "");
-
-      return `
-        <article class="invoice-item">
-          <div class="invoice-top">
-            <div>
-              <div class="invoice-title">${escapeHtml(invoice.number || "")}</div>
-              <div class="invoice-meta">
-                <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
-                <span><strong>Dossier :</strong> ${escapeHtml(dossierTitle)}</span>
-                ${invoice.date ? `<span><strong>Date :</strong> ${escapeHtml(invoice.date)}</span>` : ""}
-                ${invoice.dueDate ? `<span><strong>Échéance :</strong> ${escapeHtml(invoice.dueDate)}</span>` : ""}
+        return `
+          <article class="invoice-item">
+            <div class="invoice-top">
+              <div>
+                <div class="invoice-title">${escapeHtml(invoice.number || "")}</div>
+                <div class="invoice-meta">
+                  <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
+                  <span><strong>Dossier :</strong> ${escapeHtml(dossierTitle)}</span>
+                  ${invoice.date ? `<span><strong>Date :</strong> ${escapeHtml(invoice.date)}</span>` : ""}
+                  ${invoice.paymentDelayLabel ? `<span><strong>Délai :</strong> ${escapeHtml(invoice.paymentDelayLabel)}</span>` : ""}
+                  ${invoice.dueDate ? `<span><strong>Échéance :</strong> ${escapeHtml(invoice.dueDate)}</span>` : ""}
+                </div>
+              </div>
+              <div class="badges">
+                <span class="badge ${statusBadgeClass(invoice.status)}">${escapeHtml(invoice.status || "")}</span>
+                <span class="badge">${escapeHtml(invoice.mode || "")}</span>
               </div>
             </div>
-            <div class="badges">
-              <span class="badge ${statusBadgeClass(invoice.status)}">${escapeHtml(invoice.status || "")}</span>
-              <span class="badge">${escapeHtml(invoice.mode || "")}</span>
+
+            <div class="invoice-meta">
+              ${firstLabel ? `<span><strong>Libellé :</strong> ${escapeHtml(firstLabel)}${escapeHtml(extraLinesCount)}</span>` : ""}
+              <span><strong>HT :</strong> ${formatMoney(amountHT)}</span>
+              <span><strong>TVA :</strong> ${formatMoney(amountVAT)}</span>
+              <span class="amount">${formatMoney(amountTTC)}</span>
             </div>
-          </div>
 
-          <div class="invoice-meta">
-            ${firstLabel ? `<span><strong>Libellé :</strong> ${escapeHtml(firstLabel)}</span>` : ""}
-            <span><strong>HT :</strong> ${formatMoney(amountHT)}</span>
-            <span><strong>TVA :</strong> ${formatMoney(amountVAT)}</span>
-            <span class="amount">${formatMoney(amountTTC)}</span>
-          </div>
+            ${invoice.notes ? `<div class="invoice-notes">${escapeHtml(invoice.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
-          ${invoice.notes ? `<div class="invoice-notes">${escapeHtml(invoice.notes).replace(/\n/g, "<br>")}</div>` : ""}
-
-          <div class="mini-actions">
-            <a class="mini-btn" href="facture-apercu.html?id=${invoice.id}" target="_blank" rel="noopener noreferrer">Aperçu</a>
-            <button class="mini-btn" type="button" data-edit-id="${invoice.id}">Modifier</button>
-            <button class="mini-btn" type="button" data-delete-id="${invoice.id}">Supprimer</button>
-          </div>
-        </article>
-      `;
-    }).join("");
-  }
-
-  function buildClientSnapshot(client) {
-    return {
-      name: client?.name || "",
-      type: client?.type || "",
-      email: client?.email || "",
-      phone: client?.phone || "",
-      address: client?.address || ""
-    };
-  }
-
-  function buildBusinessSnapshot(settings) {
-    const s = { ...defaultSettings(), ...settings };
-
-    return {
-      businessName: s.businessName || "",
-      ownerName: s.ownerName || "",
-      legalForm: s.legalForm || "",
-      address: s.address || "",
-      email: s.email || "",
-      phone: s.phone || "",
-      siret: s.siret || "",
-      ape: s.ape || "",
-      logoUrl: s.logoUrl || "",
-      bankName: s.bankName || "",
-      iban: s.iban || "",
-      bic: s.bic || "",
-      legalNotice: s.legalNotice || "",
-      vatMode: s.vatMode || "NO",
-      vatRate: Number(s.vatRate || 0),
-      vatNumber: s.vatNumber || "",
-      tvaExemptionText: s.tvaExemptionText || "TVA non applicable, art. 293 B du CGI"
-    };
-  }
-
-  function computeAmounts(amountTTC, businessSnapshot) {
-    const totalTTC = Number(amountTTC || 0);
-    const vatMode = businessSnapshot.vatMode || "NO";
-    const vatRate = Number(businessSnapshot.vatRate || 0);
-
-    if (vatMode === "YES" && vatRate > 0) {
-      const amountHT = Number((totalTTC / (1 + vatRate / 100)).toFixed(2));
-      const amountVAT = Number((totalTTC - amountHT).toFixed(2));
-      return { amountHT, amountVAT, amountTTC: totalTTC };
+            <div class="mini-actions">
+              <a class="mini-btn" href="facture-apercu.html?id=${invoice.id}" target="_blank" rel="noopener noreferrer">Aperçu</a>
+              <button class="mini-btn" type="button" data-edit-id="${invoice.id}">Modifier</button>
+              <button class="mini-btn" type="button" data-delete-id="${invoice.id}">Supprimer</button>
+            </div>
+          </article>
+        `;
+      }).join("");
     }
 
-    return {
-      amountHT: totalTTC,
-      amountVAT: 0,
-      amountTTC: totalTTC
-    };
-  }
+    async function buildInvoicePayload(data, existingInvoice = null) {
+      const clientId = data.get("invoiceClient") || "";
+      const dossierId = data.get("invoiceDossier") || "";
 
-  function buildInvoiceLinesFromForm() {
-    const designation = (document.getElementById("invoiceLineDesignation")?.value || "").trim();
-    const quantity = Number(document.getElementById("invoiceLineQty")?.value || 1);
-    const unitPriceTTC = Number(document.getElementById("invoiceLineUnitPrice")?.value || 0);
+      const client = allClients.find(c => c.id === clientId);
+      const dossier = allDossiers.find(d => d.id === dossierId);
 
-    if (!designation || !quantity || !unitPriceTTC) return [];
+      const businessSnapshot = buildBusinessSnapshot(currentSettings);
+      const clientSnapshot = buildClientSnapshot(client);
 
-    const totalTTC = Number((quantity * unitPriceTTC).toFixed(2));
+      let lines = buildInvoiceLinesFromForm();
+      if (!lines.length && existingInvoice?.lines?.length) {
+        lines = existingInvoice.lines;
+      }
 
-    return [{
-      designation,
-      quantity,
-      unitPriceTTC,
-      totalTTC
-    }];
-  }
+      const amountTTCFromLines = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
+      const amounts = computeAmounts(amountTTCFromLines, businessSnapshot);
 
-  async function getNextInvoiceNumberIfNeeded(manualNumber) {
-    const trimmed = (manualNumber || "").trim();
-    if (trimmed) return trimmed;
+      let number = existingInvoice?.number || "";
+      if (!existingInvoice) {
+        number = await getNextInvoiceNumber();
+      }
 
-    const countersSnap = await getDoc(countersRef);
-    const counters = countersSnap.exists()
-      ? { ...defaultCounters(), ...countersSnap.data() }
-      : defaultCounters();
+      const invoiceDate = data.get("invoiceDate") || new Date().toISOString().slice(0, 10);
+      const paymentDelay = data.get("invoicePaymentDelay") || "A_RECEPTION";
+      const paymentDelayLabel = paymentDelayToLabel(paymentDelay);
+      const dueDate = addDays(invoiceDate, paymentDelayToDays(paymentDelay));
 
-    const nextNumber = counters.nextInvoiceNumber || 1;
-    const prefix = counters.invoicePrefix || "FAC";
-    const generated = `${prefix}-${currentYear()}-${padNumber(nextNumber)}`;
-
-    await setDoc(
-      countersRef,
-      {
-        invoicePrefix: prefix,
-        nextInvoiceNumber: nextNumber + 1,
+      return {
+        number,
+        date: invoiceDate,
+        clientId,
+        dossierId,
+        dossierTitleSnapshot: dossier?.title || "",
+        dueDate,
+        paymentDelay,
+        paymentDelayLabel,
+        status: existingInvoice?.status || "ENVOYEE",
+        mode: data.get("invoiceMode") || "VIREMENT",
+        label: lines[0]?.designation || "",
+        notes: (data.get("invoiceNotes") || "").trim(),
+        lines,
+        amountHT: amounts.amountHT,
+        amountVAT: amounts.amountVAT,
+        amountTTC: amounts.amountTTC,
+        clientSnapshot,
+        businessSnapshot,
+        createdAt: existingInvoice?.createdAt || serverTimestamp(),
         updatedAt: serverTimestamp()
+      };
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const data = new FormData(form);
+      const clientId = data.get("invoiceClient") || "";
+      const lines = buildInvoiceLinesFromForm();
+      const total = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
+
+      if (!clientId || !total) return;
+
+      try {
+        if (editingInvoiceId) {
+          const existing = allInvoices.find(i => i.id === editingInvoiceId);
+          const payload = await buildInvoicePayload(data, existing);
+
+          await updateDoc(doc(db, "factures", editingInvoiceId), {
+            date: payload.date,
+            clientId: payload.clientId,
+            dossierId: payload.dossierId,
+            dossierTitleSnapshot: payload.dossierTitleSnapshot,
+            dueDate: payload.dueDate,
+            paymentDelay: payload.paymentDelay,
+            paymentDelayLabel: payload.paymentDelayLabel,
+            mode: payload.mode,
+            label: payload.label,
+            notes: payload.notes,
+            lines: payload.lines,
+            amountHT: payload.amountHT,
+            amountVAT: payload.amountVAT,
+            amountTTC: payload.amountTTC,
+            clientSnapshot: payload.clientSnapshot,
+            businessSnapshot: payload.businessSnapshot,
+            updatedAt: serverTimestamp()
+          });
+
+          editingInvoiceId = null;
+        } else {
+          const payload = await buildInvoicePayload(data, null);
+          await addDoc(invoicesRef, payload);
+        }
+
+        form.reset();
+        ensureInvoiceDate();
+        document.getElementById("invoiceMode").value = "VIREMENT";
+        document.getElementById("invoicePaymentDelay").value = "A_RECEPTION";
+        fillDossierSelect("");
+        invoiceLines.innerHTML = "";
+        lineCounter = 0;
+        createLineElement();
+        updateInvoiceSummary();
+      } catch (err) {
+        console.error("Erreur enregistrement facture :", err);
+        alert("Impossible d’enregistrer la facture.");
+      }
+    });
+
+    form.addEventListener("reset", () => {
+      setTimeout(() => {
+        editingInvoiceId = null;
+        ensureInvoiceDate();
+        document.getElementById("invoiceMode").value = "VIREMENT";
+        document.getElementById("invoicePaymentDelay").value = "A_RECEPTION";
+        invoiceLines.innerHTML = "";
+        lineCounter = 0;
+        createLineElement();
+        updateInvoiceSummary();
+      }, 0);
+    });
+
+    addLineBtn.addEventListener("click", () => {
+      createLineElement();
+      refreshLineTitles();
+      updateInvoiceSummary();
+    });
+
+    invoiceClient.addEventListener("change", (e) => {
+      fillDossierSelect(e.target.value);
+    });
+
+    searchInput.addEventListener("input", renderInvoices);
+    statusFilter.addEventListener("change", renderInvoices);
+
+    invoiceList.addEventListener("click", async (e) => {
+      const editBtn = e.target.closest("[data-edit-id]");
+      if (editBtn) {
+        const id = editBtn.getAttribute("data-edit-id");
+        const invoice = allInvoices.find(i => i.id === id);
+        if (!invoice) return;
+
+        editingInvoiceId = id;
+        fillForm(invoice);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      const deleteBtn = e.target.closest("[data-delete-id]");
+      if (!deleteBtn) return;
+
+      const id = deleteBtn.getAttribute("data-delete-id");
+      const ok = confirm("Supprimer cette facture ?");
+      if (!ok) return;
+
+      try {
+        await deleteDoc(doc(db, "factures", id));
+
+        if (editingInvoiceId === id) {
+          editingInvoiceId = null;
+          form.reset();
+        }
+      } catch (err) {
+        console.error("Erreur suppression facture :", err);
+        alert("Impossible de supprimer la facture.");
+      }
+    });
+
+    onSnapshot(
+      query(clientsRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allClients = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        fillClientSelect();
+        renderInvoices();
       },
-      { merge: true }
+      (err) => {
+        console.error("Erreur chargement clients :", err);
+      }
     );
 
-    return generated;
-  }
-
-  async function buildInvoicePayload(data, existingInvoice = null) {
-    const clientId = data.get("invoiceClient") || "";
-    const dossierId = data.get("invoiceDossier") || "";
-
-    const client = allClients.find(c => c.id === clientId);
-    const dossier = allDossiers.find(d => d.id === dossierId);
-
-    const businessSnapshot = buildBusinessSnapshot(currentSettings);
-    const clientSnapshot = buildClientSnapshot(client);
-
-    let lines = buildInvoiceLinesFromForm();
-
-    if (!lines.length && existingInvoice?.lines?.length) {
-      lines = existingInvoice.lines;
-    }
-
-    const amountTTCFromLines = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
-    const amounts = computeAmounts(amountTTCFromLines, businessSnapshot);
-
-    let number = (data.get("invoiceNumber") || "").trim();
-
-    if (!existingInvoice) {
-      number = await getNextInvoiceNumberIfNeeded(number);
-    } else {
-      number = number || existingInvoice.number || "";
-    }
-
-    return {
-      number,
-      date: data.get("invoiceDate") || "",
-      clientId,
-      dossierId,
-      dossierTitleSnapshot: dossier?.title || "",
-      dueDate: data.get("invoiceDueDate") || "",
-      status: data.get("invoiceStatus") || "BROUILLON",
-      mode: data.get("invoiceMode") || "VIREMENT",
-      label: lines[0]?.designation || "",
-      notes: (data.get("invoiceNotes") || "").trim(),
-
-      lines,
-
-      amountHT: amounts.amountHT,
-      amountVAT: amounts.amountVAT,
-      amountTTC: amounts.amountTTC,
-
-      clientSnapshot,
-      businessSnapshot,
-
-      createdAt: existingInvoice?.createdAt || serverTimestamp(),
-      updatedAt: serverTimestamp()
-    };
-  }
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const data = new FormData(form);
-    const clientId = data.get("invoiceClient") || "";
-    const lines = buildInvoiceLinesFromForm();
-    const total = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
-
-    if (!clientId || !total) return;
-
-    try {
-      if (editingInvoiceId) {
-        const existing = allInvoices.find(i => i.id === editingInvoiceId);
-        const payload = await buildInvoicePayload(data, existing);
-
-        await updateDoc(doc(db, "factures", editingInvoiceId), {
-          number: payload.number,
-          date: payload.date,
-          clientId: payload.clientId,
-          dossierId: payload.dossierId,
-          dossierTitleSnapshot: payload.dossierTitleSnapshot,
-          dueDate: payload.dueDate,
-          status: payload.status,
-          mode: payload.mode,
-          label: payload.label,
-          notes: payload.notes,
-          lines: payload.lines,
-          amountHT: payload.amountHT,
-          amountVAT: payload.amountVAT,
-          amountTTC: payload.amountTTC,
-          clientSnapshot: payload.clientSnapshot,
-          businessSnapshot: payload.businessSnapshot,
-          updatedAt: serverTimestamp()
-        });
-
-        editingInvoiceId = null;
-      } else {
-        const payload = await buildInvoicePayload(data, null);
-        await addDoc(invoicesRef, payload);
+    onSnapshot(
+      query(dossiersRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allDossiers = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        fillDossierSelect(invoiceClient.value || "");
+        renderInvoices();
+      },
+      (err) => {
+        console.error("Erreur chargement dossiers :", err);
       }
+    );
 
-      form.reset();
-      document.getElementById("invoiceStatus").value = "BROUILLON";
-      document.getElementById("invoiceMode").value = "VIREMENT";
-      fillDossierSelect("");
-
-      if (document.getElementById("invoiceLineQty")) {
-        document.getElementById("invoiceLineQty").value = 1;
+    onSnapshot(
+      settingsRef,
+      (snap) => {
+        currentSettings = snap.exists()
+          ? { ...defaultSettings(), ...snap.data() }
+          : defaultSettings();
+        updateInvoiceSummary();
+      },
+      (err) => {
+        console.error("Erreur chargement settings :", err);
       }
-    } catch (err) {
-      console.error("Erreur enregistrement facture :", err);
-      alert("Impossible d’enregistrer la facture.");
-    }
-  });
+    );
 
-  invoiceClient.addEventListener("change", (e) => {
-    fillDossierSelect(e.target.value);
-  });
-
-  searchInput.addEventListener("input", renderInvoices);
-  statusFilter.addEventListener("change", renderInvoices);
-
-  invoiceList.addEventListener("click", async (e) => {
-    const editBtn = e.target.closest("[data-edit-id]");
-    if (editBtn) {
-      const id = editBtn.getAttribute("data-edit-id");
-      const invoice = allInvoices.find(i => i.id === id);
-      if (!invoice) return;
-
-      editingInvoiceId = id;
-      fillForm(invoice);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
-    const deleteBtn = e.target.closest("[data-delete-id]");
-    if (!deleteBtn) return;
-
-    const id = deleteBtn.getAttribute("data-delete-id");
-    const ok = confirm("Supprimer cette facture ?");
-    if (!ok) return;
-
-    try {
-      await deleteDoc(doc(db, "factures", id));
-
-      if (editingInvoiceId === id) {
-        editingInvoiceId = null;
-        form.reset();
-        document.getElementById("invoiceStatus").value = "BROUILLON";
-        document.getElementById("invoiceMode").value = "VIREMENT";
-        fillDossierSelect("");
+    onSnapshot(
+      countersRef,
+      (snap) => {
+        currentCounters = snap.exists()
+          ? { ...defaultCounters(), ...snap.data() }
+          : defaultCounters();
+      },
+      (err) => {
+        console.error("Erreur chargement counters :", err);
       }
-    } catch (err) {
-      console.error("Erreur suppression facture :", err);
-      alert("Impossible de supprimer la facture.");
-    }
-  });
+    );
 
-  onSnapshot(
-    query(clientsRef, orderBy("createdAt", "desc")),
-    (snapshot) => {
-      allClients = snapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data()
-      }));
-      fillClientSelect();
-      renderInvoices();
-    },
-    (err) => {
-      console.error("Erreur chargement clients :", err);
-    }
-  );
+    onSnapshot(
+      query(invoicesRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allInvoices = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        renderInvoices();
+      },
+      (err) => {
+        console.error("Erreur chargement factures :", err);
+        invoiceList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
+        renderStats([]);
+      }
+    );
 
-  onSnapshot(
-    query(dossiersRef, orderBy("createdAt", "desc")),
-    (snapshot) => {
-      allDossiers = snapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data()
-      }));
-      fillDossierSelect(invoiceClient.value || "");
-      renderInvoices();
-    },
-    (err) => {
-      console.error("Erreur chargement dossiers :", err);
-    }
-  );
-
-  onSnapshot(
-    settingsRef,
-    (snap) => {
-      currentSettings = snap.exists()
-        ? { ...defaultSettings(), ...snap.data() }
-        : defaultSettings();
-    },
-    (err) => {
-      console.error("Erreur chargement settings :", err);
-    }
-  );
-
-  onSnapshot(
-    countersRef,
-    (snap) => {
-      currentCounters = snap.exists()
-        ? { ...defaultCounters(), ...snap.data() }
-        : defaultCounters();
-    },
-    (err) => {
-      console.error("Erreur chargement counters :", err);
-    }
-  );
-
-  onSnapshot(
-    query(invoicesRef, orderBy("createdAt", "desc")),
-    (snapshot) => {
-      allInvoices = snapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data()
-      }));
-      renderInvoices();
-    },
-    (err) => {
-      console.error("Erreur chargement factures :", err);
-      invoiceList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
-      renderStats([]);
-    }
-  );
-</script>
+    ensureInvoiceDate();
+    createLineElement();
+    updateInvoiceSummary();
+  </script>
 </body>
 </html>
