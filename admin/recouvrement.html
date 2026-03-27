@@ -279,6 +279,7 @@
         <a class="pill" href="documents.html">Documents</a>
         <a class="pill" href="devis.html">Devis</a>
         <a class="pill" href="factures.html">Factures</a>
+        <a class="pill" href="avoirs.html">Avoirs</a>
         <a class="pill" href="paiements.html">Paiements</a>
         <a class="pill" href="settings.html">Settings</a>
       </nav>
@@ -290,7 +291,7 @@
       <section class="hero">
         <div>
           <h1>Recouvrement</h1>
-          <p>Suivi simple des factures à encaisser, avec reste dû, échéance et retard. Pas de cirque, juste l’essentiel utile.</p>
+          <p>Suivi simple des factures à encaisser, avec déduction automatique des avoirs et des paiements déjà reçus.</p>
         </div>
       </section>
 
@@ -339,14 +340,15 @@
           <table>
             <thead>
               <tr>
-                <th style="width:12%;">Échéance</th>
+                <th style="width:11%;">Échéance</th>
                 <th style="width:14%;">Facture</th>
-                <th style="width:18%;">Client</th>
-                <th style="width:16%;">Dossier</th>
-                <th class="num" style="width:10%;">TTC</th>
-                <th class="num" style="width:10%;">Encaissé</th>
-                <th class="num" style="width:10%;">Reste dû</th>
-                <th style="width:10%;">Situation</th>
+                <th style="width:16%;">Client</th>
+                <th style="width:14%;">Dossier</th>
+                <th class="num" style="width:9%;">TTC</th>
+                <th class="num" style="width:9%;">Avoirs</th>
+                <th class="num" style="width:9%;">Encaissé</th>
+                <th class="num" style="width:9%;">Reste dû</th>
+                <th style="width:9%;">Situation</th>
               </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -354,7 +356,7 @@
         </div>
 
         <div class="footer-note">
-          Le calcul repose sur les factures et paiements enregistrés dans l’admin.
+          Calcul : <strong>facture TTC - avoirs liés - paiements reçus</strong>.
         </div>
       </section>
     </div>
@@ -372,6 +374,7 @@
 
     const facturesRef = collection(db, "factures");
     const paiementsRef = collection(db, "paiements");
+    const avoirsRef = collection(db, "avoirs");
 
     const searchInput = document.getElementById("searchInput");
     const statusFilter = document.getElementById("statusFilter");
@@ -390,6 +393,7 @@
 
     let allFactures = [];
     let allPaiements = [];
+    let allAvoirs = [];
 
     function escapeHtml(text = "") {
       return String(text)
@@ -426,17 +430,36 @@
       return map;
     }
 
+    function getInvoiceCreditMap() {
+      const map = {};
+      for (const a of allAvoirs) {
+        const invoiceId = a.invoiceId || "";
+        if (!invoiceId) continue;
+
+        if ((a.status || "EMIS") === "ANNULE") continue;
+
+        const amount = Number(a.amountTTC ?? a.total ?? 0);
+        map[invoiceId] = (map[invoiceId] || 0) + amount;
+      }
+      return map;
+    }
+
     function getRecoveryRows() {
       const paymentMap = getInvoicePaymentMap();
+      const creditMap = getInvoiceCreditMap();
       const today = getToday();
 
       return allFactures.map(inv => {
         const total = Number(inv.amountTTC ?? inv.amount ?? 0);
+        const credits = Number(creditMap[inv.id] || 0);
         const paid = Number(paymentMap[inv.id] || 0);
-        const remaining = Number((total - paid).toFixed(2));
+
+        const baseAfterCredits = Math.max(0, Number((total - credits).toFixed(2)));
+        const remaining = Math.max(0, Number((baseAfterCredits - paid).toFixed(2)));
+
         const dueDate = normalizeDate(inv.dueDate || "");
         const isLate = remaining > 0 && dueDate && dueDate < today;
-        const isPartial = paid > 0 && remaining > 0;
+        const isPartial = (paid > 0 || credits > 0) && remaining > 0 && remaining < total;
         const isPaid = remaining <= 0;
 
         let recoveryStatus = "OPEN";
@@ -451,6 +474,7 @@
           dossierTitle: inv.dossierTitleSnapshot || "",
           dueDate,
           total,
+          credits,
           paid,
           remaining,
           recoveryStatus,
@@ -546,6 +570,7 @@
           <td>${escapeHtml(row.clientName || "—")}</td>
           <td>${escapeHtml(row.dossierTitle || "—")}</td>
           <td class="num">${formatMoney(row.total)}</td>
+          <td class="num">${formatMoney(row.credits)}</td>
           <td class="num">${formatMoney(row.paid)}</td>
           <td class="num">${formatMoney(row.remaining)}</td>
           <td>
@@ -589,6 +614,20 @@
       },
       (err) => {
         console.error("Erreur chargement paiements :", err);
+      }
+    );
+
+    onSnapshot(
+      query(avoirsRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allAvoirs = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        render();
+      },
+      (err) => {
+        console.error("Erreur chargement avoirs :", err);
       }
     );
   </script>
