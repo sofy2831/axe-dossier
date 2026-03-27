@@ -283,7 +283,7 @@
         <a class="pill" href="paiements.html">Paiements</a>
         <a class="pill" href="journal-ventes.html">Journal ventes</a>
         <a class="pill" href="recouvrement.html">Recouvrement</a>
-        <a class="pill" href="settings.html">Settings</a>
+        <a class="pill" href="settings.html">Réglages</a>
       </nav>
     </div>
   </header>
@@ -362,7 +362,7 @@
         </div>
 
         <div class="footer-note">
-          Journal basé sur les règlements saisis dans <strong>paiements.html</strong>.  
+          Journal basé sur les règlements saisis dans <strong>paiements.html</strong>.
           Si une facture disparaît, le règlement reste visible avec ses données propres.
         </div>
       </section>
@@ -434,6 +434,10 @@
       return s || "—";
     }
 
+    function safeDate(value = "") {
+      return String(value || "").trim();
+    }
+
     function normalizeEntries() {
       const invoiceMap = Object.fromEntries(
         allFactures.map(f => [f.id, f])
@@ -444,7 +448,7 @@
 
         return {
           id: item.id,
-          date: item.date || "",
+          date: safeDate(item.date || ""),
           invoiceNumber:
             item.invoiceNumberSnapshot ||
             invoice.number ||
@@ -466,10 +470,12 @@
       const sort = sortFilter.value || "DATE_DESC";
       const list = [...entries];
 
+      const sortDate = (v) => String(v || "0000-00-00");
+
       if (sort === "DATE_ASC") {
         return list.sort((a, b) => {
-          const da = String(a.date || "");
-          const db = String(b.date || "");
+          const da = sortDate(a.date);
+          const db = sortDate(b.date);
           if (da === db) return String(a.invoiceNumber || "").localeCompare(String(b.invoiceNumber || ""));
           return da.localeCompare(db);
         });
@@ -484,8 +490,8 @@
       }
 
       return list.sort((a, b) => {
-        const da = String(a.date || "");
-        const db = String(b.date || "");
+        const da = sortDate(a.date);
+        const db = sortDate(b.date);
         if (da === db) return String(b.invoiceNumber || "").localeCompare(String(a.invoiceNumber || ""));
         return db.localeCompare(da);
       });
