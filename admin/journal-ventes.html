@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axe Dossier — Journal des ventes</title>
+  <style>
+    :root{
+      --bg:#f3efe8;
+      --card:#ffffff;
+      --text:#171717;
+      --muted:#66615a;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --soft:#e9e1d4;
+      --shadow:0 16px 40px rgba(0,0,0,0.06);
+      --max:1200px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    a{text-decoration:none;color:inherit}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,0.85);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .topbar-inner{
+      min-height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+
+    .brand-mark{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:var(--accent);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
+
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--line);
+      font-size:.94rem;
+    }
+
+    main{padding:32px 0 56px}
+
+    .hero{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:22px;
+    }
+
+    h1,h2,h3,p{margin:0}
+    h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
+    .hero p{color:var(--muted);max-width:72ch;margin-top:8px}
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:24px;
+      margin-bottom:20px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-bottom:20px;
+    }
+
+    .stat{
+      background:#faf7f1;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+    }
+
+    .stat strong{
+      display:block;
+      font-size:1.35rem;
+      letter-spacing:-.04em;
+      margin-bottom:4px;
+    }
+
+    .stat span{
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    .toolbar{
+      display:grid;
+      grid-template-columns:2fr 1fr 1fr 1fr auto;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .toolbar input,
+    .toolbar select,
+    .toolbar button{
+      min-height:48px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:0 14px;
+      font:inherit;
+      background:#fff;
+      color:var(--text);
+    }
+
+    .toolbar button{
+      cursor:pointer;
+      font-weight:700;
+    }
+
+    .btn-dark{
+      background:var(--accent) !important;
+      color:#fff !important;
+      border-color:var(--accent) !important;
+    }
+
+    .table-wrap{
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      background:#fff;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    th,td{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      text-align:left;
+      vertical-align:top;
+      font-size:.95rem;
+    }
+
+    thead th{
+      background:#faf7f1;
+      font-size:.9rem;
+      font-weight:800;
+    }
+
+    tbody tr:last-child td{border-bottom:none}
+
+    .num{
+      text-align:right;
+      white-space:nowrap;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      font-size:.82rem;
+      font-weight:700;
+      border:1px solid rgba(23,23,23,0.06);
+      background:var(--soft);
+      color:#4f493f;
+    }
+
+    .badge.facture{background:#efe8dd}
+    .badge.avoir{background:#f7e3df}
+
+    .muted{color:var(--muted)}
+
+    .empty{
+      padding:26px;
+      text-align:center;
+      color:var(--muted);
+      background:#fcfbf8;
+      border:1px dashed var(--line);
+      border-radius:18px;
+    }
+
+    .footer-note{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    @media (max-width: 980px){
+      .stats{grid-template-columns:1fr 1fr}
+      .toolbar{grid-template-columns:1fr 1fr}
+    }
+
+    @media (max-width: 720px){
+      .topbar-inner{
+        min-height:auto;
+        padding:14px 0;
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .brand,.nav{justify-content:center}
+      .hero{flex-direction:column;align-items:start}
+      .stats{grid-template-columns:1fr}
+      .toolbar{grid-template-columns:1fr}
+      .table-wrap{overflow:auto}
+    }
+
+    @media print{
+      body{background:#fff}
+      .topbar{display:none !important}
+      .wrap{width:100%;margin:0}
+      .card{
+        box-shadow:none;
+        border:none;
+        border-radius:0;
+        padding:0;
+      }
+      .toolbar{display:none !important}
+      .stats{
+        grid-template-columns:repeat(4,1fr);
+        gap:8px;
+      }
+      .stat{
+        border:1px solid #ddd;
+        background:#fff;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="index.html" aria-label="Retour admin">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier · Journal des ventes</span>
+      </a>
+      <nav class="nav" aria-label="Navigation admin">
+        <a class="pill" href="index.html">Admin</a>
+        <a class="pill" href="clients.html">Clients</a>
+        <a class="pill" href="dossiers.html">Dossiers</a>
+        <a class="pill" href="documents.html">Documents</a>
+        <a class="pill" href="devis.html">Devis</a>
+        <a class="pill" href="factures.html">Factures</a>
+        <a class="pill" href="paiements.html">Paiements</a>
+        <a class="pill" href="settings.html">Settings</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <h1>Journal des ventes</h1>
+          <p>Vue consolidée des factures et avoirs. Tu suis ici le brut facturé, les avoirs émis et le net comptable.</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="stats">
+          <div class="stat">
+            <strong id="totalDocs">0</strong>
+            <span>Écritures</span>
+          </div>
+          <div class="stat">
+            <strong id="totalInvoices">0,00 €</strong>
+            <span>Total factures</span>
+          </div>
+          <div class="stat">
+            <strong id="totalCredits">0,00 €</strong>
+            <span>Total avoirs</span>
+          </div>
+          <div class="stat">
+            <strong id="netTotal">0,00 €</strong>
+            <span>Net</span>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input id="searchInput" type="text" placeholder="Rechercher numéro, client, dossier..." />
+          <select id="typeFilter">
+            <option value="">Tous les types</option>
+            <option value="FACTURE">Factures</option>
+            <option value="AVOIR">Avoirs</option>
+          </select>
+          <input id="dateFrom" type="date" />
+          <input id="dateTo" type="date" />
+          <button id="printBtn" class="btn-dark" type="button">Imprimer</button>
+        </div>
+
+        <div id="emptyState" class="empty" style="display:none;">Aucune écriture pour le moment.</div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:12%;">Date</th>
+                <th style="width:12%;">Type</th>
+                <th style="width:14%;">Numéro</th>
+                <th style="width:20%;">Client</th>
+                <th style="width:18%;">Dossier</th>
+                <th style="width:12%;">Statut</th>
+                <th class="num" style="width:12%;">Montant TTC</th>
+              </tr>
+            </thead>
+            <tbody id="journalBody"></tbody>
+          </table>
+        </div>
+
+        <div class="footer-note">
+          Les factures sont comptées en positif. Les avoirs sont déduits du net.
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module">
+    import "./auth-guard.js";
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      onSnapshot,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const facturesRef = collection(db, "factures");
+    const avoirsRef = collection(db, "avoirs");
+
+    const searchInput = document.getElementById("searchInput");
+    const typeFilter = document.getElementById("typeFilter");
+    const dateFrom = document.getElementById("dateFrom");
+    const dateTo = document.getElementById("dateTo");
+    const printBtn = document.getElementById("printBtn");
+
+    const totalDocs = document.getElementById("totalDocs");
+    const totalInvoices = document.getElementById("totalInvoices");
+    const totalCredits = document.getElementById("totalCredits");
+    const netTotal = document.getElementById("netTotal");
+    const journalBody = document.getElementById("journalBody");
+    const emptyState = document.getElementById("emptyState");
+
+    let allFactures = [];
+    let allAvoirs = [];
+
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatMoney(value) {
+      const num = Number(value || 0);
+      return num.toLocaleString("fr-FR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " €";
+    }
+
+    function normalizeEntries() {
+      const factures = allFactures.map(item => ({
+        id: item.id,
+        date: item.date || "",
+        type: "FACTURE",
+        number: item.number || "",
+        clientName: item.clientSnapshot?.name || "",
+        dossierTitle: item.dossierTitleSnapshot || "",
+        status: item.status || "",
+        amountTTC: Number(item.amountTTC ?? item.amount ?? 0),
+        signedAmount: Number(item.amountTTC ?? item.amount ?? 0)
+      }));
+
+      const avoirs = allAvoirs.map(item => ({
+        id: item.id,
+        date: item.date || "",
+        type: "AVOIR",
+        number: item.number || "",
+        clientName: item.clientSnapshot?.name || "",
+        dossierTitle: item.dossierTitleSnapshot || "",
+        status: item.status || "",
+        amountTTC: Number(item.amountTTC ?? item.total ?? 0),
+        signedAmount: -Math.abs(Number(item.amountTTC ?? item.total ?? 0))
+      }));
+
+      return [...factures, ...avoirs].sort((a, b) => {
+        const da = a.date || "";
+        const db = b.date || "";
+        if (da === db) return String(b.number).localeCompare(String(a.number));
+        return db.localeCompare(da);
+      });
+    }
+
+    function render() {
+      const q = (searchInput.value || "").trim().toLowerCase();
+      const t = typeFilter.value;
+      const from = dateFrom.value || "";
+      const to = dateTo.value || "";
+
+      const allEntries = normalizeEntries();
+
+      const filtered = allEntries.filter(item => {
+        const blob = [
+          item.number,
+          item.clientName,
+          item.dossierTitle,
+          item.status,
+          item.type
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = blob.includes(q);
+        const matchesType = !t || item.type === t;
+        const matchesFrom = !from || (item.date && item.date >= from);
+        const matchesTo = !to || (item.date && item.date <= to);
+
+        return matchesSearch && matchesType && matchesFrom && matchesTo;
+      });
+
+      const invoiceSum = filtered
+        .filter(i => i.type === "FACTURE")
+        .reduce((acc, i) => acc + Number(i.amountTTC || 0), 0);
+
+      const creditSum = filtered
+        .filter(i => i.type === "AVOIR")
+        .reduce((acc, i) => acc + Math.abs(Number(i.amountTTC || 0)), 0);
+
+      const net = invoiceSum - creditSum;
+
+      totalDocs.textContent = filtered.length;
+      totalInvoices.textContent = formatMoney(invoiceSum);
+      totalCredits.textContent = formatMoney(creditSum);
+      netTotal.textContent = formatMoney(net);
+
+      if (!filtered.length) {
+        journalBody.innerHTML = "";
+        emptyState.style.display = "";
+        return;
+      }
+
+      emptyState.style.display = "none";
+
+      journalBody.innerHTML = filtered.map(item => `
+        <tr>
+          <td>${escapeHtml(item.date || "—")}</td>
+          <td>
+            <span class="badge ${item.type === "FACTURE" ? "facture" : "avoir"}">
+              ${escapeHtml(item.type)}
+            </span>
+          </td>
+          <td>${escapeHtml(item.number || "—")}</td>
+          <td>${escapeHtml(item.clientName || "—")}</td>
+          <td>${escapeHtml(item.dossierTitle || "—")}</td>
+          <td>${escapeHtml(item.status || "—")}</td>
+          <td class="num">${item.type === "AVOIR" ? "-" : ""}${formatMoney(item.amountTTC)}</td>
+        </tr>
+      `).join("");
+    }
+
+    searchInput.addEventListener("input", render);
+    typeFilter.addEventListener("change", render);
+    dateFrom.addEventListener("change", render);
+    dateTo.addEventListener("change", render);
+    printBtn.addEventListener("click", () => window.print());
+
+    onSnapshot(
+      query(facturesRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allFactures = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        render();
+      },
+      (err) => {
+        console.error("Erreur chargement factures :", err);
+      }
+    );
+
+    onSnapshot(
+      query(avoirsRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allAvoirs = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        render();
+      },
+      (err) => {
+        console.error("Erreur chargement avoirs :", err);
+      }
+    );
+  </script>
+</body>
+</html>
