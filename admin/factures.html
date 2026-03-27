@@ -574,748 +574,490 @@
     </div>
   </main>
 
-  <script type="module">
-    import "./auth-guard.js";
-    import { db } from "./firebase-config.js";
-    import {
-      collection,
-      addDoc,
-      deleteDoc,
-      doc,
-      updateDoc,
-      setDoc,
-      getDoc,
-      onSnapshot,
-      query,
-      orderBy,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+ <script type="module">
+  import "./auth-guard.js";
+  import { db } from "./firebase-config.js";
+  import {
+    collection,
+    addDoc,
+    doc,
+    getDoc,
+    updateDoc,
+    setDoc,
+    onSnapshot,
+    orderBy,
+    query,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const form = document.getElementById("invoiceForm");
-    const invoiceClient = document.getElementById("invoiceClient");
-    const invoiceDossier = document.getElementById("invoiceDossier");
-    const invoiceList = document.getElementById("invoiceList");
-    const searchInput = document.getElementById("searchInput");
-    const statusFilter = document.getElementById("statusFilter");
-    const addLineBtn = document.getElementById("addLineBtn");
-    const invoiceLines = document.getElementById("invoiceLines");
+  const linesEl = document.getElementById("lines");
+  const addLineBtn = document.getElementById("addLine");
+  const form = document.getElementById("form");
+  const resetBtn = document.getElementById("resetBtn");
+  const listEl = document.getElementById("list");
+  const invoiceSelect = document.getElementById("invoiceSelect");
+  const dateInput = document.getElementById("date");
+  const notesInput = document.getElementById("notes");
+  const searchInput = document.getElementById("searchInput");
+  const statusFilter = document.getElementById("statusFilter");
 
-    const totalInvoices = document.getElementById("totalInvoices");
-    const totalOpen = document.getElementById("totalOpen");
-    const totalPaid = document.getElementById("totalPaid");
-    const totalAmount = document.getElementById("totalAmount");
+  const summaryHT = document.getElementById("summaryHT");
+  const summaryVAT = document.getElementById("summaryVAT");
+  const summaryTTC = document.getElementById("summaryTTC");
 
-    const summaryHT = document.getElementById("summaryHT");
-    const summaryVAT = document.getElementById("summaryVAT");
-    const summaryTTC = document.getElementById("summaryTTC");
+  const totalCreditsCount = document.getElementById("totalCreditsCount");
+  const totalCreditsAmount = document.getElementById("totalCreditsAmount");
+  const totalAppliedCount = document.getElementById("totalAppliedCount");
+  const totalStatusCount = document.getElementById("totalStatusCount");
 
-    const clientsRef = collection(db, "clients");
-    const dossiersRef = collection(db, "dossiers");
-    const invoicesRef = collection(db, "factures");
+  const avoirsRef = collection(db, "avoirs");
+  const facturesRef = collection(db, "factures");
+  const paiementsRef = collection(db, "paiements");
+  const countersRef = doc(db, "counters", "main");
 
-    const settingsRef = doc(db, "settings", "main");
-    const countersRef = doc(db, "counters", "main");
+  let allInvoices = [];
+  let allAvoirs = [];
+  let allPaiements = [];
+  let lineCounter = 0;
 
-    let allClients = [];
-    let allDossiers = [];
-    let allInvoices = [];
-    let currentSettings = {};
-    let currentCounters = {};
-    let editingInvoiceId = null;
-    let lineCounter = 0;
+  function escapeHtml(text = "") {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
 
-    function escapeHtml(text = "") {
-      return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+  function formatMoney(value) {
+    const num = Number(value || 0);
+    return num.toLocaleString("fr-FR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " €";
+  }
+
+  function ensureDate() {
+    if (!dateInput.value) {
+      dateInput.value = new Date().toISOString().slice(0, 10);
     }
+  }
 
-    function formatMoney(value) {
-      const num = Number(value || 0);
-      return num.toLocaleString("fr-FR", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }) + " €";
-    }
+  function getToday() {
+    return new Date().toISOString().slice(0, 10);
+  }
 
-    function statusBadgeClass(status = "") {
-      if (status === "ENVOYEE") return "envoyee";
-      if (status === "PAYEE") return "payee";
-      if (status === "RETARD") return "retard";
-      if (status === "ANNULEE") return "annulee";
-      return "";
-    }
+  function createLineElement(line = {}) {
+    lineCounter += 1;
+    const id = lineCounter;
 
-    function currentYear() {
-      return new Date().getFullYear();
-    }
+    const wrapper = document.createElement("div");
+    wrapper.className = "line-item";
+    wrapper.dataset.lineId = String(id);
 
-    function padNumber(n) {
-      return String(Number(n || 1)).padStart(3, "0");
-    }
+    wrapper.innerHTML = `
+      <div class="line-head">
+        <div class="line-title">Ligne ${id}</div>
+        <button type="button" class="btn-line" data-remove-line="${id}">Supprimer</button>
+      </div>
 
-    function defaultSettings() {
-      return {
-        businessName: "Axe Dossier",
-        ownerName: "Sophie Dumas",
-        legalForm: "EI",
-        address: "24 hameau de danis\n09700 Saverdun",
-        email: "contact@axe-dossier.fr",
-        phone: "",
-        siret: "",
-        ape: "",
-        logoUrl: "",
-        bankName: "",
-        iban: "",
-        bic: "",
-        legalNotice: "",
-        vatMode: "NO",
-        vatRate: 20,
-        vatNumber: "",
-        tvaExemptionText: "TVA non applicable, art. 293 B du CGI"
-      };
-    }
+      <div class="field" style="margin-bottom:0;">
+        <label>Désignation</label>
+        <input type="text" class="line-designation" placeholder="Ex. Correction de prestation" value="${escapeHtml(line.designation || "")}" />
+      </div>
 
-    function defaultCounters() {
-      return {
-        invoicePrefix: "FAC",
-        nextInvoiceNumber: 1
-      };
-    }
-
-    function fillClientSelect() {
-      const current = invoiceClient.value;
-      const options = ['<option value="">Sélectionner un client</option>']
-        .concat(
-          allClients.map(client => `<option value="${client.id}">${escapeHtml(client.name || "")}</option>`)
-        );
-
-      invoiceClient.innerHTML = options.join("");
-
-      if (current && allClients.some(c => c.id === current)) {
-        invoiceClient.value = current;
-      }
-    }
-
-    function fillDossierSelect(clientId = "") {
-      const current = invoiceDossier.value;
-      const filtered = clientId
-        ? allDossiers.filter(d => d.clientId === clientId)
-        : allDossiers;
-
-      const options = ['<option value="">Aucun dossier</option>']
-        .concat(
-          filtered.map(dossier => `<option value="${dossier.id}">${escapeHtml(dossier.title || "")}</option>`)
-        );
-
-      invoiceDossier.innerHTML = options.join("");
-
-      if (current && filtered.some(d => d.id === current)) {
-        invoiceDossier.value = current;
-      }
-    }
-
-    function paymentDelayToLabel(value = "A_RECEPTION") {
-      if (value === "8_DAYS") return "8 jours";
-      if (value === "15_DAYS") return "15 jours";
-      if (value === "30_DAYS") return "30 jours";
-      return "À réception";
-    }
-
-    function paymentDelayToDays(value = "A_RECEPTION") {
-      if (value === "8_DAYS") return 8;
-      if (value === "15_DAYS") return 15;
-      if (value === "30_DAYS") return 30;
-      return 0;
-    }
-
-    function addDays(dateStr, days) {
-      if (!dateStr) return "";
-      const d = new Date(dateStr + "T00:00:00");
-      if (Number.isNaN(d.getTime())) return "";
-      d.setDate(d.getDate() + Number(days || 0));
-      return d.toISOString().slice(0, 10);
-    }
-
-    function ensureInvoiceDate() {
-      const input = document.getElementById("invoiceDate");
-      if (!input.value) {
-        input.value = new Date().toISOString().slice(0, 10);
-      }
-    }
-
-    function createLineElement(line = {}) {
-      lineCounter += 1;
-      const id = lineCounter;
-
-      const wrapper = document.createElement("div");
-      wrapper.className = "line-item";
-      wrapper.dataset.lineId = String(id);
-
-      wrapper.innerHTML = `
-        <div class="line-head">
-          <div class="line-title">Ligne ${id}</div>
-          <button type="button" class="btn-line" data-remove-line="${id}">Supprimer</button>
-        </div>
-
+      <div class="row-2">
         <div class="field" style="margin-bottom:0;">
-          <label>Désignation</label>
-          <input type="text" class="line-designation" placeholder="Ex. Analyse + synthèse écrite" value="${escapeHtml(line.designation || "")}" />
+          <label>Quantité</label>
+          <input type="number" class="line-qty" step="1" min="1" value="${escapeHtml(String(line.qty ?? line.quantity ?? 1))}" />
         </div>
-
-        <div class="row-2">
-          <div class="field" style="margin-bottom:0;">
-            <label>Quantité</label>
-            <input type="number" class="line-qty" step="1" min="1" value="${escapeHtml(String(line.quantity ?? 1))}" />
-          </div>
-          <div class="field" style="margin-bottom:0;">
-            <label>Prix unitaire TTC (€)</label>
-            <input type="number" class="line-unit-price" step="0.01" min="0" placeholder="75.00" value="${escapeHtml(String(line.unitPriceTTC ?? ""))}" />
-          </div>
+        <div class="field" style="margin-bottom:0;">
+          <label>Prix unitaire TTC (€)</label>
+          <input type="number" class="line-unit-price" step="0.01" min="0" placeholder="75.00" value="${escapeHtml(String(line.price ?? line.unitPriceTTC ?? ""))}" />
         </div>
+      </div>
 
-        <div class="line-total">Total ligne : <strong class="line-total-value">0,00 €</strong></div>
-      `;
+      <div class="line-total">Total ligne : <strong class="line-total-value">0,00 €</strong></div>
+    `;
 
-      invoiceLines.appendChild(wrapper);
+    linesEl.appendChild(wrapper);
+    bindLineEvents(wrapper);
+    updateSingleLineTotal(wrapper);
+    updateSummary();
+  }
+
+  function bindLineEvents(wrapper) {
+    const qty = wrapper.querySelector(".line-qty");
+    const unit = wrapper.querySelector(".line-unit-price");
+    const removeBtn = wrapper.querySelector("[data-remove-line]");
+
+    qty.addEventListener("input", () => {
       updateSingleLineTotal(wrapper);
-      bindLineEvents(wrapper);
-    }
+      updateSummary();
+    });
 
-    function bindLineEvents(wrapper) {
-      const qty = wrapper.querySelector(".line-qty");
-      const unit = wrapper.querySelector(".line-unit-price");
-      const removeBtn = wrapper.querySelector("[data-remove-line]");
+    unit.addEventListener("input", () => {
+      updateSingleLineTotal(wrapper);
+      updateSummary();
+    });
 
-      qty.addEventListener("input", () => {
-        updateSingleLineTotal(wrapper);
-        updateInvoiceSummary();
-      });
+    removeBtn.addEventListener("click", () => {
+      if (linesEl.children.length <= 1) return;
+      wrapper.remove();
+      refreshLineTitles();
+      updateSummary();
+    });
+  }
 
-      unit.addEventListener("input", () => {
-        updateSingleLineTotal(wrapper);
-        updateInvoiceSummary();
-      });
+  function refreshLineTitles() {
+    [...linesEl.children].forEach((item, index) => {
+      const title = item.querySelector(".line-title");
+      if (title) title.textContent = `Ligne ${index + 1}`;
+    });
+  }
 
-      removeBtn.addEventListener("click", () => {
-        if (invoiceLines.children.length <= 1) return;
-        wrapper.remove();
-        refreshLineTitles();
-        updateInvoiceSummary();
-      });
-    }
+  function updateSingleLineTotal(wrapper) {
+    const qty = Number(wrapper.querySelector(".line-qty")?.value || 0);
+    const unit = Number(wrapper.querySelector(".line-unit-price")?.value || 0);
+    const total = Number((qty * unit).toFixed(2));
+    const output = wrapper.querySelector(".line-total-value");
+    if (output) output.textContent = formatMoney(total);
+  }
 
-    function refreshLineTitles() {
-      [...invoiceLines.children].forEach((item, index) => {
-        const title = item.querySelector(".line-title");
-        if (title) title.textContent = `Ligne ${index + 1}`;
-      });
-    }
+  function getSelectedInvoice() {
+    const id = invoiceSelect.value || "";
+    return allInvoices.find(inv => inv.id === id) || null;
+  }
 
-    function updateSingleLineTotal(wrapper) {
-      const qty = Number(wrapper.querySelector(".line-qty")?.value || 0);
-      const unit = Number(wrapper.querySelector(".line-unit-price")?.value || 0);
-      const total = Number((qty * unit).toFixed(2));
-      const output = wrapper.querySelector(".line-total-value");
-      if (output) output.textContent = formatMoney(total);
-    }
+  function buildLines() {
+    const rows = [...linesEl.querySelectorAll(".line-item")];
 
-    function buildInvoiceLinesFromForm() {
-      const rows = [...invoiceLines.querySelectorAll(".line-item")];
-
-      return rows.map(row => {
-        const designation = (row.querySelector(".line-designation")?.value || "").trim();
-        const quantity = Number(row.querySelector(".line-qty")?.value || 0);
-        const unitPriceTTC = Number(row.querySelector(".line-unit-price")?.value || 0);
-        const totalTTC = Number((quantity * unitPriceTTC).toFixed(2));
-
-        return {
-          designation,
-          quantity,
-          unitPriceTTC,
-          totalTTC
-        };
-      }).filter(line => line.designation && line.quantity > 0 && line.unitPriceTTC > 0);
-    }
-
-    function computeAmounts(amountTTC, businessSnapshot) {
-      const totalTTC = Number(amountTTC || 0);
-      const vatMode = businessSnapshot.vatMode || "NO";
-      const vatRate = Number(businessSnapshot.vatRate || 0);
-
-      if (vatMode === "YES" && vatRate > 0) {
-        const amountHT = Number((totalTTC / (1 + vatRate / 100)).toFixed(2));
-        const amountVAT = Number((totalTTC - amountHT).toFixed(2));
-        return { amountHT, amountVAT, amountTTC: totalTTC };
-      }
+    return rows.map(row => {
+      const designation = (row.querySelector(".line-designation")?.value || "").trim();
+      const qty = Number(row.querySelector(".line-qty")?.value || 0);
+      const price = Number(row.querySelector(".line-unit-price")?.value || 0);
+      const total = Number((qty * price).toFixed(2));
 
       return {
-        amountHT: totalTTC,
-        amountVAT: 0,
-        amountTTC: totalTTC
+        designation,
+        qty,
+        price,
+        quantity: qty,
+        unitPriceTTC: price,
+        total,
+        totalTTC: total
       };
+    }).filter(line => line.designation && line.qty > 0 && line.price > 0);
+  }
+
+  function computeAmounts(totalTTC, businessSnapshot) {
+    const amountTTC = Number(totalTTC || 0);
+    const vatMode = businessSnapshot?.vatMode || "NO";
+    const vatRate = Number(businessSnapshot?.vatRate || 0);
+
+    if (vatMode === "YES" && vatRate > 0) {
+      const amountHT = Number((amountTTC / (1 + vatRate / 100)).toFixed(2));
+      const amountVAT = Number((amountTTC - amountHT).toFixed(2));
+      return { amountHT, amountVAT, amountTTC };
     }
 
-    function updateInvoiceSummary() {
-      const lines = buildInvoiceLinesFromForm();
-      const totalTTC = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
-      const amounts = computeAmounts(totalTTC, currentSettings);
+    return {
+      amountHT: amountTTC,
+      amountVAT: 0,
+      amountTTC
+    };
+  }
 
-      summaryHT.textContent = formatMoney(amounts.amountHT);
-      summaryVAT.textContent = formatMoney(amounts.amountVAT);
-      summaryTTC.textContent = formatMoney(amounts.amountTTC);
-    }
+  function getAppliedCreditsTotal(invoiceId) {
+    return allAvoirs
+      .filter(a => a.invoiceId === invoiceId && (a.status || "EMIS") !== "ANNULE")
+      .reduce((sum, a) => sum + Number(a.amountTTC ?? a.total ?? 0), 0);
+  }
 
-    function buildClientSnapshot(client) {
-      return {
-        name: client?.name || "",
-        type: client?.type || "",
-        email: client?.email || "",
-        phone: client?.phone || "",
-        address: client?.address || ""
-      };
-    }
+  function getPaymentsTotal(invoiceId) {
+    return allPaiements
+      .filter(p => p.invoiceId === invoiceId)
+      .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+  }
 
-    function buildBusinessSnapshot(settings) {
-      const s = { ...defaultSettings(), ...settings };
+  async function syncInvoiceStatus(invoiceId, extraCredit = 0) {
+    const invoice = allInvoices.find(inv => inv.id === invoiceId);
+    if (!invoice) return;
 
-      return {
-        businessName: s.businessName || "",
-        ownerName: s.ownerName || "",
-        legalForm: s.legalForm || "",
-        address: s.address || "",
-        email: s.email || "",
-        phone: s.phone || "",
-        siret: s.siret || "",
-        ape: s.ape || "",
-        logoUrl: s.logoUrl || "",
-        bankName: s.bankName || "",
-        iban: s.iban || "",
-        bic: s.bic || "",
-        legalNotice: s.legalNotice || "",
-        vatMode: s.vatMode || "NO",
-        vatRate: Number(s.vatRate || 0),
-        vatNumber: s.vatNumber || "",
-        tvaExemptionText: s.tvaExemptionText || "TVA non applicable, art. 293 B du CGI"
-      };
-    }
+    const currentStatus = String(invoice.status || "").toUpperCase();
+    if (currentStatus === "ANNULEE") return;
 
-    async function getNextInvoiceNumber() {
-      const countersSnap = await getDoc(countersRef);
-      const counters = countersSnap.exists()
-        ? { ...defaultCounters(), ...countersSnap.data() }
-        : defaultCounters();
+    const total = Number(invoice.amountTTC ?? invoice.amount ?? 0);
+    const credits = getAppliedCreditsTotal(invoiceId) + Number(extraCredit || 0);
+    const payments = getPaymentsTotal(invoiceId);
 
-      const nextNumber = counters.nextInvoiceNumber || 1;
-      const prefix = counters.invoicePrefix || "FAC";
-      const generated = `${prefix}-${currentYear()}-${padNumber(nextNumber)}`;
+    const netAfterCredits = Math.max(0, Number((total - credits).toFixed(2)));
+    const remaining = Math.max(0, Number((netAfterCredits - payments).toFixed(2)));
+    const dueDate = String(invoice.dueDate || "");
+    const today = getToday();
 
-      await setDoc(
-        countersRef,
-        {
-          invoicePrefix: prefix,
-          nextInvoiceNumber: nextNumber + 1,
-          updatedAt: serverTimestamp()
-        },
-        { merge: true }
-      );
+    let newStatus = "ENVOYEE";
+    if (remaining <= 0) newStatus = "PAYEE";
+    else if (dueDate && dueDate < today) newStatus = "RETARD";
 
-      return generated;
-    }
+    await updateDoc(doc(db, "factures", invoiceId), {
+      status: newStatus,
+      updatedAt: serverTimestamp()
+    });
+  }
 
-    function fillForm(invoice) {
-      ensureInvoiceDate();
-      document.getElementById("invoiceDate").value = invoice.date || "";
-      document.getElementById("invoiceClient").value = invoice.clientId || "";
-      fillDossierSelect(invoice.clientId || "");
-      document.getElementById("invoiceDossier").value = invoice.dossierId || "";
-      document.getElementById("invoiceMode").value = invoice.mode || "VIREMENT";
-      document.getElementById("invoicePaymentDelay").value = invoice.paymentDelay || "A_RECEPTION";
-      document.getElementById("invoiceNotes").value = invoice.notes || "";
+  function updateSummary() {
+    const invoice = getSelectedInvoice();
+    const lines = buildLines();
+    const totalTTC = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
+    const businessSnapshot = invoice?.businessSnapshot || {};
+    const amounts = computeAmounts(totalTTC, businessSnapshot);
 
-      invoiceLines.innerHTML = "";
-      lineCounter = 0;
+    summaryHT.textContent = formatMoney(amounts.amountHT);
+    summaryVAT.textContent = formatMoney(amounts.amountVAT);
+    summaryTTC.textContent = formatMoney(amounts.amountTTC);
+  }
 
-      const lines = Array.isArray(invoice.lines) && invoice.lines.length
-        ? invoice.lines
-        : [{ designation: invoice.label || "", quantity: 1, unitPriceTTC: invoice.amountTTC ?? invoice.amount ?? "" }];
+  async function getNextNumber() {
+    const snap = await getDoc(countersRef);
+    const data = snap.exists() ? snap.data() : { nextAvoirNumber: 1 };
 
-      lines.forEach(line => createLineElement(line));
+    const n = data.nextAvoirNumber || 1;
+    const number = `AV-${new Date().getFullYear()}-${String(n).padStart(3, "0")}`;
 
-      if (!invoiceLines.children.length) {
-        createLineElement();
-      }
+    await setDoc(countersRef, { nextAvoirNumber: n + 1, updatedAt: serverTimestamp() }, { merge: true });
+    return number;
+  }
 
-      updateInvoiceSummary();
-    }
+  function fillInvoiceSelect() {
+    const current = invoiceSelect.value;
 
-    function renderStats(invoices) {
-      totalInvoices.textContent = invoices.length;
-      totalOpen.textContent = invoices.filter(i =>
-        i.status === "ENVOYEE" || i.status === "RETARD"
-      ).length;
-      totalPaid.textContent = invoices.filter(i => i.status === "PAYEE").length;
+    const usableInvoices = allInvoices.filter(inv => {
+      const status = String(inv.status || "").toUpperCase();
+      return status !== "ANNULEE";
+    });
 
-      const sum = invoices.reduce(
-        (acc, item) => acc + Number(item.amountTTC ?? item.amount ?? 0),
-        0
-      );
-      totalAmount.textContent = formatMoney(sum);
-    }
+    invoiceSelect.innerHTML =
+      '<option value="">Sélectionner une facture</option>' +
+      usableInvoices.map(inv => {
+        const clientName = inv.clientSnapshot?.name || "Client";
+        const total = Number(inv.amountTTC ?? inv.amount ?? 0);
+        const existingCredits = getAppliedCreditsTotal(inv.id);
+        const remainingCreditCapacity = Math.max(0, Number((total - existingCredits).toFixed(2)));
 
-    function renderInvoices() {
-      const clientMap = Object.fromEntries(allClients.map(c => [c.id, c]));
-      const dossierMap = Object.fromEntries(allDossiers.map(d => [d.id, d]));
-      const q = (searchInput.value || "").trim().toLowerCase();
-      const filter = statusFilter.value;
-
-      const filtered = allInvoices.filter(invoice => {
-        const clientName =
-          invoice.clientSnapshot?.name ||
-          clientMap[invoice.clientId]?.name ||
-          "";
-
-        const dossierTitle =
-          invoice.dossierTitleSnapshot ||
-          dossierMap[invoice.dossierId]?.title ||
-          "";
-
-        const firstLabel = Array.isArray(invoice.lines) && invoice.lines.length
-          ? invoice.lines[0].designation || ""
-          : (invoice.label || "");
-
-        const blob = [
-          invoice.number || "",
-          firstLabel,
-          invoice.status || "",
-          invoice.mode || "",
-          invoice.notes || "",
-          invoice.paymentDelayLabel || "",
-          clientName,
-          dossierTitle
-        ].join(" ").toLowerCase();
-
-        const matchesSearch = blob.includes(q);
-        const matchesStatus = !filter || invoice.status === filter;
-        return matchesSearch && matchesStatus;
-      });
-
-      renderStats(allInvoices);
-
-      if (!allClients.length) {
-        invoiceList.innerHTML = '<div class="empty">Ajoute d’abord au moins un client dans clients.html.</div>';
-        return;
-      }
-
-      if (!filtered.length) {
-        invoiceList.innerHTML = '<div class="empty">Aucune facture pour le moment.</div>';
-        return;
-      }
-
-      invoiceList.innerHTML = filtered.map(invoice => {
-        const clientName =
-          invoice.clientSnapshot?.name ||
-          clientMap[invoice.clientId]?.name ||
-          "Client supprimé";
-
-        const dossierTitle = invoice.dossierId
-          ? (invoice.dossierTitleSnapshot || dossierMap[invoice.dossierId]?.title || "Dossier supprimé")
-          : "Aucun dossier";
-
-        const amountTTC = invoice.amountTTC ?? invoice.amount ?? 0;
-        const amountHT = invoice.amountHT ?? amountTTC;
-        const amountVAT = invoice.amountVAT ?? 0;
-
-        const firstLabel = Array.isArray(invoice.lines) && invoice.lines.length
-          ? invoice.lines[0].designation || ""
-          : (invoice.label || "");
-
-        const extraLinesCount = Array.isArray(invoice.lines) && invoice.lines.length > 1
-          ? ` (+${invoice.lines.length - 1} ligne${invoice.lines.length - 1 > 1 ? "s" : ""})`
-          : "";
-
-        return `
-          <article class="invoice-item">
-            <div class="invoice-top">
-              <div>
-                <div class="invoice-title">${escapeHtml(invoice.number || "")}</div>
-                <div class="invoice-meta">
-                  <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
-                  <span><strong>Dossier :</strong> ${escapeHtml(dossierTitle)}</span>
-                  ${invoice.date ? `<span><strong>Date :</strong> ${escapeHtml(invoice.date)}</span>` : ""}
-                  ${invoice.paymentDelayLabel ? `<span><strong>Délai :</strong> ${escapeHtml(invoice.paymentDelayLabel)}</span>` : ""}
-                  ${invoice.dueDate ? `<span><strong>Échéance :</strong> ${escapeHtml(invoice.dueDate)}</span>` : ""}
-                </div>
-              </div>
-              <div class="badges">
-                <span class="badge ${statusBadgeClass(invoice.status)}">${escapeHtml(invoice.status || "")}</span>
-                <span class="badge">${escapeHtml(invoice.mode || "")}</span>
-              </div>
-            </div>
-
-            <div class="invoice-meta">
-              ${firstLabel ? `<span><strong>Libellé :</strong> ${escapeHtml(firstLabel)}${escapeHtml(extraLinesCount)}</span>` : ""}
-              <span><strong>HT :</strong> ${formatMoney(amountHT)}</span>
-              <span><strong>TVA :</strong> ${formatMoney(amountVAT)}</span>
-              <span class="amount">${formatMoney(amountTTC)}</span>
-            </div>
-
-            ${invoice.notes ? `<div class="invoice-notes">${escapeHtml(invoice.notes).replace(/\n/g, "<br>")}</div>` : ""}
-
-            <div class="mini-actions">
-              <a class="mini-btn" href="facture-apercu.html?id=${invoice.id}" target="_blank" rel="noopener noreferrer">Aperçu</a>
-              <button class="mini-btn" type="button" data-edit-id="${invoice.id}">Modifier</button>
-              <button class="mini-btn" type="button" data-delete-id="${invoice.id}">Supprimer</button>
-            </div>
-          </article>
-        `;
+        return `<option value="${inv.id}">${escapeHtml(inv.number || "")} — ${escapeHtml(clientName)} — crédit dispo ${formatMoney(remainingCreditCapacity)}</option>`;
       }).join("");
+
+    if (current && usableInvoices.some(i => i.id === current)) {
+      invoiceSelect.value = current;
+    }
+  }
+
+  function resetForm() {
+    form.reset();
+    linesEl.innerHTML = "";
+    lineCounter = 0;
+    createLineElement();
+    ensureDate();
+    updateSummary();
+  }
+
+  function renderStats(items) {
+    totalCreditsCount.textContent = items.length;
+    totalCreditsAmount.textContent = formatMoney(
+      items.reduce((acc, item) => acc + Number(item.amountTTC ?? item.total ?? 0), 0)
+    );
+    totalAppliedCount.textContent = items.filter(item => !!item.invoiceId).length;
+    totalStatusCount.textContent = items.filter(item => (item.status || "EMIS") === "EMIS").length;
+  }
+
+  function renderList() {
+    const q = (searchInput.value || "").trim().toLowerCase();
+    const status = statusFilter.value;
+
+    const filtered = allAvoirs.filter(item => {
+      const blob = [
+        item.number || "",
+        item.status || "",
+        item.invoiceNumberSnapshot || "",
+        item.clientSnapshot?.name || "",
+        item.dossierTitleSnapshot || "",
+        item.notes || ""
+      ].join(" ").toLowerCase();
+
+      const matchesSearch = blob.includes(q);
+      const matchesStatus = !status || (item.status || "EMIS") === status;
+      return matchesSearch && matchesStatus;
+    });
+
+    renderStats(allAvoirs);
+
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="empty">Aucun avoir pour le moment.</div>';
+      return;
     }
 
-    async function buildInvoicePayload(data, existingInvoice = null) {
-      const clientId = data.get("invoiceClient") || "";
-      const dossierId = data.get("invoiceDossier") || "";
+    listEl.innerHTML = filtered.map(item => {
+      const amountTTC = Number(item.amountTTC ?? item.total ?? 0);
+      const clientName = item.clientSnapshot?.name || "Client supprimé";
+      const statusValue = item.status || "EMIS";
+      const badgeClass = statusValue === "APPLIQUE" ? "applique" : (statusValue === "ANNULE" ? "annule" : "emis");
 
-      const client = allClients.find(c => c.id === clientId);
-      const dossier = allDossiers.find(d => d.id === dossierId);
+      return `
+        <article class="credit-item">
+          <div class="credit-top">
+            <div>
+              <div class="credit-title">${escapeHtml(item.number || "")}</div>
+              <div class="credit-meta">
+                ${item.date ? `<span><strong>Date :</strong> ${escapeHtml(item.date)}</span>` : ""}
+                ${item.invoiceNumberSnapshot ? `<span><strong>Facture liée :</strong> ${escapeHtml(item.invoiceNumberSnapshot)}</span>` : ""}
+                <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
+                ${item.dossierTitleSnapshot ? `<span><strong>Dossier :</strong> ${escapeHtml(item.dossierTitleSnapshot)}</span>` : ""}
+              </div>
+            </div>
 
-      const businessSnapshot = buildBusinessSnapshot(currentSettings);
-      const clientSnapshot = buildClientSnapshot(client);
+            <div class="badges">
+              <span class="badge ${badgeClass}">${escapeHtml(statusValue)}</span>
+            </div>
+          </div>
 
-      let lines = buildInvoiceLinesFromForm();
-      if (!lines.length && existingInvoice?.lines?.length) {
-        lines = existingInvoice.lines;
-      }
+          <div class="credit-meta">
+            <span><strong>Montant TTC :</strong> <span class="amount">${formatMoney(amountTTC)}</span></span>
+          </div>
 
-      const amountTTCFromLines = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
-      const amounts = computeAmounts(amountTTCFromLines, businessSnapshot);
+          ${item.notes ? `<div class="credit-notes">${escapeHtml(item.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
-      let number = existingInvoice?.number || "";
-      if (!existingInvoice) {
-        number = await getNextInvoiceNumber();
-      }
+          <div class="mini-actions">
+            <a class="mini-btn" href="avoir-apercu.html?id=${item.id}" target="_blank" rel="noopener noreferrer">Aperçu</a>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
 
-      const invoiceDate = data.get("invoiceDate") || new Date().toISOString().slice(0, 10);
-      const paymentDelay = data.get("invoicePaymentDelay") || "A_RECEPTION";
-      const paymentDelayLabel = paymentDelayToLabel(paymentDelay);
-      const dueDate = addDays(invoiceDate, paymentDelayToDays(paymentDelay));
+  addLineBtn.addEventListener("click", () => {
+    createLineElement();
+    refreshLineTitles();
+    updateSummary();
+  });
 
-      return {
+  invoiceSelect.addEventListener("change", updateSummary);
+  searchInput.addEventListener("input", renderList);
+  statusFilter.addEventListener("change", renderList);
+  resetBtn.addEventListener("click", resetForm);
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const invoice = getSelectedInvoice();
+    if (!invoice) {
+      alert("Sélectionne une facture.");
+      return;
+    }
+
+    if (String(invoice.status || "").toUpperCase() === "ANNULEE") {
+      alert("Impossible de créer un avoir sur une facture annulée.");
+      return;
+    }
+
+    const lines = buildLines();
+    if (!lines.length) {
+      alert("Ajoute au moins une ligne valide.");
+      return;
+    }
+
+    const totalTTC = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
+    if (!totalTTC) {
+      alert("Montant nul.");
+      return;
+    }
+
+    const invoiceTotal = Number(invoice.amountTTC ?? invoice.amount ?? 0);
+    const existingCredits = getAppliedCreditsTotal(invoice.id);
+    const remainingCreditCapacity = Math.max(0, Number((invoiceTotal - existingCredits).toFixed(2)));
+
+    if (totalTTC > remainingCreditCapacity) {
+      alert(`Avoir trop élevé. Maximum autorisé sur cette facture : ${formatMoney(remainingCreditCapacity)}.`);
+      return;
+    }
+
+    try {
+      const number = await getNextNumber();
+      const businessSnapshot = invoice.businessSnapshot || {};
+      const amounts = computeAmounts(totalTTC, businessSnapshot);
+
+      await addDoc(avoirsRef, {
         number,
-        date: invoiceDate,
-        clientId,
-        dossierId,
-        dossierTitleSnapshot: dossier?.title || "",
-        dueDate,
-        paymentDelay,
-        paymentDelayLabel,
-        status: existingInvoice?.status || "ENVOYEE",
-        mode: data.get("invoiceMode") || "VIREMENT",
-        label: lines[0]?.designation || "",
-        notes: (data.get("invoiceNotes") || "").trim(),
+        date: dateInput.value || new Date().toISOString().slice(0, 10),
+        invoiceId: invoice.id,
+        invoiceNumberSnapshot: invoice.number || "",
+        clientId: invoice.clientId || "",
+        clientSnapshot: invoice.clientSnapshot || {},
+        dossierId: invoice.dossierId || "",
+        dossierTitleSnapshot: invoice.dossierTitleSnapshot || "",
+        businessSnapshot,
+        status: "EMIS",
         lines,
         amountHT: amounts.amountHT,
         amountVAT: amounts.amountVAT,
         amountTTC: amounts.amountTTC,
-        clientSnapshot,
-        businessSnapshot,
-        createdAt: existingInvoice?.createdAt || serverTimestamp(),
+        total: amounts.amountTTC,
+        notes: notesInput.value || "",
+        createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
-      };
+      });
+
+      await syncInvoiceStatus(invoice.id, amounts.amountTTC);
+
+      resetForm();
+    } catch (err) {
+      console.error("Erreur création avoir :", err);
+      alert("Impossible d’enregistrer l’avoir.");
     }
+  });
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+  onSnapshot(
+    query(facturesRef, orderBy("createdAt", "desc")),
+    (snap) => {
+      allInvoices = snap.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      fillInvoiceSelect();
+      updateSummary();
+    },
+    (err) => console.error("Erreur chargement factures :", err)
+  );
 
-      const data = new FormData(form);
-      const clientId = data.get("invoiceClient") || "";
-      const lines = buildInvoiceLinesFromForm();
-      const total = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
+  onSnapshot(
+    query(avoirsRef, orderBy("createdAt", "desc")),
+    (snap) => {
+      allAvoirs = snap.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      fillInvoiceSelect();
+      renderList();
+    },
+    (err) => console.error("Erreur chargement avoirs :", err)
+  );
 
-      if (!clientId || !total) return;
+  onSnapshot(
+    query(paiementsRef, orderBy("createdAt", "desc")),
+    (snap) => {
+      allPaiements = snap.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      fillInvoiceSelect();
+      updateSummary();
+    },
+    (err) => console.error("Erreur chargement paiements :", err)
+  );
 
-      try {
-        if (editingInvoiceId) {
-          const existing = allInvoices.find(i => i.id === editingInvoiceId);
-          const payload = await buildInvoicePayload(data, existing);
-
-          await updateDoc(doc(db, "factures", editingInvoiceId), {
-            date: payload.date,
-            clientId: payload.clientId,
-            dossierId: payload.dossierId,
-            dossierTitleSnapshot: payload.dossierTitleSnapshot,
-            dueDate: payload.dueDate,
-            paymentDelay: payload.paymentDelay,
-            paymentDelayLabel: payload.paymentDelayLabel,
-            mode: payload.mode,
-            label: payload.label,
-            notes: payload.notes,
-            lines: payload.lines,
-            amountHT: payload.amountHT,
-            amountVAT: payload.amountVAT,
-            amountTTC: payload.amountTTC,
-            clientSnapshot: payload.clientSnapshot,
-            businessSnapshot: payload.businessSnapshot,
-            updatedAt: serverTimestamp()
-          });
-
-          editingInvoiceId = null;
-        } else {
-          const payload = await buildInvoicePayload(data, null);
-          await addDoc(invoicesRef, payload);
-        }
-
-        form.reset();
-        ensureInvoiceDate();
-        document.getElementById("invoiceMode").value = "VIREMENT";
-        document.getElementById("invoicePaymentDelay").value = "A_RECEPTION";
-        fillDossierSelect("");
-        invoiceLines.innerHTML = "";
-        lineCounter = 0;
-        createLineElement();
-        updateInvoiceSummary();
-      } catch (err) {
-        console.error("Erreur enregistrement facture :", err);
-        alert("Impossible d’enregistrer la facture.");
-      }
-    });
-
-    form.addEventListener("reset", () => {
-      setTimeout(() => {
-        editingInvoiceId = null;
-        ensureInvoiceDate();
-        document.getElementById("invoiceMode").value = "VIREMENT";
-        document.getElementById("invoicePaymentDelay").value = "A_RECEPTION";
-        invoiceLines.innerHTML = "";
-        lineCounter = 0;
-        createLineElement();
-        updateInvoiceSummary();
-      }, 0);
-    });
-
-    addLineBtn.addEventListener("click", () => {
-      createLineElement();
-      refreshLineTitles();
-      updateInvoiceSummary();
-    });
-
-    invoiceClient.addEventListener("change", (e) => {
-      fillDossierSelect(e.target.value);
-    });
-
-    searchInput.addEventListener("input", renderInvoices);
-    statusFilter.addEventListener("change", renderInvoices);
-
-    invoiceList.addEventListener("click", async (e) => {
-      const editBtn = e.target.closest("[data-edit-id]");
-      if (editBtn) {
-        const id = editBtn.getAttribute("data-edit-id");
-        const invoice = allInvoices.find(i => i.id === id);
-        if (!invoice) return;
-
-        editingInvoiceId = id;
-        fillForm(invoice);
-        window.scrollTo({ top: 0, behavior: "smooth" });
-        return;
-      }
-
-      const deleteBtn = e.target.closest("[data-delete-id]");
-      if (!deleteBtn) return;
-
-      const id = deleteBtn.getAttribute("data-delete-id");
-      const ok = confirm("Supprimer cette facture ?");
-      if (!ok) return;
-
-      try {
-        await deleteDoc(doc(db, "factures", id));
-
-        if (editingInvoiceId === id) {
-          editingInvoiceId = null;
-          form.reset();
-        }
-      } catch (err) {
-        console.error("Erreur suppression facture :", err);
-        alert("Impossible de supprimer la facture.");
-      }
-    });
-
-    onSnapshot(
-      query(clientsRef, orderBy("createdAt", "desc")),
-      (snapshot) => {
-        allClients = snapshot.docs.map(docSnap => ({
-          id: docSnap.id,
-          ...docSnap.data()
-        }));
-        fillClientSelect();
-        renderInvoices();
-      },
-      (err) => {
-        console.error("Erreur chargement clients :", err);
-      }
-    );
-
-    onSnapshot(
-      query(dossiersRef, orderBy("createdAt", "desc")),
-      (snapshot) => {
-        allDossiers = snapshot.docs.map(docSnap => ({
-          id: docSnap.id,
-          ...docSnap.data()
-        }));
-        fillDossierSelect(invoiceClient.value || "");
-        renderInvoices();
-      },
-      (err) => {
-        console.error("Erreur chargement dossiers :", err);
-      }
-    );
-
-    onSnapshot(
-      settingsRef,
-      (snap) => {
-        currentSettings = snap.exists()
-          ? { ...defaultSettings(), ...snap.data() }
-          : defaultSettings();
-        updateInvoiceSummary();
-      },
-      (err) => {
-        console.error("Erreur chargement settings :", err);
-      }
-    );
-
-    onSnapshot(
-      countersRef,
-      (snap) => {
-        currentCounters = snap.exists()
-          ? { ...defaultCounters(), ...snap.data() }
-          : defaultCounters();
-      },
-      (err) => {
-        console.error("Erreur chargement counters :", err);
-      }
-    );
-
-    onSnapshot(
-      query(invoicesRef, orderBy("createdAt", "desc")),
-      (snapshot) => {
-        allInvoices = snapshot.docs.map(docSnap => ({
-          id: docSnap.id,
-          ...docSnap.data()
-        }));
-        renderInvoices();
-      },
-      (err) => {
-        console.error("Erreur chargement factures :", err);
-        invoiceList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
-        renderStats([]);
-      }
-    );
-
-    ensureInvoiceDate();
-    createLineElement();
-    updateInvoiceSummary();
-  </script>
+  ensureDate();
+  createLineElement();
+  updateSummary();
+</script>
 </body>
 </html>
