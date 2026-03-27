@@ -1,51 +1,497 @@
-<!DOCTYPE html><!-- litiges assurance / banque / mutuelle --><html lang="fr">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Litige assurance, banque, mutuelle : que faire ? | Axe Dossier</title>
-  <meta name="description" content="Assurance refuse remboursement, banque bloque compte, mutuelle ne rembourse pas : que faire face à un litige ?" />
+  <meta name="description" content="Assurance refuse remboursement, banque bloque compte, mutuelle ne rembourse pas : que faire face à un litige et comment reprendre le dossier proprement ?" />
   <meta name="robots" content="index,follow" />
   <style>
-    body{margin:0;font-family:Inter,system-ui;background:#f3efe8;color:#171717}
-    .wrap{max-width:1000px;margin:auto;padding:40px 20px}
-    h1{font-size:40px;line-height:1.1;margin-bottom:20px}
-    h2{margin-top:40px}
-    p{line-height:1.6;color:#444}
-    .card{background:#fff;padding:24px;border-radius:16px;margin-top:20px}
-    .btn{display:inline-block;margin-top:20px;padding:12px 20px;background:#111;color:#fff;text-decoration:none}
+    :root{
+      --bg:#f3efe8;
+      --surface:rgba(255,255,255,0.88);
+      --surface-strong:#ffffff;
+      --text:#171717;
+      --muted:#5f5952;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --accent-soft:#e9e1d4;
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:18px;
+      --shadow:0 20px 60px rgba(0,0,0,0.07);
+      --max:1120px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      line-height:1.6;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.92), transparent 28%),
+        radial-gradient(circle at right 20%, rgba(233,225,212,0.75), transparent 20%),
+        var(--bg);
+    }
+
+    a{color:inherit;text-decoration:none}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,0.78);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(23,23,23,0.05);
+    }
+
+    .topbar-inner{
+      min-height:76px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+
+    .brand-logo{
+      height:94px;
+      width:auto;
+      display:block;
+      object-fit:contain;
+    }
+
+    .brand-name{
+      font-size:1.8rem;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      line-height:1;
+    }
+
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.7);
+      border:1px solid rgba(23,23,23,0.07);
+      font-size:.94rem;
+      transition:transform .2s ease, background .2s ease;
+    }
+
+    .pill:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,0.95);
+    }
+
+    .hero{padding:54px 0 24px}
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:20px;
+      align-items:stretch;
+    }
+
+    .card{
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:var(--radius-xl);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+    }
+
+    .hero-main{padding:42px}
+    .side-card,.content-card,.cta-card,.faq-item{padding:26px}
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--accent-soft);
+      color:#4b443b;
+      font-size:.88rem;
+      font-weight:700;
+      margin-bottom:18px;
+    }
+
+    h1,h2,h3,p{margin:0}
+
+    h1{
+      font-size:clamp(2.2rem,4vw,4.5rem);
+      line-height:1.02;
+      letter-spacing:-.055em;
+      margin-bottom:18px;
+      max-width:11ch;
+    }
+
+    h2{
+      font-size:clamp(1.6rem,2.5vw,2.5rem);
+      letter-spacing:-.04em;
+      margin-bottom:14px;
+    }
+
+    h3{
+      font-size:1.08rem;
+      letter-spacing:-.02em;
+      margin-bottom:10px;
+    }
+
+    .lead{
+      max-width:60ch;
+      color:#4b4640;
+      font-size:1.08rem;
+    }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:26px;
+    }
+
+    .btn{
+      min-height:52px;
+      padding:0 20px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--accent);
+      font-weight:700;
+      transition:transform .2s ease, opacity .2s ease;
+    }
+
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-secondary{background:rgba(255,255,255,0.75);color:var(--accent);border-color:rgba(23,23,23,0.1)}
+
+    .hero-side{display:grid;gap:20px}
+
+    .mini-list{
+      list-style:none;
+      padding:0;
+      margin:0;
+      display:grid;
+      gap:12px;
+    }
+
+    .mini-list li{
+      position:relative;
+      padding-left:18px;
+      color:#49443e;
+    }
+
+    .mini-list li::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:10px;
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:var(--accent);
+    }
+
+    section{padding:20px 0}
+
+    .section-head{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
+
+    .section-head p{
+      max-width:60ch;
+      color:var(--muted);
+    }
+
+    .grid-2,.grid-3,.faq-grid{
+      display:grid;
+      gap:18px;
+    }
+
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .faq-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+
+    .content-card,.cta-card,.faq-item{
+      border-radius:var(--radius-lg);
+      background:rgba(255,255,255,0.82);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
+
+    .content-card p,.cta-card p,.faq-item p{color:#4f4942}
+
+    .footer{padding:30px 0 64px}
+
+    .footer-box{
+      padding:22px 24px;
+      border-radius:var(--radius-lg);
+      background:rgba(255,255,255,0.72);
+      border:1px solid var(--line);
+      color:#605951;
+    }
+
+    .footer-box small{
+      display:block;
+      margin-top:8px;
+      line-height:1.5;
+    }
+
+    @media (max-width:980px){
+      .hero-grid,.grid-2,.grid-3,.faq-grid{grid-template-columns:1fr}
+      .section-head{flex-direction:column;align-items:start}
+    }
+
+    @media (max-width:720px){
+      .topbar-inner{
+        min-height:auto;
+        padding:14px 0;
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .brand,.nav{justify-content:center}
+      .hero-main,.side-card,.content-card,.cta-card,.faq-item,.footer-box{padding:20px}
+      .actions{flex-direction:column}
+      .btn{width:100%}
+      h1{max-width:none}
+      .brand-logo{height:72px}
+      .brand-name{font-size:1.35rem;text-align:center}
+    }
   </style>
 </head>
-<body><div class="wrap">  <h1>Litige assurance, banque, mutuelle : quand rien n’avance</h1>  <p>
-    Refus de remboursement, compte bloqué, dossier en attente, réponse floue…
-    Dans les litiges avec une assurance, une banque ou une mutuelle, le problème est rarement simple.
-    Et sans méthode, la situation peut durer des mois.
-  </p>  <h2>Les situations fréquentes</h2>  <div class="card">
-    <p>
-      • Assurance refuse d’indemniser<br>
-      • Banque bloque un compte ou un virement<br>
-      • Mutuelle ne rembourse pas<br>
-      • Réponse incomplète ou incohérente
-    </p>
-  </div>  <h2>Ce qu’il ne faut pas faire</h2>  <div class="card">
-    <p>
-      Multiplier les appels et mails sans structure.<br>
-      Envoyer trop de documents inutiles.<br>
-      Réagir uniquement à l’émotion.
-    </p>
-  </div>  <h2>Ce qu’il faut faire</h2>  <div class="card">
-    <p>
-      Reprendre les échanges depuis le début.<br>
-      Identifier précisément le blocage.<br>
-      Structurer les pièces utiles.<br>
-      Préparer une réponse claire et factuelle.
-    </p>
-  </div>  <h2>Comment Axe Dossier intervient</h2>  <div class="card">
-    <p>
-      Analyse du dossier<br>
-      Synthèse des points clés<br>
-      Rédaction d’un courrier exploitable
-    </p>
-  </div><a class="btn" href="mailto:contact@axe-dossier.fr?subject=Litige%20assurance%20banque">Envoyer mon dossier</a>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a href="index.html" class="brand" aria-label="Axe Dossier">
+        <img src="images/axe-dossier.png" alt="Logo Axe Dossier" class="brand-logo" />
+        <span class="brand-name">AXE DOSSIER</span>
+      </a>
 
-</div></body>
+      <nav class="nav" aria-label="Navigation principale">
+        <a class="pill" href="index.html">Accueil</a>
+        <a class="pill" href="#situations">Situations</a>
+        <a class="pill" href="#erreurs">Erreurs</a>
+        <a class="pill" href="#actions">Que faire</a>
+        <a class="pill" href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <article class="card hero-main">
+          <div class="eyebrow">Assurance · Banque · Mutuelle</div>
+          <h1>Litige assurance, banque, mutuelle : que faire quand rien n’avance ?</h1>
+          <p class="lead">
+            Refus de remboursement, compte bloqué, réponse floue, silence prolongé, demande qui tourne en rond : dans les litiges avec une assurance, une banque ou une mutuelle, le problème n’est presque jamais “simple”. Et sans méthode, la situation peut durer des mois.
+          </p>
+          <div class="actions">
+            <a class="btn btn-primary" href="mailto:contact@axe-dossier.fr?subject=Litige%20assurance%20banque%20mutuelle&body=Bonjour,%0A%0AJe%20souhaite%20vous%20transmettre%20un%20litige.%0A%0AType%20d%E2%80%99organisme%20:%0A%0ASituation%20:%0A%0AObjectif%20:%0A">Envoyer mon dossier</a>
+            <a class="btn btn-secondary" href="#actions">Voir quoi faire</a>
+          </div>
+        </article>
+
+        <div class="hero-side">
+          <article class="card side-card">
+            <h3>Situations fréquentes</h3>
+            <ul class="mini-list">
+              <li>Assurance refuse d’indemniser</li>
+              <li>Banque bloque un compte ou un virement</li>
+              <li>Mutuelle ne rembourse pas</li>
+              <li>Réponse incohérente ou incomplète</li>
+            </ul>
+          </article>
+
+          <article class="card side-card">
+            <h3>Le vrai enjeu</h3>
+            <p>Reprendre les échanges, isoler le blocage réel et produire une réponse factuelle qui tienne debout face à l’interlocuteur.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="situations">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Quand un litige commence à s’enliser</h2>
+            <p>Le point de départ varie, mais la mécanique est souvent la même : tu as des pièces, tu as relancé, et malgré ça la situation reste figée.</p>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <article class="content-card">
+            <h3>Assurance</h3>
+            <p>Refus d’indemnisation, expertise contestée, sinistre mal traité, silence après transmission des pièces, explication floue ou incomplète.</p>
+          </article>
+          <article class="content-card">
+            <h3>Banque</h3>
+            <p>Compte bloqué, opération refusée, fonds indisponibles, réponse interne peu claire, ou dossier qui dérive entre plusieurs services.</p>
+          </article>
+          <article class="content-card">
+            <h3>Mutuelle</h3>
+            <p>Remboursement non effectué, justificatifs redemandés, décision peu compréhensible, traitement qui traîne sans réponse nette.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="erreurs">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Ce qu’il ne faut pas faire</h2>
+            <p>Quand la situation se tend, beaucoup aggravent le problème sans le vouloir.</p>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <article class="cta-card">
+            <h3>Multiplier les appels</h3>
+            <p>Sans trace écrite claire, tu t’épuises et tu n’améliores pas vraiment la solidité du dossier.</p>
+          </article>
+          <article class="cta-card">
+            <h3>Envoyer trop de documents</h3>
+            <p>Le trop-plein nuit à la lisibilité. Un dossier noyé sous les doublons devient plus faible, pas plus convaincant.</p>
+          </article>
+          <article class="cta-card">
+            <h3>Réagir à chaud</h3>
+            <p>Une réponse rédigée sous la colère ou la lassitude perd souvent en précision, et donc en efficacité.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="actions">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Ce qu’il faut faire</h2>
+            <p>Avant toute nouvelle démarche, il faut remettre le dossier dans l’ordre. C’est la base.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <article class="content-card">
+            <h3>1. Reprendre les échanges depuis le début</h3>
+            <p>Dates, interlocuteurs, pièces envoyées, décisions reçues, contradictions éventuelles : tout doit être remis à plat.</p>
+          </article>
+          <article class="content-card">
+            <h3>2. Identifier le blocage précis</h3>
+            <p>Refus explicite, absence de traitement, pièce manquante, erreur d’analyse, problème interne, ou réponse volontairement vague.</p>
+          </article>
+          <article class="content-card">
+            <h3>3. Trier les documents utiles</h3>
+            <p>Conserver les preuves, les réponses importantes et les éléments qui appuient la demande. Écarter le bruit.</p>
+          </article>
+          <article class="content-card">
+            <h3>4. Préparer une réponse claire</h3>
+            <p>Un courrier structuré, daté, ciblé et fondé sur les bonnes pièces pèse plus qu’une accumulation de relances mal tenues.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Comment Axe Dossier intervient</h2>
+            <p>L’intervention repose sur la lecture, la synthèse et la rédaction. Pas sur les effets de manche.</p>
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <article class="cta-card">
+            <h3>Analyse du dossier</h3>
+            <p>Lecture des pièces, chronologie, point de blocage, contradictions, et niveau réel de solidité documentaire.</p>
+          </article>
+          <article class="cta-card">
+            <h3>Synthèse des points clés</h3>
+            <p>Retour propre, structuré, avec les priorités utiles et les angles à clarifier ou renforcer.</p>
+          </article>
+          <article class="cta-card">
+            <h3>Rédaction d’un courrier exploitable</h3>
+            <p>Préparation d’une réponse factuelle, lisible et sérieuse pour remettre le litige dans l’axe.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Envoyer un litige</h2>
+            <p>Un résumé simple, les pièces utiles, et l’objectif recherché. C’est largement suffisant pour commencer correctement.</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <article class="cta-card">
+            <h3>À transmettre</h3>
+            <p>Décision reçue, dernier courrier ou mail important, justificatifs utiles, chronologie courte et objectif attendu.</p>
+          </article>
+          <article class="cta-card">
+            <h3>À éviter</h3>
+            <p>Copies en doublon, captures inutiles, messages trop émotionnels et dossier sans point précis sur le blocage.</p>
+          </article>
+        </div>
+
+        <div class="actions" style="justify-content:center; margin-top:24px;">
+          <a class="btn btn-primary" href="mailto:contact@axe-dossier.fr?subject=Litige%20assurance%20banque%20mutuelle&body=Bonjour,%0A%0AJe%20vous%20transmets%20un%20litige.%0A%0AType%20d%E2%80%99organisme%20:%0A%0ASituation%20:%0A%0AObjectif%20:%0A">Envoyer mon dossier</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-box">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;">
+        <div>
+          <strong style="display:block; font-size:1.05rem; margin-bottom:6px;">Axe Dossier</strong>
+          <small>Analyse · Structure · Rédaction</small>
+        </div>
+
+        <div style="text-align:right;">
+          <a href="mentions-legales.html" style="font-size:0.9rem; color:#666;">Mentions légales</a>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; padding-top:14px; border-top:1px solid rgba(23,23,23,0.08);">
+        <small>
+          Service d’accompagnement documentaire et rédactionnel. Ne constitue pas une consultation juridique,
+          une représentation en justice ou une prise en charge judiciaire.<br>
+          © 2026 Axe Dossier
+        </small>
+      </div>
+    </div>
+  </footer>
+</body>
 </html>
