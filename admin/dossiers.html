@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Axe Dossier — Clients</title>
+  <title>Axe Dossier — Dossiers</title>
   <style>
     :root{
       --bg:#f3efe8;
@@ -15,7 +15,7 @@
       --soft:#e9e1d4;
       --radius:18px;
       --shadow:0 16px 40px rgba(0,0,0,0.06);
-      --max:1100px;
+      --max:1180px;
     }*{box-sizing:border-box}
     body{
       margin:0;
@@ -91,11 +91,11 @@
 
     h1,h2,h3,p{margin:0}
     h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
-    .hero p{color:var(--muted);max-width:60ch;margin-top:8px}
+    .hero p{color:var(--muted);max-width:68ch;margin-top:8px}
 
     .grid{
       display:grid;
-      grid-template-columns:380px 1fr;
+      grid-template-columns:400px 1fr;
       gap:20px;
       align-items:start;
     }
@@ -135,9 +135,12 @@
       background:#fff;
     }
 
-    .field textarea{
-      min-height:96px;
-      resize:vertical;
+    .field textarea{min-height:110px;resize:vertical}
+
+    .row-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
     }
 
     .actions{
@@ -172,8 +175,8 @@
       margin-bottom:18px;
     }
 
-    .search{
-      flex:1 1 260px;
+    .search,
+    .filter{
       min-height:48px;
       border:1px solid var(--line);
       border-radius:999px;
@@ -182,9 +185,12 @@
       background:#fff;
     }
 
+    .search{flex:1 1 260px}
+    .filter{min-width:170px}
+
     .stats{
       display:grid;
-      grid-template-columns:repeat(3,minmax(0,1fr));
+      grid-template-columns:repeat(4,minmax(0,1fr));
       gap:12px;
       margin-bottom:18px;
     }
@@ -214,31 +220,43 @@
       background:#fcfbf8;
     }
 
-    .client-list{
-      display:grid;
-      gap:14px;
-    }
+    .dossier-list{display:grid;gap:14px}
 
-    .client-item{
+    .dossier-item{
       border:1px solid var(--line);
       border-radius:18px;
       padding:18px;
       background:#fff;
       display:grid;
-      gap:10px;
+      gap:12px;
     }
 
-    .client-top{
+    .dossier-top{
       display:flex;
       align-items:start;
       justify-content:space-between;
       gap:16px;
     }
 
-    .client-name{
+    .dossier-title{
       font-size:1.08rem;
       font-weight:800;
       letter-spacing:-.02em;
+      margin-bottom:4px;
+    }
+
+    .dossier-meta{
+      display:grid;
+      gap:6px;
+      color:#4f4942;
+      font-size:.95rem;
+    }
+
+    .badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
     }
 
     .badge{
@@ -254,14 +272,12 @@
       border:1px solid rgba(23,23,23,0.06);
     }
 
-    .client-meta{
-      display:grid;
-      gap:6px;
-      color:#4f4942;
-      font-size:.95rem;
-    }
+    .badge.status-en-cours{background:#efe8dd}
+    .badge.status-attente{background:#f6edd8}
+    .badge.status-clos{background:#e8efe4}
+    .badge.status-archive{background:#ececec}
 
-    .client-notes{
+    .dossier-notes{
       color:var(--muted);
       font-size:.94rem;
       line-height:1.5;
@@ -271,7 +287,6 @@
       display:flex;
       gap:8px;
       flex-wrap:wrap;
-      margin-top:4px;
     }
 
     .mini-btn{
@@ -294,9 +309,9 @@
       font-size:.92rem;
     }
 
-    @media (max-width: 920px){
+    @media (max-width: 980px){
       .grid{grid-template-columns:1fr}
-      .stats{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr 1fr}
     }
 
     @media (max-width: 720px){
@@ -309,7 +324,9 @@
       .brand,.nav{justify-content:center}
       .hero{flex-direction:column;align-items:start}
       .card{padding:20px}
-      .client-top{flex-direction:column}
+      .dossier-top{flex-direction:column}
+      .row-2{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr}
       .actions .btn{width:100%}
     }
   </style>
@@ -319,7 +336,7 @@
     <div class="wrap topbar-inner">
       <a class="brand" href="index.html" aria-label="Retour admin">
         <span class="brand-mark">AD</span>
-        <span>Axe Dossier · Clients</span>
+        <span>Axe Dossier · Dossiers</span>
       </a>
       <nav class="nav" aria-label="Navigation admin">
         <a class="pill" href="index.html">Admin</a>
@@ -337,46 +354,71 @@
     <div class="wrap">
       <section class="hero">
         <div>
-          <h1>Clients</h1>
-          <p>Base simple et propre. Tu ajoutes tes clients ici avant de créer leurs dossiers, documents et factures.</p>
+          <h1>Dossiers</h1>
+          <p>Chaque dossier est rattaché à un client, à un type de situation et à un statut. Ici tu structures le vrai cœur de l’activité.</p>
         </div>
       </section>
 
       <section class="grid">
         <article class="card">
-          <h2>Ajouter un client</h2>
-          <form id="clientForm">
+          <h2>Créer un dossier</h2>
+          <form id="dossierForm">
             <div class="field">
-              <label for="clientName">Nom / prénom ou raison sociale</label>
-              <input id="clientName" name="clientName" type="text" placeholder="Ex. Claire Martin" required />
+              <label for="dossierTitle">Titre du dossier</label>
+              <input id="dossierTitle" name="dossierTitle" type="text" placeholder="Ex. Succession Barenton" required />
             </div>
 
             <div class="field">
-              <label for="clientType">Type</label>
-              <select id="clientType" name="clientType">
-                <option value="Particulier">Particulier</option>
-                <option value="Professionnel">Professionnel</option>
+              <label for="dossierClient">Client</label>
+              <select id="dossierClient" name="dossierClient" required>
+                <option value="">Sélectionner un client</option>
               </select>
             </div>
 
-            <div class="field">
-              <label for="clientEmail">Email</label>
-              <input id="clientEmail" name="clientEmail" type="email" placeholder="client@email.fr" />
+            <div class="row-2">
+              <div class="field">
+                <label for="dossierType">Type</label>
+                <select id="dossierType" name="dossierType">
+                  <option value="Succession">Succession</option>
+                  <option value="Organisme">Organisme</option>
+                  <option value="Assurance / Banque">Assurance / Banque</option>
+                  <option value="Litige civil">Litige civil</option>
+                  <option value="Administratif">Administratif</option>
+                  <option value="Autre">Autre</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="dossierStatus">Statut</label>
+                <select id="dossierStatus" name="dossierStatus">
+                  <option value="EN_COURS">EN_COURS</option>
+                  <option value="EN_ATTENTE">EN_ATTENTE</option>
+                  <option value="CLOS">CLOS</option>
+                  <option value="ARCHIVE">ARCHIVE</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row-2">
+              <div class="field">
+                <label for="dossierOpenedAt">Date d’ouverture</label>
+                <input id="dossierOpenedAt" name="dossierOpenedAt" type="date" />
+              </div>
+
+              <div class="field">
+                <label for="dossierReference">Référence interne</label>
+                <input id="dossierReference" name="dossierReference" type="text" placeholder="Ex. DOS-2026-001" />
+              </div>
             </div>
 
             <div class="field">
-              <label for="clientPhone">Téléphone</label>
-              <input id="clientPhone" name="clientPhone" type="text" placeholder="06 00 00 00 00" />
+              <label for="dossierSummary">Résumé</label>
+              <textarea id="dossierSummary" name="dossierSummary" placeholder="Le problème en quelques lignes, sans roman."></textarea>
             </div>
 
             <div class="field">
-              <label for="clientAddress">Adresse</label>
-              <textarea id="clientAddress" name="clientAddress" placeholder="Adresse complète"></textarea>
-            </div>
-
-            <div class="field">
-              <label for="clientNotes">Notes internes</label>
-              <textarea id="clientNotes" name="clientNotes" placeholder="Ex. premier contact via Google, dossier succession, rappel prévu..."></textarea>
+              <label for="dossierNotes">Notes internes</label>
+              <textarea id="dossierNotes" name="dossierNotes" placeholder="Suivi, éléments à vérifier, prochaines actions..."></textarea>
             </div>
 
             <div class="actions">
@@ -386,31 +428,42 @@
           </form>
 
           <div class="note">
-            Les clients enregistrés ici seront ensuite utilisés dans les dossiers, documents, devis et factures.
+            Chaque dossier est rattaché à un client. Les documents, devis et factures s’appuieront ensuite sur ce dossier.
           </div>
         </article>
 
         <article class="card">
           <div class="stats">
             <div class="stat">
-              <strong id="totalClients">0</strong>
-              <span>Clients</span>
+              <strong id="totalDossiers">0</strong>
+              <span>Dossiers</span>
             </div>
             <div class="stat">
-              <strong id="totalParticuliers">0</strong>
-              <span>Particuliers</span>
+              <strong id="totalEnCours">0</strong>
+              <span>En cours</span>
             </div>
             <div class="stat">
-              <strong id="totalPros">0</strong>
-              <span>Professionnels</span>
+              <strong id="totalAttente">0</strong>
+              <span>En attente</span>
+            </div>
+            <div class="stat">
+              <strong id="totalClos">0</strong>
+              <span>Clos / archivés</span>
             </div>
           </div>
 
           <div class="toolbar">
-            <input id="searchInput" class="search" type="text" placeholder="Rechercher un client..." />
+            <input id="searchInput" class="search" type="text" placeholder="Rechercher un dossier..." />
+            <select id="statusFilter" class="filter">
+              <option value="">Tous les statuts</option>
+              <option value="EN_COURS">EN_COURS</option>
+              <option value="EN_ATTENTE">EN_ATTENTE</option>
+              <option value="CLOS">CLOS</option>
+              <option value="ARCHIVE">ARCHIVE</option>
+            </select>
           </div>
 
-          <div id="clientList" class="client-list"></div>
+          <div id="dossierList" class="dossier-list"></div>
         </article>
       </section>
     </div>
@@ -431,23 +484,25 @@
       updateDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const form = document.getElementById("clientForm");
-    const clientList = document.getElementById("clientList");
+    const form = document.getElementById("dossierForm");
+    const dossierList = document.getElementById("dossierList");
     const searchInput = document.getElementById("searchInput");
-    const totalClients = document.getElementById("totalClients");
-    const totalParticuliers = document.getElementById("totalParticuliers");
-    const totalPros = document.getElementById("totalPros");
+    const statusFilter = document.getElementById("statusFilter");
+    const clientSelect = document.getElementById("dossierClient");
+
+    const totalDossiers = document.getElementById("totalDossiers");
+    const totalEnCours = document.getElementById("totalEnCours");
+    const totalAttente = document.getElementById("totalAttente");
+    const totalClos = document.getElementById("totalClos");
 
     const clientsRef = collection(db, "clients");
     const dossiersRef = collection(db, "dossiers");
-    const invoicesRef = collection(db, "factures");
-    const quotesRef = collection(db, "devis");
+    const documentsRef = collection(db, "documents");
 
     let allClients = [];
     let allDossiers = [];
-    let allInvoices = [];
-    let allQuotes = [];
-    let editingClientId = null;
+    let allDocuments = [];
+    let editingDossierId = null;
 
     function escapeHtml(text = "") {
       return String(text)
@@ -462,97 +517,148 @@
       return String(value || "").trim();
     }
 
-    function renderStats(clients) {
-      totalClients.textContent = clients.length;
-      totalParticuliers.textContent = clients.filter(c => c.type === "Particulier").length;
-      totalPros.textContent = clients.filter(c => c.type === "Professionnel").length;
+    function statusLabel(status = "") {
+      if (status === "EN_COURS") return "En cours";
+      if (status === "EN_ATTENTE") return "En attente";
+      if (status === "CLOS") return "Clos";
+      if (status === "ARCHIVE") return "Archivé";
+      return status || "";
     }
 
-    function fillForm(client) {
-      document.getElementById("clientName").value = client.name || "";
-      document.getElementById("clientType").value = client.type || "Particulier";
-      document.getElementById("clientEmail").value = client.email || "";
-      document.getElementById("clientPhone").value = client.phone || "";
-      document.getElementById("clientAddress").value = client.address || "";
-      document.getElementById("clientNotes").value = client.notes || "";
+    function statusClass(status = "") {
+      if (status === "EN_COURS") return "status-en-cours";
+      if (status === "EN_ATTENTE") return "status-attente";
+      if (status === "CLOS") return "status-clos";
+      if (status === "ARCHIVE") return "status-archive";
+      return "";
     }
 
-    function getClientUsage(clientId) {
-      const dossiersCount = allDossiers.filter(d => d.clientId === clientId).length;
-      const invoicesCount = allInvoices.filter(i => i.clientId === clientId).length;
-      const quotesCount = allQuotes.filter(q => q.clientId === clientId).length;
+    function fillClientSelect() {
+      const current = clientSelect.value;
 
+      const options = ['<option value="">Sélectionner un client</option>']
+        .concat(
+          allClients.map(client => {
+            const label = client.name || "Client sans nom";
+            return `<option value="${client.id}">${escapeHtml(label)}</option>`;
+          })
+        );
+
+      clientSelect.innerHTML = options.join("");
+
+      if (current && allClients.some(c => c.id === current)) {
+        clientSelect.value = current;
+      }
+    }
+
+    function renderStats(dossiers) {
+      totalDossiers.textContent = dossiers.length;
+      totalEnCours.textContent = dossiers.filter(d => d.status === "EN_COURS").length;
+      totalAttente.textContent = dossiers.filter(d => d.status === "EN_ATTENTE").length;
+      totalClos.textContent = dossiers.filter(d => d.status === "CLOS" || d.status === "ARCHIVE").length;
+    }
+
+    function fillForm(dossier) {
+      document.getElementById("dossierTitle").value = dossier.title || "";
+      document.getElementById("dossierClient").value = dossier.clientId || "";
+      document.getElementById("dossierType").value = dossier.type || "Succession";
+      document.getElementById("dossierStatus").value = dossier.status || "EN_COURS";
+      document.getElementById("dossierOpenedAt").value = dossier.openedAt || "";
+      document.getElementById("dossierReference").value = dossier.reference || "";
+      document.getElementById("dossierSummary").value = dossier.summary || "";
+      document.getElementById("dossierNotes").value = dossier.notes || "";
+    }
+
+    function getDossierUsage(dossierId) {
+      const documentsCount = allDocuments.filter(d => d.dossierId === dossierId).length;
       return {
-        dossiersCount,
-        invoicesCount,
-        quotesCount,
-        total: dossiersCount + invoicesCount + quotesCount
+        documentsCount,
+        total: documentsCount
       };
     }
 
-    function renderClients() {
+    function renderDossiers() {
       const q = normalizeText(searchInput.value).toLowerCase();
+      const filter = statusFilter.value;
 
-      const filtered = allClients.filter(client => {
+      const filtered = allDossiers.filter(dossier => {
         const blob = [
-          client.name || "",
-          client.type || "",
-          client.email || "",
-          client.phone || "",
-          client.address || "",
-          client.notes || ""
+          dossier.title || "",
+          dossier.clientNameSnapshot || "",
+          dossier.type || "",
+          dossier.status || "",
+          dossier.reference || "",
+          dossier.summary || "",
+          dossier.notes || ""
         ].join(" ").toLowerCase();
 
-        return blob.includes(q);
+        const matchesSearch = blob.includes(q);
+        const matchesStatus = !filter || dossier.status === filter;
+        return matchesSearch && matchesStatus;
       });
 
-      renderStats(allClients);
+      renderStats(allDossiers);
 
-      if (!filtered.length) {
-        clientList.innerHTML = '<div class="empty">Aucun client pour le moment.</div>';
+      if (!allClients.length) {
+        dossierList.innerHTML = '<div class="empty">Ajoute d’abord au moins un client dans clients.html.</div>';
         return;
       }
 
-      clientList.innerHTML = filtered.map(client => {
-        const usage = getClientUsage(client.id);
+      if (!filtered.length) {
+        dossierList.innerHTML = '<div class="empty">Aucun dossier pour le moment.</div>';
+        return;
+      }
+
+      dossierList.innerHTML = filtered.map(dossier => {
+        const usage = getDossierUsage(dossier.id);
         const usageLine = usage.total
-          ? `<span><strong>Utilisation :</strong> ${usage.dossiersCount} dossier(s), ${usage.invoicesCount} facture(s), ${usage.quotesCount} devis</span>`
+          ? `<span><strong>Documents liés :</strong> ${usage.documentsCount}</span>`
           : "";
 
         return `
-          <article class="client-item">
-            <div class="client-top">
+          <article class="dossier-item">
+            <div class="dossier-top">
               <div>
-                <div class="client-name">${escapeHtml(client.name || "")}</div>
-                <div class="client-meta">
-                  ${client.email ? `<span>${escapeHtml(client.email)}</span>` : ""}
-                  ${client.phone ? `<span>${escapeHtml(client.phone)}</span>` : ""}
+                <div class="dossier-title">${escapeHtml(dossier.title || "")}</div>
+                <div class="dossier-meta">
+                  ${dossier.clientNameSnapshot ? `<span><strong>Client :</strong> ${escapeHtml(dossier.clientNameSnapshot)}</span>` : ""}
+                  ${dossier.type ? `<span><strong>Type :</strong> ${escapeHtml(dossier.type)}</span>` : ""}
+                  ${dossier.reference ? `<span><strong>Réf :</strong> ${escapeHtml(dossier.reference)}</span>` : ""}
+                  ${dossier.openedAt ? `<span><strong>Ouvert le :</strong> ${escapeHtml(dossier.openedAt)}</span>` : ""}
                   ${usageLine}
                 </div>
               </div>
-              <span class="badge">${escapeHtml(client.type || "")}</span>
+              <div class="badges">
+                <span class="badge ${statusClass(dossier.status)}">${escapeHtml(statusLabel(dossier.status))}</span>
+              </div>
             </div>
 
-            ${client.address ? `<div class="client-meta"><span>${escapeHtml(client.address).replace(/\n/g, "<br>")}</span></div>` : ""}
-            ${client.notes ? `<div class="client-notes">${escapeHtml(client.notes).replace(/\n/g, "<br>")}</div>` : ""}
+            ${dossier.summary ? `<div class="dossier-notes"><strong>Résumé :</strong><br>${escapeHtml(dossier.summary).replace(/\n/g, "<br>")}</div>` : ""}
+            ${dossier.notes ? `<div class="dossier-notes"><strong>Notes :</strong><br>${escapeHtml(dossier.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
             <div class="mini-actions">
-              <button class="mini-btn" type="button" data-edit-id="${client.id}">Modifier</button>
-              <button class="mini-btn" type="button" data-delete-id="${client.id}">Supprimer</button>
+              <button class="mini-btn" type="button" data-edit-id="${dossier.id}">Modifier</button>
+              <button class="mini-btn" type="button" data-delete-id="${dossier.id}">Supprimer</button>
             </div>
           </article>
         `;
       }).join("");
     }
 
-    function createClient(data) {
+    function createDossier(data) {
+      const clientId = data.get("dossierClient") || "";
+      const client = allClients.find(c => c.id === clientId);
+
       return {
-        name: normalizeText(data.get("clientName")),
-        type: data.get("clientType") || "Particulier",
-        email: normalizeText(data.get("clientEmail")),
-        phone: normalizeText(data.get("clientPhone")),
-        address: normalizeText(data.get("clientAddress")),
-        notes: normalizeText(data.get("clientNotes")),
+        title: normalizeText(data.get("dossierTitle")),
+        clientId,
+        clientNameSnapshot: client?.name || "",
+        type: data.get("dossierType") || "Autre",
+        status: data.get("dossierStatus") || "EN_COURS",
+        openedAt: data.get("dossierOpenedAt") || "",
+        reference: normalizeText(data.get("dossierReference")),
+        summary: normalizeText(data.get("dossierSummary")),
+        notes: normalizeText(data.get("dossierNotes")),
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       };
@@ -562,61 +668,67 @@
       e.preventDefault();
 
       const data = new FormData(form);
-      const payload = createClient(data);
+      const payload = createDossier(data);
 
-      if (!payload.name) {
-        alert("Nom obligatoire.");
+      if (!payload.title || !payload.clientId) {
+        alert("Titre et client obligatoires.");
         return;
       }
 
       try {
-        if (editingClientId) {
-          const usage = getClientUsage(editingClientId);
+        if (editingDossierId) {
+          const usage = getDossierUsage(editingDossierId);
 
           if (usage.total > 0) {
-            alert("Modification bloquée : ce client est déjà utilisé par un dossier, un devis ou une facture.");
+            alert("Modification bloquée : ce dossier est déjà utilisé par un ou plusieurs documents.");
             return;
           }
 
-          await updateDoc(doc(db, "clients", editingClientId), {
-            name: payload.name,
+          await updateDoc(doc(db, "dossiers", editingDossierId), {
+            title: payload.title,
+            clientId: payload.clientId,
+            clientNameSnapshot: payload.clientNameSnapshot,
             type: payload.type,
-            email: payload.email,
-            phone: payload.phone,
-            address: payload.address,
+            status: payload.status,
+            openedAt: payload.openedAt,
+            reference: payload.reference,
+            summary: payload.summary,
             notes: payload.notes,
             updatedAt: serverTimestamp()
           });
-          editingClientId = null;
+
+          editingDossierId = null;
         } else {
-          await addDoc(clientsRef, payload);
+          await addDoc(dossiersRef, payload);
         }
 
         form.reset();
-        document.getElementById("clientType").value = "Particulier";
+        document.getElementById("dossierType").value = "Succession";
+        document.getElementById("dossierStatus").value = "EN_COURS";
       } catch (err) {
-        console.error("Erreur enregistrement client :", err);
-        alert("Impossible d’enregistrer le client.");
+        console.error("Erreur enregistrement dossier :", err);
+        alert("Impossible d’enregistrer le dossier.");
       }
     });
 
-    searchInput.addEventListener("input", renderClients);
+    searchInput.addEventListener("input", renderDossiers);
+    statusFilter.addEventListener("change", renderDossiers);
 
-    clientList.addEventListener("click", async (e) => {
+    dossierList.addEventListener("click", async (e) => {
       const editBtn = e.target.closest("[data-edit-id]");
       if (editBtn) {
         const id = editBtn.getAttribute("data-edit-id");
-        const client = allClients.find(c => c.id === id);
-        if (!client) return;
+        const dossier = allDossiers.find(d => d.id === id);
+        if (!dossier) return;
 
-        const usage = getClientUsage(id);
+        const usage = getDossierUsage(id);
         if (usage.total > 0) {
-          alert("Modification bloquée : ce client est déjà utilisé par un dossier, un devis ou une facture.");
+          alert("Modification bloquée : ce dossier est déjà utilisé par un ou plusieurs documents.");
           return;
         }
 
-        editingClientId = id;
-        fillForm(client);
+        editingDossierId = id;
+        fillForm(dossier);
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
@@ -625,27 +737,28 @@
       if (!deleteBtn) return;
 
       const id = deleteBtn.getAttribute("data-delete-id");
-      const usage = getClientUsage(id);
+      const usage = getDossierUsage(id);
 
       if (usage.total > 0) {
-        alert("Suppression bloquée : ce client est déjà utilisé.");
+        alert("Suppression bloquée : ce dossier est déjà utilisé par un ou plusieurs documents.");
         return;
       }
 
-      const ok = confirm("Supprimer ce client ?");
+      const ok = confirm("Supprimer ce dossier ?");
       if (!ok) return;
 
       try {
-        await deleteDoc(doc(db, "clients", id));
+        await deleteDoc(doc(db, "dossiers", id));
 
-        if (editingClientId === id) {
-          editingClientId = null;
+        if (editingDossierId === id) {
+          editingDossierId = null;
           form.reset();
-          document.getElementById("clientType").value = "Particulier";
+          document.getElementById("dossierType").value = "Succession";
+          document.getElementById("dossierStatus").value = "EN_COURS";
         }
       } catch (err) {
-        console.error("Erreur suppression client :", err);
-        alert("Impossible de supprimer le client.");
+        console.error("Erreur suppression dossier :", err);
+        alert("Impossible de supprimer le dossier.");
       }
     });
 
@@ -656,12 +769,12 @@
           id: docSnap.id,
           ...docSnap.data()
         }));
-        renderClients();
+        fillClientSelect();
+        renderDossiers();
       },
       (err) => {
         console.error("Erreur chargement clients :", err);
-        clientList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
-        renderStats([]);
+        dossierList.innerHTML = '<div class="empty">Erreur de chargement des clients.</div>';
       }
     );
 
@@ -672,33 +785,25 @@
           id: docSnap.id,
           ...docSnap.data()
         }));
-        renderClients();
+        renderDossiers();
       },
-      (err) => console.error("Erreur chargement dossiers :", err)
+      (err) => {
+        console.error("Erreur chargement dossiers :", err);
+        dossierList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
+        renderStats([]);
+      }
     );
 
     onSnapshot(
-      query(invoicesRef, orderBy("createdAt", "desc")),
+      query(documentsRef, orderBy("createdAt", "desc")),
       (snapshot) => {
-        allInvoices = snapshot.docs.map(docSnap => ({
+        allDocuments = snapshot.docs.map(docSnap => ({
           id: docSnap.id,
           ...docSnap.data()
         }));
-        renderClients();
+        renderDossiers();
       },
-      (err) => console.error("Erreur chargement factures :", err)
-    );
-
-    onSnapshot(
-      query(quotesRef, orderBy("createdAt", "desc")),
-      (snapshot) => {
-        allQuotes = snapshot.docs.map(docSnap => ({
-          id: docSnap.id,
-          ...docSnap.data()
-        }));
-        renderClients();
-      },
-      (err) => console.error("Erreur chargement devis :", err)
+      (err) => console.error("Erreur chargement documents :", err)
     );
   </script>
 </body>
