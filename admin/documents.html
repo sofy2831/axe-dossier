@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="fr">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,314 +17,313 @@
       --shadow:0 16px 40px rgba(0,0,0,0.06);
       --max:1180px;
     }*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-a{text-decoration:none;color:inherit}
-.wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+    a{text-decoration:none;color:inherit}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
 
-.topbar{
-  position:sticky;
-  top:0;
-  z-index:20;
-  background:rgba(243,239,232,0.85);
-  backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--line);
-}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,0.85);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
 
-.topbar-inner{
-  min-height:72px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-}
+    .topbar-inner{
+      min-height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-weight:800;
-  letter-spacing:.02em;
-}
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
 
-.brand-mark{
-  width:42px;
-  height:42px;
-  border-radius:14px;
-  background:var(--accent);
-  color:#fff;
-  display:grid;
-  place-items:center;
-  font-weight:900;
-  box-shadow:var(--shadow);
-}
+    .brand-mark{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:var(--accent);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
 
-.nav{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
 
-.pill{
-  padding:10px 14px;
-  border-radius:999px;
-  background:rgba(255,255,255,.7);
-  border:1px solid var(--line);
-  font-size:.94rem;
-}
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--line);
+      font-size:.94rem;
+    }
 
-main{padding:32px 0 56px}
+    main{padding:32px 0 56px}
 
-.hero{
-  display:flex;
-  align-items:end;
-  justify-content:space-between;
-  gap:16px;
-  margin-bottom:22px;
-}
+    .hero{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:22px;
+    }
 
-h1,h2,h3,p{margin:0}
-h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
-.hero p{color:var(--muted);max-width:68ch;margin-top:8px}
+    h1,h2,h3,p{margin:0}
+    h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
+    .hero p{color:var(--muted);max-width:68ch;margin-top:8px}
 
-.grid{
-  display:grid;
-  grid-template-columns:400px 1fr;
-  gap:20px;
-  align-items:start;
-}
+    .grid{
+      display:grid;
+      grid-template-columns:400px 1fr;
+      gap:20px;
+      align-items:start;
+    }
 
-.card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:24px;
-  box-shadow:var(--shadow);
-  padding:24px;
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:24px;
+    }
 
-.card h2{
-  font-size:1.2rem;
-  margin-bottom:14px;
-  letter-spacing:-.02em;
-}
+    .card h2{
+      font-size:1.2rem;
+      margin-bottom:14px;
+      letter-spacing:-.02em;
+    }
 
-.field{margin-bottom:14px}
-.field label{
-  display:block;
-  font-size:.92rem;
-  font-weight:700;
-  margin-bottom:6px;
-}
+    .field{margin-bottom:14px}
+    .field label{
+      display:block;
+      font-size:.92rem;
+      font-weight:700;
+      margin-bottom:6px;
+    }
 
-.field input,
-.field textarea,
-.field select{
-  width:100%;
-  min-height:48px;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:12px 14px;
-  font:inherit;
-  color:var(--text);
-  background:#fff;
-}
+    .field input,
+    .field textarea,
+    .field select{
+      width:100%;
+      min-height:48px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      font:inherit;
+      color:var(--text);
+      background:#fff;
+    }
 
-.field textarea{min-height:110px;resize:vertical}
+    .field textarea{min-height:110px;resize:vertical}
 
-.row-2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
-}
+    .row-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
 
-.actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:18px;
-}
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
 
-.btn{
-  min-height:48px;
-  padding:0 18px;
-  border-radius:999px;
-  border:1px solid var(--accent);
-  background:var(--accent);
-  color:#fff;
-  font:inherit;
-  font-weight:700;
-  cursor:pointer;
-}
+    .btn{
+      min-height:48px;
+      padding:0 18px;
+      border-radius:999px;
+      border:1px solid var(--accent);
+      background:var(--accent);
+      color:#fff;
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+    }
 
-.btn-secondary{
-  background:#fff;
-  color:var(--accent);
-  border-color:var(--line);
-}
+    .btn-secondary{
+      background:#fff;
+      color:var(--accent);
+      border-color:var(--line);
+    }
 
-.toolbar{
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-  margin-bottom:18px;
-}
+    .toolbar{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
 
-.search,
-.filter{
-  min-height:48px;
-  border:1px solid var(--line);
-  border-radius:999px;
-  padding:0 16px;
-  font:inherit;
-  background:#fff;
-}
+    .search,
+    .filter{
+      min-height:48px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:0 16px;
+      font:inherit;
+      background:#fff;
+    }
 
-.search{flex:1 1 260px}
-.filter{min-width:180px}
+    .search{flex:1 1 260px}
+    .filter{min-width:180px}
 
-.stats{
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:12px;
-  margin-bottom:18px;
-}
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-bottom:18px;
+    }
 
-.stat{
-  background:#faf7f1;
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:16px;
-}
+    .stat{
+      background:#faf7f1;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+    }
 
-.stat strong{
-  display:block;
-  font-size:1.35rem;
-  letter-spacing:-.04em;
-  margin-bottom:4px;
-}
+    .stat strong{
+      display:block;
+      font-size:1.35rem;
+      letter-spacing:-.04em;
+      margin-bottom:4px;
+    }
 
-.stat span{color:var(--muted);font-size:.92rem}
+    .stat span{color:var(--muted);font-size:.92rem}
 
-.empty{
-  padding:24px;
-  border:1px dashed var(--line);
-  border-radius:18px;
-  color:var(--muted);
-  text-align:center;
-  background:#fcfbf8;
-}
+    .empty{
+      padding:24px;
+      border:1px dashed var(--line);
+      border-radius:18px;
+      color:var(--muted);
+      text-align:center;
+      background:#fcfbf8;
+    }
 
-.doc-list{display:grid;gap:14px}
+    .doc-list{display:grid;gap:14px}
 
-.doc-item{
-  border:1px solid var(--line);
-  border-radius:18px;
-  padding:18px;
-  background:#fff;
-  display:grid;
-  gap:12px;
-}
+    .doc-item{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      background:#fff;
+      display:grid;
+      gap:12px;
+    }
 
-.doc-top{
-  display:flex;
-  align-items:start;
-  justify-content:space-between;
-  gap:16px;
-}
+    .doc-top{
+      display:flex;
+      align-items:start;
+      justify-content:space-between;
+      gap:16px;
+    }
 
-.doc-title{
-  font-size:1.08rem;
-  font-weight:800;
-  letter-spacing:-.02em;
-  margin-bottom:4px;
-}
+    .doc-title{
+      font-size:1.08rem;
+      font-weight:800;
+      letter-spacing:-.02em;
+      margin-bottom:4px;
+    }
 
-.doc-meta{
-  display:grid;
-  gap:6px;
-  color:#4f4942;
-  font-size:.95rem;
-}
+    .doc-meta{
+      display:grid;
+      gap:6px;
+      color:#4f4942;
+      font-size:.95rem;
+    }
 
-.badges{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
+    .badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
 
-.badge{
-  display:inline-flex;
-  align-items:center;
-  min-height:28px;
-  padding:0 10px;
-  border-radius:999px;
-  background:var(--soft);
-  font-size:.82rem;
-  font-weight:700;
-  color:#4f493f;
-  border:1px solid rgba(23,23,23,0.06);
-}
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      background:var(--soft);
+      font-size:.82rem;
+      font-weight:700;
+      color:#4f493f;
+      border:1px solid rgba(23,23,23,0.06);
+    }
 
-.doc-notes{
-  color:var(--muted);
-  font-size:.94rem;
-  line-height:1.5;
-}
+    .doc-notes{
+      color:var(--muted);
+      font-size:.94rem;
+      line-height:1.5;
+    }
 
-.mini-actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
+    .mini-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
 
-.mini-btn{
-  min-height:36px;
-  padding:0 12px;
-  border-radius:999px;
-  border:1px solid var(--line);
-  background:#fff;
-  font:inherit;
-  cursor:pointer;
-}
+    .mini-btn{
+      min-height:36px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      font:inherit;
+      cursor:pointer;
+    }
 
-.note{
-  margin-top:12px;
-  padding:14px 16px;
-  border-radius:14px;
-  background:#faf7f1;
-  border:1px solid var(--line);
-  color:#4f4942;
-  font-size:.92rem;
-}
+    .note{
+      margin-top:12px;
+      padding:14px 16px;
+      border-radius:14px;
+      background:#faf7f1;
+      border:1px solid var(--line);
+      color:#4f4942;
+      font-size:.92rem;
+    }
 
-@media (max-width: 980px){
-  .grid{grid-template-columns:1fr}
-  .stats{grid-template-columns:1fr 1fr}
-}
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr 1fr}
+    }
 
-@media (max-width: 720px){
-  .topbar-inner{
-    min-height:auto;
-    padding:14px 0;
-    flex-direction:column;
-    align-items:stretch;
-  }
-  .brand,.nav{justify-content:center}
-  .hero{flex-direction:column;align-items:start}
-  .card{padding:20px}
-  .doc-top{flex-direction:column}
-  .row-2{grid-template-columns:1fr}
-  .stats{grid-template-columns:1fr}
-  .actions .btn{width:100%}
-}
-
+    @media (max-width: 720px){
+      .topbar-inner{
+        min-height:auto;
+        padding:14px 0;
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .brand,.nav{justify-content:center}
+      .hero{flex-direction:column;align-items:start}
+      .card{padding:20px}
+      .doc-top{flex-direction:column}
+      .row-2{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr}
+      .actions .btn{width:100%}
+    }
   </style>
 </head>
 <body>
@@ -332,44 +332,119 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       <a class="brand" href="index.html" aria-label="Retour admin">
         <span class="brand-mark">AD</span>
         <span>Axe Dossier · Documents</span>
-      </a><nav class="nav" aria-label="Navigation admin">
-    <a class="pill" href="index.html">Admin</a>
-    <a class="pill" href="clients.html">Clients</a>
-    <a class="pill" href="dossiers.html">Dossiers</a>
-    <a class="pill" href="documents.html">Documents</a>
-    <a class="pill" href="factures.html">Factures</a>
-    <a class="pill" href="paiements.html">Paiements</a>
-    <a class="pill" href="settings.html">Settings</a>
-  </nav>
-</div>
+      </a>
+      <nav class="nav" aria-label="Navigation admin">
+        <a class="pill" href="index.html">Admin</a>
+        <a class="pill" href="clients.html">Clients</a>
+        <a class="pill" href="dossiers.html">Dossiers</a>
+        <a class="pill" href="documents.html">Documents</a>
+        <a class="pill" href="factures.html">Factures</a>
+        <a class="pill" href="paiements.html">Paiements</a>
+        <a class="pill" href="settings.html">Réglages</a>
+      </nav>
+    </div>
+  </header>
 
-  </header>  <main>
+  <main>
     <div class="wrap">
       <section class="hero">
         <div>
           <h1>Documents</h1>
           <p>Ici tu attaches les pièces utiles à un dossier : courrier, mail, pièce client, note interne, preuve ou document de travail.</p>
         </div>
-      </section><section class="grid">
-    <article class="card">
-      <h2>Ajouter un document</h2>
-      <form id="documentForm">
-        <div class="field">
-          <label for="documentTitle">Titre du document</label>
-          <input id="documentTitle" name="documentTitle" type="text" placeholder="Ex. Courrier de relance notaire" required />
-        </div>
+      </section>
 
-        <div class="field">
-          <label for="documentDossier">Dossier</label>
-          <select id="documentDossier" name="documentDossier" required>
-            <option value="">Sélectionner un dossier</option>
-          </select>
-        </div>
+      <section class="grid">
+        <article class="card">
+          <h2>Ajouter un document</h2>
+          <form id="documentForm">
+            <div class="field">
+              <label for="documentTitle">Titre du document</label>
+              <input id="documentTitle" name="documentTitle" type="text" placeholder="Ex. Courrier de relance notaire" required />
+            </div>
 
-        <div class="row-2">
-          <div class="field">
-            <label for="documentType">Type</label>
-            <select id="documentType" name="documentType">
+            <div class="field">
+              <label for="documentDossier">Dossier</label>
+              <select id="documentDossier" name="documentDossier" required>
+                <option value="">Sélectionner un dossier</option>
+              </select>
+            </div>
+
+            <div class="row-2">
+              <div class="field">
+                <label for="documentType">Type</label>
+                <select id="documentType" name="documentType">
+                  <option value="Courrier">Courrier</option>
+                  <option value="Email">Email</option>
+                  <option value="Pièce client">Pièce client</option>
+                  <option value="Preuve">Preuve</option>
+                  <option value="Note interne">Note interne</option>
+                  <option value="Document de travail">Document de travail</option>
+                  <option value="Autre">Autre</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="documentDate">Date du document</label>
+                <input id="documentDate" name="documentDate" type="date" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="documentUrl">Lien / URL (optionnel)</label>
+              <input id="documentUrl" name="documentUrl" type="text" placeholder="Ex. https://... ou chemin futur Storage" />
+            </div>
+
+            <div class="field">
+              <label for="documentFile">Fichier (PDF, JPG, PNG, DOC, DOCX)</label>
+              <input
+                id="documentFile"
+                name="documentFile"
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx"
+              />
+            </div>
+
+            <div class="field">
+              <label for="documentNotes">Notes</label>
+              <textarea id="documentNotes" name="documentNotes" placeholder="Ce que contient le document, pourquoi il compte, ce qu’il faut retenir..."></textarea>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="btn">Enregistrer</button>
+              <button type="reset" class="btn btn-secondary">Vider</button>
+            </div>
+          </form>
+
+          <div class="note">
+            Chaque document est rattaché à un dossier. Si un fichier est ajouté, il est stocké dans Firebase Storage.
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="stats">
+            <div class="stat">
+              <strong id="totalDocuments">0</strong>
+              <span>Documents</span>
+            </div>
+            <div class="stat">
+              <strong id="totalCourriers">0</strong>
+              <span>Courriers</span>
+            </div>
+            <div class="stat">
+              <strong id="totalEmails">0</strong>
+              <span>Emails</span>
+            </div>
+            <div class="stat">
+              <strong id="totalPieces">0</strong>
+              <span>Pièces / preuves</span>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <input id="searchInput" class="search" type="text" placeholder="Rechercher un document..." />
+            <select id="typeFilter" class="filter">
+              <option value="">Tous les types</option>
               <option value="Courrier">Courrier</option>
               <option value="Email">Email</option>
               <option value="Pièce client">Pièce client</option>
@@ -380,458 +455,240 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
             </select>
           </div>
 
-          <div class="field">
-            <label for="documentDate">Date du document</label>
-            <input id="documentDate" name="documentDate" type="date" />
-          </div>
-        </div>
+          <div id="documentList" class="doc-list"></div>
+        </article>
+      </section>
+    </div>
+  </main>
 
-        <div class="field">
-          <label for="documentUrl">Lien / URL (optionnel)</label>
-          <input id="documentUrl" name="documentUrl" type="text" placeholder="Ex. https://... ou chemin futur Storage" />
-        </div>
+  <script type="module">
+    import "./auth-guard.js";
+    import { db, storage } from "./firebase-config.js";
+    import {
+      collection,
+      addDoc,
+      deleteDoc,
+      doc,
+      updateDoc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-<div class="field">
-  <label for="documentFile">Fichier (PDF, JPG, PNG, DOC, DOCX)</label>
-  <input
-    id="documentFile"
-    name="documentFile"
-    type="file"
-    accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx"
-  />
-</div>
-        
-        <div class="field">
-          <label for="documentNotes">Notes</label>
-          <textarea id="documentNotes" name="documentNotes" placeholder="Ce que contient le document, pourquoi il compte, ce qu’il faut retenir..."></textarea>
-        </div>
+    import {
+      ref,
+      uploadBytes,
+      getDownloadURL,
+      deleteObject
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-        <div class="actions">
-          <button type="submit" class="btn">Enregistrer</button>
-          <button type="reset" class="btn btn-secondary">Vider</button>
-        </div>
-      </form>
+    const form = document.getElementById("documentForm");
+    const dossierSelect = document.getElementById("documentDossier");
+    const documentList = document.getElementById("documentList");
+    const searchInput = document.getElementById("searchInput");
+    const typeFilter = document.getElementById("typeFilter");
+    const documentFileInput = document.getElementById("documentFile");
 
-      <div class="note">
-        Version 1 : stockage local pour valider la logique. Le vrai upload de fichier viendra ensuite avec Firebase Storage.
-      </div>
-    </article>
+    const totalDocuments = document.getElementById("totalDocuments");
+    const totalCourriers = document.getElementById("totalCourriers");
+    const totalEmails = document.getElementById("totalEmails");
+    const totalPieces = document.getElementById("totalPieces");
 
-    <article class="card">
-      <div class="stats">
-        <div class="stat">
-          <strong id="totalDocuments">0</strong>
-          <span>Documents</span>
-        </div>
-        <div class="stat">
-          <strong id="totalCourriers">0</strong>
-          <span>Courriers</span>
-        </div>
-        <div class="stat">
-          <strong id="totalEmails">0</strong>
-          <span>Emails</span>
-        </div>
-        <div class="stat">
-          <strong id="totalPieces">0</strong>
-          <span>Pièces / preuves</span>
-        </div>
-      </div>
+    const clientsRef = collection(db, "clients");
+    const dossiersRef = collection(db, "dossiers");
+    const documentsRef = collection(db, "documents");
 
-      <div class="toolbar">
-        <input id="searchInput" class="search" type="text" placeholder="Rechercher un document..." />
-        <select id="typeFilter" class="filter">
-          <option value="">Tous les types</option>
-          <option value="Courrier">Courrier</option>
-          <option value="Email">Email</option>
-          <option value="Pièce client">Pièce client</option>
-          <option value="Preuve">Preuve</option>
-          <option value="Note interne">Note interne</option>
-          <option value="Document de travail">Document de travail</option>
-          <option value="Autre">Autre</option>
-        </select>
-      </div>
+    let allClients = [];
+    let allDossiers = [];
+    let allDocuments = [];
+    let editingDocumentId = null;
 
-      <div id="documentList" class="doc-list"></div>
-    </article>
-  </section>
-</div>
-
-  </main>  
-  
-<script type="module">
-  import "./auth-guard.js";
-  import { db, storage } from "./firebase-config.js";
-  import {
-    collection,
-    addDoc,
-    deleteDoc,
-    doc,
-    updateDoc,
-    onSnapshot,
-    query,
-    orderBy,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-  import {
-    ref,
-    uploadBytes,
-    getDownloadURL,
-    deleteObject
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
-  const form = document.getElementById("documentForm");
-  const dossierSelect = document.getElementById("documentDossier");
-  const documentList = document.getElementById("documentList");
-  const searchInput = document.getElementById("searchInput");
-  const typeFilter = document.getElementById("typeFilter");
-  const documentFileInput = document.getElementById("documentFile");
-
-  const totalDocuments = document.getElementById("totalDocuments");
-  const totalCourriers = document.getElementById("totalCourriers");
-  const totalEmails = document.getElementById("totalEmails");
-  const totalPieces = document.getElementById("totalPieces");
-
-  const clientsRef = collection(db, "clients");
-  const dossiersRef = collection(db, "dossiers");
-  const documentsRef = collection(db, "documents");
-
-  let allClients = [];
-  let allDossiers = [];
-  let allDocuments = [];
-  let editingDocumentId = null;
-
-  function escapeHtml(text = "") {
-    return String(text)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-
-  function normalizeText(value = "") {
-    return String(value || "").trim();
-  }
-
-  function fillDossierSelect() {
-    const current = dossierSelect.value;
-
-    const options = ['<option value="">Sélectionner un dossier</option>']
-      .concat(
-        allDossiers.map(dossier => {
-          const client = allClients.find(c => c.id === dossier.clientId);
-          const label = client?.name
-            ? `${dossier.title || ""} — ${client.name}`
-            : `${dossier.title || ""}`;
-          return `<option value="${dossier.id}">${escapeHtml(label)}</option>`;
-        })
-      );
-
-    dossierSelect.innerHTML = options.join("");
-
-    if (current && allDossiers.some(d => d.id === current)) {
-      dossierSelect.value = current;
-    }
-  }
-
-  function fillForm(item) {
-    document.getElementById("documentTitle").value = item.title || "";
-    document.getElementById("documentDossier").value = item.dossierId || "";
-    document.getElementById("documentType").value = item.type || "Courrier";
-    document.getElementById("documentDate").value = item.date || "";
-    document.getElementById("documentUrl").value = item.url || "";
-    document.getElementById("documentNotes").value = item.notes || "";
-    if (documentFileInput) documentFileInput.value = "";
-  }
-
-  function renderStats(documents) {
-    totalDocuments.textContent = documents.length;
-    totalCourriers.textContent = documents.filter(d => d.type === "Courrier").length;
-    totalEmails.textContent = documents.filter(d => d.type === "Email").length;
-    totalPieces.textContent = documents.filter(d => d.type === "Pièce client" || d.type === "Preuve").length;
-  }
-
-  function renderDocuments() {
-    const dossierMap = Object.fromEntries(allDossiers.map(dossier => [dossier.id, dossier]));
-    const clientMap = Object.fromEntries(allClients.map(client => [client.id, client]));
-    const q = normalizeText(searchInput.value).toLowerCase();
-    const filter = typeFilter.value;
-
-    const filtered = allDocuments.filter(item => {
-      const dossier = dossierMap[item.dossierId];
-      const clientName = item.clientNameSnapshot || (dossier ? (clientMap[dossier.clientId]?.name || "") : "");
-
-      const blob = [
-        item.title || "",
-        item.type || "",
-        item.notes || "",
-        item.url || "",
-        item.fileName || "",
-        item.dossierTitleSnapshot || dossier?.title || "",
-        clientName
-      ].join(" ").toLowerCase();
-
-      const matchesSearch = blob.includes(q);
-      const matchesType = !filter || item.type === filter;
-      return matchesSearch && matchesType;
-    });
-
-    renderStats(allDocuments);
-
-    if (!allDossiers.length) {
-      documentList.innerHTML = '<div class="empty">Ajoute d’abord au moins un dossier dans dossiers.html.</div>';
-      return;
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    if (!filtered.length) {
-      documentList.innerHTML = '<div class="empty">Aucun document pour le moment.</div>';
-      return;
+    function normalizeText(value = "") {
+      return String(value || "").trim();
     }
 
-    documentList.innerHTML = filtered.map(item => {
-      const dossier = dossierMap[item.dossierId];
-      const clientName = item.clientNameSnapshot || (dossier ? (clientMap[dossier.clientId]?.name || "Client supprimé") : "Dossier supprimé");
-      const dossierTitle = item.dossierTitleSnapshot || dossier?.title || "Dossier supprimé";
+    function fillDossierSelect() {
+      const current = dossierSelect.value;
 
-      return `
-        <article class="doc-item">
-          <div class="doc-top">
-            <div>
-              <div class="doc-title">${escapeHtml(item.title || "")}</div>
-              <div class="doc-meta">
-                <span><strong>Dossier :</strong> ${escapeHtml(dossierTitle)}</span>
-                <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
-                ${item.date ? `<span><strong>Date :</strong> ${escapeHtml(item.date)}</span>` : ""}
-                ${item.fileName ? `<span><strong>Fichier :</strong> ${escapeHtml(item.fileName)}</span>` : ""}
+      const options = ['<option value="">Sélectionner un dossier</option>']
+        .concat(
+          allDossiers.map(dossier => {
+            const client = allClients.find(c => c.id === dossier.clientId);
+            const label = client?.name
+              ? `${dossier.title || ""} — ${client.name}`
+              : `${dossier.title || ""}`;
+            return `<option value="${dossier.id}">${escapeHtml(label)}</option>`;
+          })
+        );
+
+      dossierSelect.innerHTML = options.join("");
+
+      if (current && allDossiers.some(d => d.id === current)) {
+        dossierSelect.value = current;
+      }
+    }
+
+    function fillForm(item) {
+      document.getElementById("documentTitle").value = item.title || "";
+      document.getElementById("documentDossier").value = item.dossierId || "";
+      document.getElementById("documentType").value = item.type || "Courrier";
+      document.getElementById("documentDate").value = item.date || "";
+      document.getElementById("documentUrl").value = item.url || "";
+      document.getElementById("documentNotes").value = item.notes || "";
+      if (documentFileInput) documentFileInput.value = "";
+    }
+
+    function renderStats(documents) {
+      totalDocuments.textContent = documents.length;
+      totalCourriers.textContent = documents.filter(d => d.type === "Courrier").length;
+      totalEmails.textContent = documents.filter(d => d.type === "Email").length;
+      totalPieces.textContent = documents.filter(d => d.type === "Pièce client" || d.type === "Preuve").length;
+    }
+
+    function renderDocuments() {
+      const dossierMap = Object.fromEntries(allDossiers.map(dossier => [dossier.id, dossier]));
+      const clientMap = Object.fromEntries(allClients.map(client => [client.id, client]));
+      const q = normalizeText(searchInput.value).toLowerCase();
+      const filter = typeFilter.value;
+
+      const filtered = allDocuments.filter(item => {
+        const dossier = dossierMap[item.dossierId];
+        const clientName = item.clientNameSnapshot || (dossier ? (clientMap[dossier.clientId]?.name || "") : "");
+
+        const blob = [
+          item.title || "",
+          item.type || "",
+          item.notes || "",
+          item.url || "",
+          item.fileName || "",
+          item.dossierTitleSnapshot || dossier?.title || "",
+          clientName
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = blob.includes(q);
+        const matchesType = !filter || item.type === filter;
+        return matchesSearch && matchesType;
+      });
+
+      renderStats(allDocuments);
+
+      if (!allDossiers.length) {
+        documentList.innerHTML = '<div class="empty">Ajoute d’abord au moins un dossier dans dossiers.html.</div>';
+        return;
+      }
+
+      if (!filtered.length) {
+        documentList.innerHTML = '<div class="empty">Aucun document pour le moment.</div>';
+        return;
+      }
+
+      documentList.innerHTML = filtered.map(item => {
+        const dossier = dossierMap[item.dossierId];
+        const clientName = item.clientNameSnapshot || (dossier ? (clientMap[dossier.clientId]?.name || "Client supprimé") : "Dossier supprimé");
+        const dossierTitle = item.dossierTitleSnapshot || dossier?.title || "Dossier supprimé";
+
+        return `
+          <article class="doc-item">
+            <div class="doc-top">
+              <div>
+                <div class="doc-title">${escapeHtml(item.title || "")}</div>
+                <div class="doc-meta">
+                  <span><strong>Dossier :</strong> ${escapeHtml(dossierTitle)}</span>
+                  <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
+                  ${item.date ? `<span><strong>Date :</strong> ${escapeHtml(item.date)}</span>` : ""}
+                  ${item.fileName ? `<span><strong>Fichier :</strong> ${escapeHtml(item.fileName)}</span>` : ""}
+                </div>
+              </div>
+              <div class="badges">
+                <span class="badge">${escapeHtml(item.type || "")}</span>
               </div>
             </div>
-            <div class="badges">
-              <span class="badge">${escapeHtml(item.type || "")}</span>
+
+            ${item.url ? `<div class="doc-meta"><span><strong>Lien :</strong> <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">ouvrir</a></span></div>` : ""}
+            ${item.notes ? `<div class="doc-notes">${escapeHtml(item.notes).replace(/\n/g, "<br>")}</div>` : ""}
+
+            <div class="mini-actions">
+              <button class="mini-btn" type="button" data-edit-id="${item.id}">Modifier</button>
+              <button class="mini-btn" type="button" data-delete-id="${item.id}">Supprimer</button>
             </div>
-          </div>
-
-          ${item.url ? `<div class="doc-meta"><span><strong>Lien :</strong> <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">ouvrir</a></span></div>` : ""}
-          ${item.notes ? `<div class="doc-notes">${escapeHtml(item.notes).replace(/\n/g, "<br>")}</div>` : ""}
-
-          <div class="mini-actions">
-            <button class="mini-btn" type="button" data-edit-id="${item.id}">Modifier</button>
-            <button class="mini-btn" type="button" data-delete-id="${item.id}">Supprimer</button>
-          </div>
-        </article>
-      `;
-    }).join("");
-  }
-
-  function sanitizeFileName(name = "") {
-    return String(name)
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-zA-Z0-9._-]/g, "_");
-  }
-
-  async function uploadDocumentFile(file, dossierId, docId) {
-    const safeName = sanitizeFileName(file.name);
-    const filePath = `documents/${dossierId}/${docId}/${safeName}`;
-    const fileRef = ref(storage, filePath);
-
-    await uploadBytes(fileRef, file);
-    const fileUrl = await getDownloadURL(fileRef);
-
-    return {
-      fileName: file.name,
-      filePath,
-      url: fileUrl
-    };
-  }
-
-  function createDocument(data) {
-    const dossierId = data.get("documentDossier") || "";
-    const dossier = allDossiers.find(d => d.id === dossierId);
-    const client = allClients.find(c => c.id === dossier?.clientId);
-
-    return {
-      title: normalizeText(data.get("documentTitle")),
-      dossierId,
-      dossierTitleSnapshot: dossier?.title || "",
-      clientIdSnapshot: dossier?.clientId || "",
-      clientNameSnapshot: client?.name || "",
-      type: data.get("documentType") || "Autre",
-      date: data.get("documentDate") || "",
-      url: normalizeText(data.get("documentUrl")),
-      notes: normalizeText(data.get("documentNotes")),
-      fileName: "",
-      filePath: "",
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    };
-  }
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const data = new FormData(form);
-    const payload = createDocument(data);
-    const file = documentFileInput?.files?.[0] || null;
-
-    if (!payload.title || !payload.dossierId) {
-      alert("Titre et dossier obligatoires.");
-      return;
+          </article>
+        `;
+      }).join("");
     }
 
-    try {
-      if (editingDocumentId) {
-        const existing = allDocuments.find(d => d.id === editingDocumentId);
+    function sanitizeFileName(name = "") {
+      return String(name)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9._-]/g, "_");
+    }
 
-        const updatePayload = {
-          title: payload.title,
-          dossierId: payload.dossierId,
-          dossierTitleSnapshot: payload.dossierTitleSnapshot,
-          clientIdSnapshot: payload.clientIdSnapshot,
-          clientNameSnapshot: payload.clientNameSnapshot,
-          type: payload.type,
-          date: payload.date,
-          notes: payload.notes,
-          updatedAt: serverTimestamp()
-        };
+    async function uploadDocumentFile(file, dossierId, docId) {
+      const safeName = sanitizeFileName(file.name);
+      const filePath = `documents/${dossierId}/${docId}/${safeName}`;
+      const fileRef = ref(storage, filePath);
 
-        if (file) {
-          if (existing?.filePath) {
-            try {
-              await deleteObject(ref(storage, existing.filePath));
-            } catch (err) {
-              console.warn("Ancien fichier non supprimé :", err);
-            }
-          }
+      await uploadBytes(fileRef, file);
+      const fileUrl = await getDownloadURL(fileRef);
 
-          const uploaded = await uploadDocumentFile(file, payload.dossierId, editingDocumentId);
-          updatePayload.fileName = uploaded.fileName;
-          updatePayload.filePath = uploaded.filePath;
-          updatePayload.url = uploaded.url;
-        } else {
-          updatePayload.url = payload.url || existing?.url || "";
-          updatePayload.fileName = existing?.fileName || "";
-          updatePayload.filePath = existing?.filePath || "";
-        }
+      return {
+        fileName: file.name,
+        filePath,
+        url: fileUrl
+      };
+    }
 
-        await updateDoc(doc(db, "documents", editingDocumentId), updatePayload);
-        editingDocumentId = null;
-      } else {
-        const docRef = await addDoc(documentsRef, payload);
+    function createDocument(data) {
+      const dossierId = data.get("documentDossier") || "";
+      const dossier = allDossiers.find(d => d.id === dossierId);
+      const client = allClients.find(c => c.id === dossier?.clientId);
 
-        if (file) {
-          const uploaded = await uploadDocumentFile(file, payload.dossierId, docRef.id);
-          await updateDoc(doc(db, "documents", docRef.id), {
-            fileName: uploaded.fileName,
-            filePath: uploaded.filePath,
-            url: uploaded.url,
-            updatedAt: serverTimestamp()
-          });
-        }
+      return {
+        title: normalizeText(data.get("documentTitle")),
+        dossierId,
+        dossierTitleSnapshot: dossier?.title || "",
+        clientIdSnapshot: dossier?.clientId || "",
+        clientNameSnapshot: client?.name || "",
+        type: data.get("documentType") || "Autre",
+        date: data.get("documentDate") || "",
+        url: normalizeText(data.get("documentUrl")),
+        notes: normalizeText(data.get("documentNotes")),
+        fileName: "",
+        filePath: "",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const data = new FormData(form);
+      const payload = createDocument(data);
+      const file = documentFileInput?.files?.[0] || null;
+
+      if (!payload.title || !payload.dossierId) {
+        alert("Titre et dossier obligatoires.");
+        return;
       }
 
-      form.reset();
-      if (documentFileInput) documentFileInput.value = "";
-      document.getElementById("documentType").value = "Courrier";
-    } catch (err) {
-      console.error("Erreur enregistrement document :", err);
-      alert("Impossible d’enregistrer le document.");
-    }
-  });
+      try {
+        if (editingDocumentId) {
+          const existing = allDocuments.find(d => d.id === editingDocumentId);
 
-  searchInput.addEventListener("input", renderDocuments);
-  typeFilter.addEventListener("change", renderDocuments);
-
-  documentList.addEventListener("click", async (e) => {
-    const editBtn = e.target.closest("[data-edit-id]");
-    if (editBtn) {
-      const id = editBtn.getAttribute("data-edit-id");
-      const item = allDocuments.find(d => d.id === id);
-      if (!item) return;
-
-      editingDocumentId = id;
-      fillForm(item);
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      return;
-    }
-
-    const deleteBtn = e.target.closest("[data-delete-id]");
-    if (!deleteBtn) return;
-
-    const id = deleteBtn.getAttribute("data-delete-id");
-    const ok = confirm("Supprimer ce document ?");
-    if (!ok) return;
-
-    try {
-      const existing = allDocuments.find(d => d.id === id);
-
-      if (existing?.filePath) {
-        try {
-          await deleteObject(ref(storage, existing.filePath));
-        } catch (err) {
-          console.warn("Fichier Storage non supprimé :", err);
-        }
-      }
-
-      await deleteDoc(doc(db, "documents", id));
-
-      if (editingDocumentId === id) {
-        editingDocumentId = null;
-        form.reset();
-        if (documentFileInput) documentFileInput.value = "";
-        document.getElementById("documentType").value = "Courrier";
-      }
-    } catch (err) {
-      console.error("Erreur suppression document :", err);
-      alert("Impossible de supprimer le document.");
-    }
-  });
-
-  onSnapshot(
-    query(clientsRef, orderBy("createdAt", "desc")),
-    (snapshot) => {
-      allClients = snapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data()
-      }));
-      fillDossierSelect();
-      renderDocuments();
-    },
-    (err) => console.error("Erreur chargement clients :", err)
-  );
-
-  onSnapshot(
-    query(dossiersRef, orderBy("createdAt", "desc")),
-    (snapshot) => {
-      allDossiers = snapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data()
-      }));
-      fillDossierSelect();
-      renderDocuments();
-    },
-    (err) => {
-      console.error("Erreur chargement dossiers :", err);
-      documentList.innerHTML = '<div class="empty">Erreur de chargement des dossiers.</div>';
-    }
-  );
-
-  onSnapshot(
-    query(documentsRef, orderBy("createdAt", "desc")),
-    (snapshot) => {
-      allDocuments = snapshot.docs.map(docSnap => ({
-        id: docSnap.id,
-        ...docSnap.data()
-      }));
-      renderDocuments();
-    },
-    (err) => {
-      console.error("Erreur chargement documents :", err);
-      documentList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
-      renderStats([]);
-    }
-  );
-</script>
-  
-</body>
-</html>
+          const updatePayload = {
+            title: payload.title,
+            dossierId: payload.dossierId,
+            dossierTitleSnapshot: payload.dossierTitleSnapshot,
+            clientIdSnapshot: payload.clientIdSnapshot,
+            client
