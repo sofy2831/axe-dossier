@@ -1,268 +1,938 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Axe Dossier — Paiements</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axe Dossier — Paiements</title>
+  <style>
+    :root{
+      --bg:#f3efe8;
+      --card:#ffffff;
+      --text:#171717;
+      --muted:#66615a;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --soft:#e9e1d4;
+      --radius:18px;
+      --shadow:0 16px 40px rgba(0,0,0,0.06);
+      --max:1180px;
+    }*{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-<style>
-/* ⚠️ TON CSS ORIGINAL CONSERVÉ — aucune modif */
-:root{
-  --bg:#f3efe8;
-  --card:#ffffff;
-  --text:#171717;
-  --muted:#66615a;
-  --line:rgba(23,23,23,0.08);
-  --accent:#111111;
-  --soft:#e9e1d4;
-  --radius:18px;
-  --shadow:0 16px 40px rgba(0,0,0,0.06);
-  --max:1180px;
-}
-*{box-sizing:border-box}
-body{margin:0;font-family:Inter,sans-serif;background:var(--bg);color:var(--text)}
-.wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
-.topbar{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line)}
-.topbar-inner{display:flex;justify-content:space-between;align-items:center;padding:12px 0}
-.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:20px}
-.grid{display:grid;grid-template-columns:420px 1fr;gap:20px}
-.btn{background:#111;color:#fff;border:none;padding:10px 14px;border-radius:999px;cursor:pointer}
-.btn-secondary{background:#fff;color:#111;border:1px solid var(--line)}
-.payment-item{border:1px solid var(--line);padding:12px;border-radius:12px;margin-bottom:10px}
-</style>
+    a{text-decoration:none;color:inherit}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,0.85);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .topbar-inner{
+      min-height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+
+    .brand-mark{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:var(--accent);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
+
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--line);
+      font-size:.94rem;
+    }
+
+    main{padding:32px 0 56px}
+
+    .hero{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:22px;
+    }
+
+    h1,h2,h3,p{margin:0}
+    h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
+    .hero p{color:var(--muted);max-width:68ch;margin-top:8px}
+
+    .grid{
+      display:grid;
+      grid-template-columns:420px 1fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:24px;
+    }
+
+    .card h2{
+      font-size:1.2rem;
+      margin-bottom:14px;
+      letter-spacing:-.02em;
+    }
+
+    .field{margin-bottom:14px}
+    .field label{
+      display:block;
+      font-size:.92rem;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+
+    .field input,
+    .field textarea,
+    .field select{
+      width:100%;
+      min-height:48px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      font:inherit;
+      color:var(--text);
+      background:#fff;
+    }
+
+    .field textarea{min-height:100px;resize:vertical}
+
+    .row-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+
+    .btn{
+      min-height:48px;
+      padding:0 18px;
+      border-radius:999px;
+      border:1px solid var(--accent);
+      background:var(--accent);
+      color:#fff;
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .btn-secondary{
+      background:#fff;
+      color:var(--accent);
+      border-color:var(--line);
+    }
+
+    .toolbar{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .search,
+    .filter{
+      min-height:48px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:0 16px;
+      font:inherit;
+      background:#fff;
+    }
+
+    .search{flex:1 1 260px}
+    .filter{min-width:190px}
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .stat{
+      background:#faf7f1;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+    }
+
+    .stat strong{
+      display:block;
+      font-size:1.35rem;
+      letter-spacing:-.04em;
+      margin-bottom:4px;
+    }
+
+    .stat span{color:var(--muted);font-size:.92rem}
+
+    .empty{
+      padding:24px;
+      border:1px dashed var(--line);
+      border-radius:18px;
+      color:var(--muted);
+      text-align:center;
+      background:#fcfbf8;
+    }
+
+    .payment-list{display:grid;gap:14px}
+
+    .payment-item{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      background:#fff;
+      display:grid;
+      gap:12px;
+    }
+
+    .payment-top{
+      display:flex;
+      align-items:start;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .payment-title{
+      font-size:1.08rem;
+      font-weight:800;
+      letter-spacing:-.02em;
+      margin-bottom:4px;
+    }
+
+    .payment-meta{
+      display:grid;
+      gap:6px;
+      color:#4f4942;
+      font-size:.95rem;
+    }
+
+    .badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      background:var(--soft);
+      font-size:.82rem;
+      font-weight:700;
+      color:#4f493f;
+      border:1px solid rgba(23,23,23,0.06);
+    }
+
+    .badge.virement{background:#efe8dd}
+    .badge.cheque{background:#f6edd8}
+    .badge.especes{background:#ececec}
+    .badge.autre{background:#ece4ef}
+
+    .payment-notes{
+      color:var(--muted);
+      font-size:.94rem;
+      line-height:1.5;
+    }
+
+    .mini-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .mini-btn{
+      min-height:36px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      font:inherit;
+      cursor:pointer;
+    }
+
+    .amount{
+      font-size:1.35rem;
+      font-weight:800;
+      letter-spacing:-.04em;
+    }
+
+    .note{
+      margin-top:12px;
+      padding:14px 16px;
+      border-radius:14px;
+      background:#faf7f1;
+      border:1px solid var(--line);
+      color:#4f4942;
+      font-size:.92rem;
+    }
+
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr 1fr}
+    }
+
+    @media (max-width: 720px){
+      .topbar-inner{
+        min-height:auto;
+        padding:14px 0;
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .brand,.nav{justify-content:center}
+      .hero{flex-direction:column;align-items:start}
+      .card{padding:20px}
+      .payment-top{flex-direction:column}
+      .row-2{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr}
+      .actions .btn{width:100%}
+    }
+  </style>
 </head>
-
 <body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="index.html" aria-label="Retour admin">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier · Paiements</span>
+      </a>
+      <nav class="nav" aria-label="Navigation admin">
+        <a class="pill" href="index.html">Admin</a>
+        <a class="pill" href="clients.html">Clients</a>
+        <a class="pill" href="dossiers.html">Dossiers</a>
+        <a class="pill" href="documents.html">Documents</a>
+        <a class="pill" href="devis.html">Devis</a>
+        <a class="pill" href="factures.html">Factures</a>
+        <a class="pill" href="avoirs.html">Avoirs</a>
+        <a class="pill" href="paiements.html">Paiements</a>
+        <a class="pill" href="settings.html">Réglages</a>
+      </nav>
+    </div>
+  </header>
 
-<header class="topbar">
-  <div class="wrap topbar-inner">
-    <strong>Axe Dossier · Paiements</strong>
-    <nav>
-      <a href="factures.html">Factures</a>
-      <a href="avoirs.html">Avoirs</a>
-      <a href="paiements.html">Paiements</a>
-    </nav>
-  </div>
-</header>
+  <main>
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <h1>Paiements</h1>
+          <p>Tu enregistres ici les règlements reçus, avec lien vers la facture, date, mode et montant. Cela te permet d’avoir un suivi propre avant d’automatiser davantage.</p>
+        </div>
+      </section>
 
-<main class="wrap">
+      <section class="grid">
+        <article class="card">
+          <h2>Ajouter un paiement</h2>
+          <form id="paymentForm">
+            <div class="field">
+              <label for="paymentInvoice">Facture</label>
+              <select id="paymentInvoice" name="paymentInvoice" required>
+                <option value="">Sélectionner une facture</option>
+              </select>
+            </div>
 
-<div class="grid">
+            <div class="row-2">
+              <div class="field">
+                <label for="paymentDate">Date de paiement</label>
+                <input id="paymentDate" name="paymentDate" type="date" />
+              </div>
+              <div class="field">
+                <label for="paymentAmount">Montant reçu (€)</label>
+                <input id="paymentAmount" name="paymentAmount" type="number" step="0.01" min="0" placeholder="190.00" required />
+              </div>
+            </div>
 
-<!-- FORM -->
-<div class="card">
-<h2>Ajouter un paiement</h2>
+            <div class="row-2">
+              <div class="field">
+                <label for="paymentMode">Mode</label>
+                <select id="paymentMode" name="paymentMode">
+                  <option value="VIREMENT">VIREMENT</option>
+                  <option value="CHEQUE">CHEQUE</option>
+                  <option value="ESPECES">ESPECES</option>
+                  <option value="AUTRE">AUTRE</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="paymentReference">Référence</label>
+                <input id="paymentReference" name="paymentReference" type="text" placeholder="Ex. Virement 14/04 / Chèque n°..." />
+              </div>
+            </div>
 
-<form id="form">
+            <div class="field">
+              <label for="paymentNotes">Notes internes</label>
+              <textarea id="paymentNotes" name="paymentNotes" placeholder="Ex. acompte, règlement complet, reste à recevoir, vérifié en banque..."></textarea>
+            </div>
 
-<label>Facture</label>
-<select id="invoice" required></select>
+            <div class="actions">
+              <button type="submit" class="btn">Enregistrer</button>
+              <button type="button" id="resetBtn" class="btn btn-secondary">Vider</button>
+            </div>
+          </form>
 
-<label>Date</label>
-<input type="date" id="date">
+          <div class="note">
+            Le paiement embarque ses snapshots facture/client/entreprise au moment de l’enregistrement. C’est plus propre pour les journaux et l’historique.
+          </div>
+        </article>
 
-<label>Montant</label>
-<input type="number" id="amount" step="0.01" required>
+        <article class="card">
+          <div class="stats">
+            <div class="stat">
+              <strong id="totalPayments">0</strong>
+              <span>Paiements</span>
+            </div>
+            <div class="stat">
+              <strong id="totalPaidAmount">0 €</strong>
+              <span>Total encaissé</span>
+            </div>
+            <div class="stat">
+              <strong id="totalVirements">0</strong>
+              <span>Virements</span>
+            </div>
+            <div class="stat">
+              <strong id="totalCheques">0</strong>
+              <span>Chèques</span>
+            </div>
+          </div>
 
-<label>Mode</label>
-<select id="mode">
-<option value="VIREMENT">VIREMENT</option>
-<option value="CHEQUE">CHEQUE</option>
-<option value="ESPECES">ESPECES</option>
-</select>
+          <div class="toolbar">
+            <input id="searchInput" class="search" type="text" placeholder="Rechercher un paiement..." />
+            <select id="modeFilter" class="filter">
+              <option value="">Tous les modes</option>
+              <option value="VIREMENT">VIREMENT</option>
+              <option value="CHEQUE">CHEQUE</option>
+              <option value="ESPECES">ESPECES</option>
+              <option value="AUTRE">AUTRE</option>
+            </select>
+          </div>
 
-<label>Référence</label>
-<input id="ref">
+          <div id="paymentList" class="payment-list"></div>
+        </article>
+      </section>
+    </div>
+  </main>
 
-<label>Notes</label>
-<textarea id="notes"></textarea>
+  <script type="module">
+    import "./auth-guard.js";
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      addDoc,
+      deleteDoc,
+      doc,
+      updateDoc,
+      onSnapshot,
+      query,
+      orderBy,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-<div style="margin-top:10px">
-<button class="btn">Enregistrer</button>
-<button type="button" id="reset" class="btn btn-secondary">Vider</button>
-</div>
+    const form = document.getElementById("paymentForm");
+    const paymentInvoice = document.getElementById("paymentInvoice");
+    const paymentAmount = document.getElementById("paymentAmount");
+    const paymentList = document.getElementById("paymentList");
+    const searchInput = document.getElementById("searchInput");
+    const modeFilter = document.getElementById("modeFilter");
+    const resetBtn = document.getElementById("resetBtn");
 
-</form>
-</div>
+    const totalPayments = document.getElementById("totalPayments");
+    const totalPaidAmount = document.getElementById("totalPaidAmount");
+    const totalVirements = document.getElementById("totalVirements");
+    const totalCheques = document.getElementById("totalCheques");
 
-<!-- LIST -->
-<div class="card">
-<h2>Liste</h2>
-<div id="list"></div>
-</div>
+    const invoicesRef = collection(db, "factures");
+    const paymentsRef = collection(db, "paiements");
+    const creditsRef = collection(db, "avoirs");
 
-</div>
-</main>
+    let allInvoices = [];
+    let allPayments = [];
+    let allCredits = [];
+    let editingPaymentId = null;
+    let editingOriginalInvoiceId = null;
 
-<script type="module">
-import { db } from "./firebase-config.js";
-import {
-collection, addDoc, deleteDoc, doc, updateDoc,
-onSnapshot, query, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
 
-/* ---------------- DATA ---------------- */
+    function formatMoney(value) {
+      const num = Number(value || 0);
+      return num.toLocaleString("fr-FR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " €";
+    }
 
-const invoicesRef = collection(db,"factures");
-const paymentsRef = collection(db,"paiements");
-const creditsRef = collection(db,"avoirs");
+    function modeBadgeClass(mode = "") {
+      if (mode === "VIREMENT") return "virement";
+      if (mode === "CHEQUE") return "cheque";
+      if (mode === "ESPECES") return "especes";
+      return "autre";
+    }
 
-let invoices=[], payments=[], credits=[];
-let editId=null;
+    function getToday() {
+      return new Date().toISOString().slice(0, 10);
+    }
 
-/* ---------------- HELPERS ---------------- */
+    function getCreditsTotal(invoiceId) {
+      return allCredits
+        .filter(a => a.invoiceId === invoiceId && (a.status || "EMIS") !== "ANNULE")
+        .reduce((sum, a) => sum + Number(a.amountTTC ?? a.total ?? 0), 0);
+    }
 
-const money=v=>Number(v||0).toFixed(2)+" €";
+    function getPaymentsTotal(invoiceId, excludedPaymentId = null) {
+      return allPayments
+        .filter(p => p.invoiceId === invoiceId && p.id !== excludedPaymentId)
+        .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+    }
 
-const creditsTotal=id =>
-credits.filter(a=>a.invoiceId===id && a.status!=="ANNULE")
-.reduce((s,a)=>s+(a.amountTTC||0),0);
+    function computeInvoiceRemaining(invoiceId, excludedPaymentId = null) {
+      const invoice = allInvoices.find(i => i.id === invoiceId);
+      if (!invoice) return 0;
 
-const paymentsTotal=(id,exclude=null)=>
-payments.filter(p=>p.invoiceId===id && p.id!==exclude)
-.reduce((s,p)=>s+(p.amount||0),0);
+      const total = Number(invoice.amountTTC ?? invoice.amount ?? 0);
+      const credits = getCreditsTotal(invoiceId);
+      const paid = getPaymentsTotal(invoiceId, excludedPaymentId);
 
-const remaining=(id,exclude=null)=>{
-const inv=invoices.find(i=>i.id===id);
-if(!inv)return 0;
-return Math.max(0,(inv.amountTTC||0)-creditsTotal(id)-paymentsTotal(id,exclude));
-};
+      const netAfterCredits = Math.max(0, Number((total - credits).toFixed(2)));
+      const remaining = Math.max(0, Number((netAfterCredits - paid).toFixed(2)));
 
-/* ---------------- SELECT ---------------- */
+      return remaining;
+    }
 
-function fillSelect(){
-const el=document.getElementById("invoice");
+    async function syncInvoiceStatus(invoiceId) {
+      const invoice = allInvoices.find(inv => inv.id === invoiceId);
+      if (!invoice) return;
 
-el.innerHTML='<option value="">Choisir</option>'+
-invoices.map(i=>{
-const r=remaining(i.id,editId);
-return `<option value="${i.id}" data-rem="${r}">
-${i.number} — reste ${money(r)}
-</option>`;
-}).join("");
-}
+      const currentStatus = String(invoice.status || "").toUpperCase();
+      if (currentStatus === "ANNULEE") return;
 
-/* ---------------- RESET ---------------- */
+      const total = Number(invoice.amountTTC ?? invoice.amount ?? 0);
+      const credits = getCreditsTotal(invoiceId);
+      const paid = getPaymentsTotal(invoiceId);
 
-function resetForm(){
-document.getElementById("form").reset();
-document.getElementById("mode").value="VIREMENT";
-editId=null;
-fillSelect();
-}
+      const netAfterCredits = Math.max(0, Number((total - credits).toFixed(2)));
+      const remaining = Math.max(0, Number((netAfterCredits - paid).toFixed(2)));
+      const dueDate = String(invoice.dueDate || "");
+      const today = getToday();
 
-/* ---------------- PAYLOAD ---------------- */
+      let newStatus = "ENVOYEE";
+      if (remaining <= 0) newStatus = "PAYEE";
+      else if (dueDate && dueDate < today) newStatus = "RETARD";
 
-function payload(){
-const id=document.getElementById("invoice").value;
-const inv=invoices.find(i=>i.id===id);
+      await updateDoc(doc(db, "factures", invoiceId), {
+        status: newStatus,
+        updatedAt: serverTimestamp()
+      });
+    }
 
-return{
-invoiceId:id,
-invoiceNumberSnapshot:inv?.number||"",
-clientNameSnapshot:inv?.clientSnapshot?.name||"",
-invoiceAmountSnapshot:inv?.amountTTC||0,
-businessSnapshot:inv?.businessSnapshot||{},
+    function fillInvoiceSelect() {
+      const current = paymentInvoice.value;
 
-date:document.getElementById("date").value,
-amount:Number(document.getElementById("amount").value),
-mode:document.getElementById("mode").value,
-reference:document.getElementById("ref").value,
-notes:document.getElementById("notes").value,
+      const eligibleInvoices = allInvoices.filter(invoice => {
+        const status = String(invoice.status || "").toUpperCase();
+        if (status === "ANNULEE") return false;
 
-createdAt:serverTimestamp(),
-updatedAt:serverTimestamp()
-};
-}
+        const remaining = computeInvoiceRemaining(invoice.id, editingPaymentId);
+        if (editingPaymentId && invoice.id === editingOriginalInvoiceId) return true;
 
-/* ---------------- RENDER ---------------- */
+        return remaining > 0;
+      });
 
-function render(){
+      const options = ['<option value="">Sélectionner une facture</option>']
+        .concat(
+          eligibleInvoices.map(invoice => {
+            const amount = computeInvoiceRemaining(invoice.id, editingPaymentId);
+            const label =
+              (Array.isArray(invoice.lines) && invoice.lines.length
+                ? invoice.lines[0]?.designation
+                : invoice.label) || "Sans libellé";
 
-const list=document.getElementById("list");
+            return `
+              <option value="${invoice.id}" data-remaining="${amount}">
+                ${escapeHtml(invoice.number || "")} — ${escapeHtml(label)} — reste ${formatMoney(amount)}
+              </option>
+            `;
+          })
+        );
 
-if(!payments.length){
-list.innerHTML="Aucun paiement";
-return;
-}
+      paymentInvoice.innerHTML = options.join("");
 
-list.innerHTML=payments.map(p=>{
-const r=remaining(p.invoiceId);
+      if (current && eligibleInvoices.some(i => i.id === current)) {
+        paymentInvoice.value = current;
+      }
+    }
 
-return `
-<div class="payment-item">
-<strong>${p.invoiceNumberSnapshot}</strong><br>
-${p.clientNameSnapshot}<br>
-Montant : ${money(p.amount)}<br>
-Reste : ${money(r)}<br>
+    function fillForm(payment) {
+      editingOriginalInvoiceId = payment.invoiceId || null;
+      fillInvoiceSelect();
+      document.getElementById("paymentInvoice").value = payment.invoiceId || "";
+      document.getElementById("paymentDate").value = payment.date || "";
+      document.getElementById("paymentAmount").value = payment.amount ?? "";
+      document.getElementById("paymentMode").value = payment.mode || "VIREMENT";
+      document.getElementById("paymentReference").value = payment.reference || "";
+      document.getElementById("paymentNotes").value = payment.notes || "";
+    }
 
-<button data-edit="${p.id}">Modifier</button>
-<button data-del="${p.id}">Supprimer</button>
-</div>
-`;
-}).join("");
-}
+    function resetFormClean() {
+      form.reset();
+      document.getElementById("paymentMode").value = "VIREMENT";
+      editingPaymentId = null;
+      editingOriginalInvoiceId = null;
+      fillInvoiceSelect();
+    }
 
-/* ---------------- EVENTS ---------------- */
+    function renderStats(payments) {
+      totalPayments.textContent = payments.length;
+      totalPaidAmount.textContent = formatMoney(
+        payments.reduce((acc, p) => acc + Number(p.amount || 0), 0)
+      );
+      totalVirements.textContent = payments.filter(p => p.mode === "VIREMENT").length;
+      totalCheques.textContent = payments.filter(p => p.mode === "CHEQUE").length;
+    }
 
-document.getElementById("form").addEventListener("submit",async e=>{
-e.preventDefault();
+    function renderPayments() {
+      const invoiceMap = Object.fromEntries(allInvoices.map(i => [i.id, i]));
+      const q = (searchInput.value || "").trim().toLowerCase();
+      const filter = modeFilter.value;
 
-const data=payload();
-const max=remaining(data.invoiceId,editId);
+      const filtered = allPayments.filter(payment => {
+        const invoice = invoiceMap[payment.invoiceId];
 
-if(data.amount>max){
-alert("Montant trop élevé");
-return;
-}
+        const clientName =
+          payment.clientNameSnapshot ||
+          invoice?.clientSnapshot?.name ||
+          "";
 
-if(editId){
-await updateDoc(doc(db,"paiements",editId),data);
-}else{
-await addDoc(paymentsRef,data);
-}
+        const invoiceNumber =
+          payment.invoiceNumberSnapshot ||
+          invoice?.number ||
+          "";
 
-resetForm();
-});
+        const invoiceLabel =
+          payment.invoiceLabelSnapshot ||
+          (((Array.isArray(invoice?.lines) && invoice.lines.length)
+            ? invoice.lines[0]?.designation
+            : invoice?.label) || "");
 
-document.getElementById("reset").onclick=resetForm;
+        const blob = [
+          payment.reference || "",
+          payment.notes || "",
+          payment.mode || "",
+          invoiceNumber,
+          invoiceLabel,
+          clientName
+        ].join(" ").toLowerCase();
 
-document.getElementById("list").onclick=async e=>{
+        const matchesSearch = blob.includes(q);
+        const matchesMode = !filter || payment.mode === filter;
+        return matchesSearch && matchesMode;
+      });
 
-if(e.target.dataset.del){
-await deleteDoc(doc(db,"paiements",e.target.dataset.del));
-if(editId===e.target.dataset.del) resetForm();
-}
+      renderStats(allPayments);
 
-if(e.target.dataset.edit){
-const p=payments.find(x=>x.id===e.target.dataset.edit);
-editId=p.id;
+      if (!allInvoices.length && !allPayments.length) {
+        paymentList.innerHTML = '<div class="empty">Ajoute d’abord au moins une facture dans factures.html.</div>';
+        return;
+      }
 
-document.getElementById("invoice").value=p.invoiceId;
-document.getElementById("amount").value=p.amount;
-document.getElementById("date").value=p.date;
-}
-};
+      if (!filtered.length) {
+        paymentList.innerHTML = '<div class="empty">Aucun paiement pour le moment.</div>';
+        return;
+      }
 
-/* ---------------- FIRESTORE ---------------- */
+      paymentList.innerHTML = filtered.map(payment => {
+        const invoice = invoiceMap[payment.invoiceId];
 
-onSnapshot(query(invoicesRef),s=>{
-invoices=s.docs.map(d=>({id:d.id,...d.data()}));
-fillSelect();
-render();
-});
+        const invoiceNumber =
+          payment.invoiceNumberSnapshot ||
+          invoice?.number ||
+          "Facture supprimée";
 
-onSnapshot(query(paymentsRef),s=>{
-payments=s.docs.map(d=>({id:d.id,...d.data()}));
-render();
-});
+        const clientName =
+          payment.clientNameSnapshot ||
+          invoice?.clientSnapshot?.name ||
+          "Facture supprimée";
 
-onSnapshot(query(creditsRef),s=>{
-credits=s.docs.map(d=>({id:d.id,...d.data()}));
-render();
-});
+        const invoiceLabel =
+          payment.invoiceLabelSnapshot ||
+          (((Array.isArray(invoice?.lines) && invoice.lines.length)
+            ? invoice.lines[0]?.designation
+            : invoice?.label) || "");
 
-</script>
+        const invoiceStatus =
+          invoice?.status ||
+          payment.invoiceStatusSnapshot ||
+          "";
 
+        const remaining = computeInvoiceRemaining(payment.invoiceId);
+
+        return `
+          <article class="payment-item">
+            <div class="payment-top">
+              <div>
+                <div class="payment-title">${escapeHtml(invoiceNumber)}</div>
+                <div class="payment-meta">
+                  <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
+                  ${invoiceLabel ? `<span><strong>Libellé :</strong> ${escapeHtml(invoiceLabel)}</span>` : ""}
+                  ${payment.date ? `<span><strong>Date :</strong> ${escapeHtml(payment.date)}</span>` : ""}
+                  ${payment.reference ? `<span><strong>Référence :</strong> ${escapeHtml(payment.reference)}</span>` : ""}
+                  ${invoiceStatus ? `<span><strong>Statut facture :</strong> ${escapeHtml(invoiceStatus)}</span>` : ""}
+                  <span><strong>Reste après paiement :</strong> ${formatMoney(remaining)}</span>
+                </div>
+              </div>
+              <div class="badges">
+                <span class="badge ${modeBadgeClass(payment.mode)}">${escapeHtml(payment.mode || "")}</span>
+              </div>
+            </div>
+
+            <div class="payment-meta">
+              <span class="amount">${formatMoney(payment.amount)}</span>
+            </div>
+
+            ${payment.notes ? `<div class="payment-notes">${escapeHtml(payment.notes).replace(/\n/g, "<br>")}</div>` : ""}
+
+            <div class="mini-actions">
+              <button class="mini-btn" type="button" data-edit-id="${payment.id}">Modifier</button>
+              <button class="mini-btn" type="button" data-delete-id="${payment.id}">Supprimer</button>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function buildPaymentPayload(data) {
+      const invoiceId = data.get("paymentInvoice") || "";
+      const invoice = allInvoices.find(i => i.id === invoiceId);
+
+      return {
+        invoiceId,
+        clientIdSnapshot: invoice?.clientId || "",
+        invoiceNumberSnapshot: invoice?.number || "",
+        clientNameSnapshot: invoice?.clientSnapshot?.name || "",
+        invoiceStatusSnapshot: invoice?.status || "",
+        invoiceAmountSnapshot: Number(invoice?.amountTTC ?? invoice?.amount ?? 0),
+        invoiceLabelSnapshot:
+          ((Array.isArray(invoice?.lines) && invoice.lines.length)
+            ? invoice.lines[0]?.designation
+            : invoice?.label) || "",
+        businessSnapshot: invoice?.businessSnapshot || {},
+        date: data.get("paymentDate") || "",
+        amount: Number(data.get("paymentAmount") || 0),
+        mode: data.get("paymentMode") || "VIREMENT",
+        reference: (data.get("paymentReference") || "").trim(),
+        notes: (data.get("paymentNotes") || "").trim(),
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const data = new FormData(form);
+      const payload = buildPaymentPayload(data);
+
+      if (!payload.invoiceId || !payload.amount) {
+        alert("Facture et montant obligatoires.");
+        return;
+      }
+
+      const invoice = allInvoices.find(i => i.id === payload.invoiceId);
+      if (!invoice) {
+        alert("Facture introuvable.");
+        return;
+      }
+
+      if (String(invoice.status || "").toUpperCase() === "ANNULEE") {
+        alert("Impossible d’enregistrer un paiement sur une facture annulée.");
+        return;
+      }
+
+      const available = computeInvoiceRemaining(payload.invoiceId, editingPaymentId);
+
+      if (payload.amount > available) {
+        alert(`Montant trop élevé. Reste encaissable maximum : ${formatMoney(available)}.`);
+        return;
+      }
+
+      try {
+        if (editingPaymentId) {
+          const oldPayment = allPayments.find(p => p.id === editingPaymentId);
+          const oldInvoiceId = oldPayment?.invoiceId || null;
+
+          await updateDoc(doc(db, "paiements", editingPaymentId), {
+            invoiceId: payload.invoiceId,
+            clientIdSnapshot: payload.clientIdSnapshot,
+            invoiceNumberSnapshot: payload.invoiceNumberSnapshot,
+            clientNameSnapshot: payload.clientNameSnapshot,
+            invoiceStatusSnapshot: payload.invoiceStatusSnapshot,
+            invoiceAmountSnapshot: payload.invoiceAmountSnapshot,
+            invoiceLabelSnapshot: payload.invoiceLabelSnapshot,
+            businessSnapshot: payload.businessSnapshot,
+            date: payload.date,
+            amount: payload.amount,
+            mode: payload.mode,
+            reference: payload.reference,
+            notes: payload.notes,
+            updatedAt: serverTimestamp()
+          });
+
+          if (oldInvoiceId) await syncInvoiceStatus(oldInvoiceId);
+          await syncInvoiceStatus(payload.invoiceId);
+
+          resetFormClean();
+        } else {
+          await addDoc(paymentsRef, payload);
+          await syncInvoiceStatus(payload.invoiceId);
+          resetFormClean();
+        }
+      } catch (err) {
+        console.error("Erreur enregistrement paiement :", err);
+        alert("Impossible d’enregistrer le paiement.");
+      }
+    });
+
+    paymentInvoice.addEventListener("change", (e) => {
+      const option = e.target.selectedOptions[0];
+      if (!paymentAmount.value && option?.dataset?.remaining) {
+        paymentAmount.value = option.dataset.remaining;
+      }
+    });
+
+    searchInput.addEventListener("input", renderPayments);
+    modeFilter.addEventListener("change", renderPayments);
+    resetBtn.addEventListener("click", resetFormClean);
+
+    paymentList.addEventListener("click", async (e) => {
+      const editBtn = e.target.closest("[data-edit-id]");
+      if (editBtn) {
+        const id = editBtn.getAttribute("data-edit-id");
+        const payment = allPayments.find(p => p.id === id);
+        if (!payment) return;
+
+        editingPaymentId = id;
+        fillForm(payment);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      const deleteBtn = e.target.closest("[data-delete-id]");
+      if (!deleteBtn) return;
+
+      const id = deleteBtn.getAttribute("data-delete-id");
+      const payment = allPayments.find(p => p.id === id);
+      const oldInvoiceId = payment?.invoiceId || null;
+
+      const ok = confirm("Supprimer ce paiement ?");
+      if (!ok) return;
+
+      try {
+        await deleteDoc(doc(db, "paiements", id));
+
+        if (oldInvoiceId) await syncInvoiceStatus(oldInvoiceId);
+
+        if (editingPaymentId === id) {
+          resetFormClean();
+        }
+      } catch (err) {
+        console.error("Erreur suppression paiement :", err);
+        alert("Impossible de supprimer le paiement.");
+      }
+    });
+
+    onSnapshot(
+      query(invoicesRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allInvoices = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        fillInvoiceSelect();
+        renderPayments();
+      },
+      (err) => console.error("Erreur chargement factures :", err)
+    );
+
+    onSnapshot(
+      query(creditsRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allCredits = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        fillInvoiceSelect();
+        renderPayments();
+      },
+      (err) => console.error("Erreur chargement avoirs :", err)
+    );
+
+    onSnapshot(
+      query(paymentsRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allPayments = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        fillInvoiceSelect();
+        renderPayments();
+      },
+      (err) => {
+        console.error("Erreur chargement paiements :", err);
+        paymentList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
+        renderStats([]);
+      }
+    );
+  </script>
 </body>
 </html>
