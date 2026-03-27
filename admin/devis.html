@@ -434,6 +434,7 @@
         <a class="pill" href="documents.html">Documents</a>
         <a class="pill" href="devis.html">Devis</a>
         <a class="pill" href="factures.html">Factures</a>
+        <a class="pill" href="avoirs.html">Avoirs</a>
         <a class="pill" href="paiements.html">Paiements</a>
         <a class="pill" href="settings.html">Settings</a>
       </nav>
@@ -790,6 +791,7 @@
     function bindLineEvents(wrapper) {
       const qty = wrapper.querySelector(".line-qty");
       const unit = wrapper.querySelector(".line-unit-price");
+      const designation = wrapper.querySelector(".line-designation");
       const removeBtn = wrapper.querySelector("[data-remove-line]");
 
       qty.addEventListener("input", () => {
@@ -799,6 +801,10 @@
 
       unit.addEventListener("input", () => {
         updateSingleLineTotal(wrapper);
+        updateQuoteSummary();
+      });
+
+      designation.addEventListener("input", () => {
         updateQuoteSummary();
       });
 
@@ -864,7 +870,8 @@
     function updateQuoteSummary() {
       const lines = buildQuoteLinesFromForm();
       const totalTTC = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
-      const amounts = computeAmounts(totalTTC, currentSettings);
+      const businessSnapshot = buildBusinessSnapshot(currentSettings);
+      const amounts = computeAmounts(totalTTC, businessSnapshot);
 
       summaryHT.textContent = formatMoney(amounts.amountHT);
       summaryVAT.textContent = formatMoney(amounts.amountVAT);
@@ -943,7 +950,7 @@
 
       const lines = Array.isArray(quote.lines) && quote.lines.length
         ? quote.lines
-        : [{ designation: quote.label || "", quantity: 1, unitPriceTTC: quote.amountTTC ?? quote.amount ?? "" }];
+        : [{ designation: quote.labelSnapshot || quote.label || "", quantity: 1, unitPriceTTC: quote.amountTTC ?? quote.amount ?? "" }];
 
       lines.forEach(line => createLineElement(line));
 
@@ -983,9 +990,10 @@
           dossierMap[quote.dossierId]?.title ||
           "";
 
-        const firstLabel = Array.isArray(quote.lines) && quote.lines.length
-          ? quote.lines[0].designation || ""
-          : (quote.label || "");
+        const firstLabel = quote.labelSnapshot ||
+          (Array.isArray(quote.lines) && quote.lines.length
+            ? quote.lines[0].designation || ""
+            : (quote.label || ""));
 
         const blob = [
           quote.number || "",
@@ -1029,9 +1037,10 @@
         const amountHT = quote.amountHT ?? amountTTC;
         const amountVAT = quote.amountVAT ?? 0;
 
-        const firstLabel = Array.isArray(quote.lines) && quote.lines.length
-          ? quote.lines[0].designation || ""
-          : (quote.label || "");
+        const firstLabel = quote.labelSnapshot ||
+          (Array.isArray(quote.lines) && quote.lines.length
+            ? quote.lines[0].designation || ""
+            : (quote.label || ""));
 
         const extraLinesCount = Array.isArray(quote.lines) && quote.lines.length > 1
           ? ` (+${quote.lines.length - 1} ligne${quote.lines.length - 1 > 1 ? "s" : ""})`
@@ -1107,7 +1116,9 @@
         number,
         date: quoteDate,
         clientId,
+        clientIdSnapshot: client?.id || "",
         dossierId,
+        dossierIdSnapshot: dossier?.id || "",
         dossierTitleSnapshot: dossier?.title || "",
         dueDate,
         validityDelay,
@@ -1115,6 +1126,7 @@
         status: existingQuote?.status || "ENVOYE",
         mode: data.get("quoteMode") || "VIREMENT",
         label: lines[0]?.designation || "",
+        labelSnapshot: lines[0]?.designation || "",
         notes: (data.get("quoteNotes") || "").trim(),
         lines,
         amountHT: amounts.amountHT,
@@ -1145,13 +1157,16 @@
           await updateDoc(doc(db, "devis", editingQuoteId), {
             date: payload.date,
             clientId: payload.clientId,
+            clientIdSnapshot: payload.clientIdSnapshot,
             dossierId: payload.dossierId,
+            dossierIdSnapshot: payload.dossierIdSnapshot,
             dossierTitleSnapshot: payload.dossierTitleSnapshot,
             dueDate: payload.dueDate,
             validityDelay: payload.validityDelay,
             validityDelayLabel: payload.validityDelayLabel,
             mode: payload.mode,
             label: payload.label,
+            labelSnapshot: payload.labelSnapshot,
             notes: payload.notes,
             lines: payload.lines,
             amountHT: payload.amountHT,
