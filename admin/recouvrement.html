@@ -425,7 +425,7 @@
       for (const p of allPaiements) {
         const invoiceId = p.invoiceId || "";
         if (!invoiceId) continue;
-        map[invoiceId] = (map[invoiceId] || 0) + Number(p.amount || 0);
+        map[invoiceId] = Number((map[invoiceId] || 0) + Number(p.amount || 0));
       }
       return map;
     }
@@ -439,9 +439,13 @@
         if ((a.status || "EMIS") === "ANNULE") continue;
 
         const amount = Number(a.amountTTC ?? a.total ?? 0);
-        map[invoiceId] = (map[invoiceId] || 0) + amount;
+        map[invoiceId] = Number((map[invoiceId] || 0) + amount);
       }
       return map;
+    }
+
+    function isCancelledInvoice(inv) {
+      return (inv.status || "").toUpperCase() === "ANNULEE";
     }
 
     function getRecoveryRows() {
@@ -449,39 +453,43 @@
       const creditMap = getInvoiceCreditMap();
       const today = getToday();
 
-      return allFactures.map(inv => {
-        const total = Number(inv.amountTTC ?? inv.amount ?? 0);
-        const credits = Number(creditMap[inv.id] || 0);
-        const paid = Number(paymentMap[inv.id] || 0);
+      return allFactures
+        .filter(inv => !isCancelledInvoice(inv))
+        .map(inv => {
+          const total = Number(inv.amountTTC ?? inv.amount ?? 0);
+          const credits = Number(creditMap[inv.id] || 0);
+          const paid = Number(paymentMap[inv.id] || 0);
 
-        const baseAfterCredits = Math.max(0, Number((total - credits).toFixed(2)));
-        const remaining = Math.max(0, Number((baseAfterCredits - paid).toFixed(2)));
+          const netAfterCredits = Math.max(0, Number((total - credits).toFixed(2)));
+          const remaining = Math.max(0, Number((netAfterCredits - paid).toFixed(2)));
 
-        const dueDate = normalizeDate(inv.dueDate || "");
-        const isLate = remaining > 0 && dueDate && dueDate < today;
-        const isPartial = (paid > 0 || credits > 0) && remaining > 0 && remaining < total;
-        const isPaid = remaining <= 0;
+          const dueDate = normalizeDate(inv.dueDate || "");
+          const hasPaymentOrCredit = paid > 0 || credits > 0;
+          const isPaid = remaining <= 0;
+          const isLate = !isPaid && !!dueDate && dueDate < today;
+          const isPartial = !isPaid && hasPaymentOrCredit && paid < netAfterCredits;
 
-        let recoveryStatus = "OPEN";
-        if (isPaid) recoveryStatus = "PAID";
-        else if (isLate) recoveryStatus = "LATE";
-        else if (isPartial) recoveryStatus = "PARTIAL";
+          let recoveryStatus = "OPEN";
+          if (isPaid) recoveryStatus = "PAID";
+          else if (isLate) recoveryStatus = "LATE";
+          else if (isPartial) recoveryStatus = "PARTIAL";
 
-        return {
-          id: inv.id,
-          invoiceNumber: inv.number || "",
-          clientName: inv.clientSnapshot?.name || "",
-          dossierTitle: inv.dossierTitleSnapshot || "",
-          dueDate,
-          total,
-          credits,
-          paid,
-          remaining,
-          recoveryStatus,
-          invoiceStatus: inv.status || "",
-          date: normalizeDate(inv.date || "")
-        };
-      }).filter(row => row.remaining > 0);
+          return {
+            id: inv.id,
+            invoiceNumber: inv.number || "",
+            clientName: inv.clientSnapshot?.name || "",
+            dossierTitle: inv.dossierTitleSnapshot || "",
+            dueDate,
+            total,
+            credits,
+            paid,
+            remaining,
+            recoveryStatus,
+            invoiceStatus: inv.status || "",
+            date: normalizeDate(inv.date || "")
+          };
+        })
+        .filter(row => row.remaining > 0);
     }
 
     function sortRows(rows) {
@@ -534,10 +542,7 @@
 
         const matchesSearch = blob.includes(q);
 
-        const matchesStatus =
-          !filter ||
-          row.recoveryStatus === filter ||
-          (filter === "OPEN" && row.recoveryStatus === "OPEN");
+        const matchesStatus = !filter || row.recoveryStatus === filter;
 
         const due = row.dueDate || "";
         const matchesFrom = !from || (due && due >= from);
