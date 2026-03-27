@@ -691,4 +691,149 @@
             dossierId: payload.dossierId,
             dossierTitleSnapshot: payload.dossierTitleSnapshot,
             clientIdSnapshot: payload.clientIdSnapshot,
-            client
+            clientNameSnapshot: payload.clientNameSnapshot,
+            type: payload.type,
+            date: payload.date,
+            notes: payload.notes,
+            updatedAt: serverTimestamp()
+          };
+
+          if (file) {
+            if (existing?.filePath) {
+              try {
+                await deleteObject(ref(storage, existing.filePath));
+              } catch (err) {
+                console.warn("Ancien fichier non supprimé :", err);
+              }
+            }
+
+            const uploaded = await uploadDocumentFile(file, payload.dossierId, editingDocumentId);
+            updatePayload.fileName = uploaded.fileName;
+            updatePayload.filePath = uploaded.filePath;
+            updatePayload.url = uploaded.url;
+          } else {
+            updatePayload.url = payload.url || existing?.url || "";
+            updatePayload.fileName = existing?.fileName || "";
+            updatePayload.filePath = existing?.filePath || "";
+          }
+
+          await updateDoc(doc(db, "documents", editingDocumentId), updatePayload);
+          editingDocumentId = null;
+        } else {
+          const docRef = await addDoc(documentsRef, payload);
+
+          if (file) {
+            const uploaded = await uploadDocumentFile(file, payload.dossierId, docRef.id);
+            await updateDoc(doc(db, "documents", docRef.id), {
+              fileName: uploaded.fileName,
+              filePath: uploaded.filePath,
+              url: uploaded.url,
+              updatedAt: serverTimestamp()
+            });
+          }
+        }
+
+        form.reset();
+        if (documentFileInput) documentFileInput.value = "";
+        document.getElementById("documentType").value = "Courrier";
+      } catch (err) {
+        console.error("Erreur enregistrement document :", err);
+        alert("Impossible d’enregistrer le document.");
+      }
+    });
+
+    searchInput.addEventListener("input", renderDocuments);
+    typeFilter.addEventListener("change", renderDocuments);
+
+    documentList.addEventListener("click", async (e) => {
+      const editBtn = e.target.closest("[data-edit-id]");
+      if (editBtn) {
+        const id = editBtn.getAttribute("data-edit-id");
+        const item = allDocuments.find(d => d.id === id);
+        if (!item) return;
+
+        editingDocumentId = id;
+        fillForm(item);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+
+      const deleteBtn = e.target.closest("[data-delete-id]");
+      if (!deleteBtn) return;
+
+      const id = deleteBtn.getAttribute("data-delete-id");
+      const ok = confirm("Supprimer ce document ?");
+      if (!ok) return;
+
+      try {
+        const existing = allDocuments.find(d => d.id === id);
+
+        if (existing?.filePath) {
+          try {
+            await deleteObject(ref(storage, existing.filePath));
+          } catch (err) {
+            console.warn("Fichier Storage non supprimé :", err);
+          }
+        }
+
+        await deleteDoc(doc(db, "documents", id));
+
+        if (editingDocumentId === id) {
+          editingDocumentId = null;
+          form.reset();
+          if (documentFileInput) documentFileInput.value = "";
+          document.getElementById("documentType").value = "Courrier";
+        }
+      } catch (err) {
+        console.error("Erreur suppression document :", err);
+        alert("Impossible de supprimer le document.");
+      }
+    });
+
+    onSnapshot(
+      query(clientsRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allClients = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        fillDossierSelect();
+        renderDocuments();
+      },
+      (err) => console.error("Erreur chargement clients :", err)
+    );
+
+    onSnapshot(
+      query(dossiersRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allDossiers = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        fillDossierSelect();
+        renderDocuments();
+      },
+      (err) => {
+        console.error("Erreur chargement dossiers :", err);
+        documentList.innerHTML = '<div class="empty">Erreur de chargement des dossiers.</div>';
+      }
+    );
+
+    onSnapshot(
+      query(documentsRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allDocuments = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        renderDocuments();
+      },
+      (err) => {
+        console.error("Erreur chargement documents :", err);
+        documentList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
+        renderStats([]);
+      }
+    );
+  </script>
+</body>
+</html>
