@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mentions légales — Axe Dossier</title>
 
   <style>
@@ -21,156 +21,170 @@
 
     body{
       margin:0;
-      font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
       background:var(--bg);
       color:var(--text);
-      line-height:1.6;
     }
 
     .wrap{
       width:min(var(--max),calc(100% - 32px));
-      margin:40px auto;
+      margin:0 auto;
+    }
+
+    /* HEADER */
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,0.88);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .topbar-inner{
+      width:min(var(--max),calc(100% - 32px));
+      margin:0 auto;
+      min-height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+      text-decoration:none;
+      color:inherit;
+    }
+
+    .brand-mark{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:var(--accent);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
+
+    .btn-return{
+      min-height:44px;
+      padding:0 16px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      text-decoration:none;
+      font:inherit;
+      font-weight:700;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    main{
+      padding:40px 0;
     }
 
     h1{
-      font-size:2.2rem;
-      letter-spacing:-.04em;
+      font-size:2rem;
       margin-bottom:20px;
-    }
-
-    h2{
-      margin-top:30px;
-      font-size:1.2rem;
-      letter-spacing:-.02em;
+      letter-spacing:-0.04em;
     }
 
     .card{
       background:var(--card);
       border:1px solid var(--line);
-      border-radius:20px;
-      padding:24px;
+      border-radius:24px;
+      padding:28px;
       box-shadow:var(--shadow);
+      line-height:1.6;
     }
 
-    .block{
-      margin-bottom:18px;
-    }
-
-    .label{
-      font-weight:700;
+    strong{
       display:block;
-      margin-bottom:4px;
+      margin-top:18px;
+      margin-bottom:6px;
     }
 
-    .muted{
-      color:var(--muted);
-      font-size:.95rem;
+    p{
+      margin:0 0 10px;
+      color:#4f4942;
     }
 
-    a{
-      color:inherit;
-      text-decoration:none;
-      border-bottom:1px solid rgba(0,0,0,0.2);
+    @media (max-width:720px){
+      .topbar-inner{
+        flex-direction:column;
+        align-items:stretch;
+        padding:12px 0;
+      }
+
+      .btn-return{
+        width:100%;
+      }
     }
   </style>
 </head>
 
 <body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="index.html" class="brand">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier</span>
+      </a>
+
+      <a href="index.html" class="btn-return">Retour</a>
+    </div>
+  </header>
+
   <main class="wrap">
     <h1>Mentions légales</h1>
 
     <div class="card">
 
-      <h2>Éditeur du site</h2>
+      <strong>Éditeur du site</strong>
+      <p>Sophie Dumas</p>
+      <p>Entreprise individuelle (EI)</p>
+      <p>SIRET : 413442328RM031</p>
 
-      <div class="block">
-        <span class="label">Nom</span>
-        Sophie Dumas
-      </div>
+      <strong>Adresse</strong>
+      <p>24 hameau de danis<br>09700 Saverdun — France</p>
 
-      <div class="block">
-        <span class="label">Statut</span>
-        Entreprise individuelle (EI)
-      </div>
+      <strong>Contact</strong>
+      <p>Email : contact@axe-dossier.fr</p>
 
-      <div class="block">
-        <span class="label">Adresse</span>
-        24 hameau de danis<br>
-        09700 Saverdun
-      </div>
+      <strong>Directeur de la publication</strong>
+      <p>Sophie Dumas</p>
 
-      <div class="block">
-        <span class="label">Email</span>
-        <a href="mailto:contact@axe-dossier.fr">contact@axe-dossier.fr</a>
-      </div>
-
-      <div class="block">
-        <span class="label">Téléphone</span>
-        06 74 06 33 00
-      </div>
-
-      <div class="block">
-        <span class="label">SIRET</span>
-        41344232800022
-      </div>
-
-      <div class="block">
-        <span class="label">RNE / RM</span>
-        413442328 RM 031
-      </div>
-
-      <div class="block">
-        <span class="label">Code APE</span>
-        8211Z
-      </div>
-
-      <div class="block">
-        <span class="label">Directeur de la publication</span>
-        Sophie Dumas
-      </div>
-
-      <h2>Hébergement</h2>
-
-      <div class="block">
-        OVH SAS<br>
+      <strong>Hébergement</strong>
+      <p>
+        OVH<br>
         2 rue Kellermann<br>
         59100 Roubaix — France<br>
-        Téléphone : 1007<br>
-        <span class="muted">https://www.ovh.com</span>
-      </div>
+        www.ovh.com
+      </p>
 
-      <h2>Propriété intellectuelle</h2>
+      <strong>Activité</strong>
+      <p>
+        Service d’analyse, de structuration de dossiers et de rédaction administrative.
+      </p>
 
-      <div class="block">
-        L’ensemble des contenus présents sur le site Axe Dossier (textes, éléments graphiques, structure)
-        est protégé par le droit de la propriété intellectuelle.<br><br>
-        Toute reproduction, diffusion ou exploitation sans autorisation préalable est interdite.
-      </div>
-
-      <h2>Responsabilité</h2>
-
-      <div class="block">
-        Les informations fournies sur ce site sont données à titre indicatif.<br>
-        L’éditeur ne saurait être tenu responsable des erreurs, omissions ou de l’usage qui pourrait en être fait.
-      </div>
-
-      <h2>Données personnelles</h2>
-
-      <div class="block">
-        Les informations transmises par email sont utilisées uniquement pour traiter les demandes.<br><br>
-        Aucune donnée n’est cédée à des tiers.<br><br>
-        Conformément à la réglementation, vous pouvez demander l’accès, la modification ou la suppression de vos données
-        en contactant : <a href="mailto:contact@axe-dossier.fr">contact@axe-dossier.fr</a>
-      </div>
-
-      <h2>Nature de l’activité</h2>
-
-      <div class="block">
-        Axe Dossier propose un service d’accompagnement documentaire et rédactionnel.<br>
-        Il ne constitue pas une consultation juridique, ni une représentation en justice.
-      </div>
+      <strong>Responsabilité</strong>
+      <p>
+        Les informations fournies sur ce site sont données à titre indicatif. Elles ne constituent pas
+        un conseil juridique, une consultation juridique ni une représentation en justice.
+      </p>
 
     </div>
   </main>
+
 </body>
 </html>
