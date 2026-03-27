@@ -209,6 +209,18 @@
     .badge.late{background:#f7e3df}
     .badge.paid{background:#e8efe4}
 
+    .badge.action{
+      background:#fff;
+      border-color:var(--line);
+      color:var(--text);
+      text-decoration:none;
+      cursor:pointer;
+    }
+
+    .badge.action:hover{
+      border-color:var(--accent);
+    }
+
     .empty{
       padding:26px;
       text-align:center;
@@ -261,6 +273,9 @@
       .stat{
         border:1px solid #ddd;
         background:#fff;
+      }
+      .action-col{
+        display:none !important;
       }
     }
   </style>
@@ -340,15 +355,16 @@
           <table>
             <thead>
               <tr>
-                <th style="width:11%;">Échéance</th>
-                <th style="width:14%;">Facture</th>
-                <th style="width:16%;">Client</th>
-                <th style="width:14%;">Dossier</th>
-                <th class="num" style="width:9%;">TTC</th>
-                <th class="num" style="width:9%;">Avoirs</th>
-                <th class="num" style="width:9%;">Encaissé</th>
-                <th class="num" style="width:9%;">Reste dû</th>
+                <th style="width:10%;">Échéance</th>
+                <th style="width:13%;">Facture</th>
+                <th style="width:15%;">Client</th>
+                <th style="width:13%;">Dossier</th>
+                <th class="num" style="width:8%;">TTC</th>
+                <th class="num" style="width:8%;">Avoirs</th>
+                <th class="num" style="width:8%;">Encaissé</th>
+                <th class="num" style="width:8%;">Reste dû</th>
                 <th style="width:9%;">Situation</th>
+                <th class="action-col" style="width:8%;">Action</th>
               </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -586,6 +602,9 @@
             <span class="badge ${badgeClass(row.recoveryStatus)}">
               ${statusLabel(row.recoveryStatus)}
             </span>
+          </td>
+          <td class="action-col">
+            <a class="badge action" href="relance.html?id=${row.id}">Relancer</a>
           </td>
         </tr>
       `).join("");
