@@ -559,6 +559,7 @@
   import {
     collection,
     addDoc,
+    deleteDoc,
     doc,
     getDoc,
     updateDoc,
@@ -598,6 +599,7 @@
   let allAvoirs = [];
   let allPaiements = [];
   let lineCounter = 0;
+  let editingCreditId = null;
 
   function escapeHtml(text = "") {
     return String(text)
@@ -611,6 +613,14 @@
   function formatMoney(value) {
     const num = Number(value || 0);
     return num.toLocaleString("fr-FR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " €";
+  }
+
+  function formatMoneyNegative(value) {
+    const num = Math.abs(Number(value || 0));
+    return "-"+num.toLocaleString("fr-FR", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }) + " €";
@@ -747,9 +757,9 @@
     };
   }
 
-  function getAppliedCreditsTotal(invoiceId) {
+  function getAppliedCreditsTotal(invoiceId, excludedCreditId = null) {
     return allAvoirs
-      .filter(a => a.invoiceId === invoiceId && (a.status || "EMIS") !== "ANNULE")
+      .filter(a => a.invoiceId === invoiceId && a.id !== excludedCreditId && (a.status || "EMIS") !== "ANNULE")
       .reduce((sum, a) => sum + Number(a.amountTTC ?? a.total ?? 0), 0);
   }
 
@@ -759,7 +769,7 @@
       .reduce((sum, p) => sum + Number(p.amount || 0), 0);
   }
 
-  async function syncInvoiceStatus(invoiceId, extraCredit = 0) {
+  async function syncInvoiceStatus(invoiceId, extraCredit = 0, excludedCreditId = null) {
     const invoice = allInvoices.find(inv => inv.id === invoiceId);
     if (!invoice) return;
 
@@ -767,7 +777,7 @@
     if (currentStatus === "ANNULEE") return;
 
     const total = Number(invoice.amountTTC ?? invoice.amount ?? 0);
-    const credits = getAppliedCreditsTotal(invoiceId) + Number(extraCredit || 0);
+    const credits = getAppliedCreditsTotal(invoiceId, excludedCreditId) + Number(extraCredit || 0);
     const payments = getPaymentsTotal(invoiceId);
 
     const netAfterCredits = Math.max(0, Number((total - credits).toFixed(2)));
@@ -821,7 +831,7 @@
       usableInvoices.map(inv => {
         const clientName = inv.clientSnapshot?.name || "Client";
         const total = Number(inv.amountTTC ?? inv.amount ?? 0);
-        const existingCredits = getAppliedCreditsTotal(inv.id);
+        const existingCredits = getAppliedCreditsTotal(inv.id, editingCreditId);
         const remainingCreditCapacity = Math.max(0, Number((total - existingCredits).toFixed(2)));
 
         return `<option value="${inv.id}">${escapeHtml(inv.number || "")} — ${escapeHtml(clientName)} — crédit dispo ${formatMoney(remainingCreditCapacity)}</option>`;
@@ -836,9 +846,32 @@
     form.reset();
     linesEl.innerHTML = "";
     lineCounter = 0;
+    editingCreditId = null;
     createLineElement();
     ensureDate();
+    fillInvoiceSelect();
     updateSummary();
+  }
+
+  function fillForm(item) {
+    editingCreditId = item.id;
+    dateInput.value = item.date || "";
+    notesInput.value = item.notes || "";
+    fillInvoiceSelect();
+    invoiceSelect.value = item.invoiceId || "";
+
+    linesEl.innerHTML = "";
+    lineCounter = 0;
+
+    const lines = Array.isArray(item.lines) && item.lines.length ? item.lines : [];
+    if (lines.length) {
+      lines.forEach(line => createLineElement(line));
+    } else {
+      createLineElement();
+    }
+
+    updateSummary();
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function renderStats(items) {
@@ -901,13 +934,15 @@
           </div>
 
           <div class="credit-meta">
-            <span><strong>Montant TTC :</strong> <span class="amount">${formatMoney(amountTTC)}</span></span>
+            <span><strong>Montant TTC :</strong> <span class="amount">${formatMoneyNegative(amountTTC)}</span></span>
           </div>
 
           ${item.notes ? `<div class="credit-notes">${escapeHtml(item.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
           <div class="mini-actions">
             <a class="mini-btn" href="avoir-apercu.html?id=${item.id}" target="_blank" rel="noopener noreferrer">Aperçu</a>
+            <button class="mini-btn" type="button" data-edit-id="${item.id}">Modifier</button>
+            <button class="mini-btn" type="button" data-delete-id="${item.id}">Supprimer</button>
           </div>
         </article>
       `;
@@ -924,6 +959,41 @@
   searchInput.addEventListener("input", renderList);
   statusFilter.addEventListener("change", renderList);
   resetBtn.addEventListener("click", resetForm);
+
+  listEl.addEventListener("click", async (e) => {
+    const editBtn = e.target.closest("[data-edit-id]");
+    if (editBtn) {
+      const id = editBtn.getAttribute("data-edit-id");
+      const item = allAvoirs.find(a => a.id === id);
+      if (!item) return;
+      fillForm(item);
+      return;
+    }
+
+    const deleteBtn = e.target.closest("[data-delete-id]");
+    if (!deleteBtn) return;
+
+    const id = deleteBtn.getAttribute("data-delete-id");
+    const item = allAvoirs.find(a => a.id === id);
+    if (!item) return;
+
+    const ok = confirm("Supprimer cet avoir ?");
+    if (!ok) return;
+
+    try {
+      await deleteDoc(doc(db, "avoirs", id));
+      if (item.invoiceId) {
+        await syncInvoiceStatus(item.invoiceId, 0, id);
+      }
+
+      if (editingCreditId === id) {
+        resetForm();
+      }
+    } catch (err) {
+      console.error("Erreur suppression avoir :", err);
+      alert("Impossible de supprimer l’avoir.");
+    }
+  });
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -952,7 +1022,7 @@
     }
 
     const invoiceTotal = Number(invoice.amountTTC ?? invoice.amount ?? 0);
-    const existingCredits = getAppliedCreditsTotal(invoice.id);
+    const existingCredits = getAppliedCreditsTotal(invoice.id, editingCreditId);
     const remainingCreditCapacity = Math.max(0, Number((invoiceTotal - existingCredits).toFixed(2)));
 
     if (totalTTC > remainingCreditCapacity) {
@@ -961,36 +1031,63 @@
     }
 
     try {
-      const number = await getNextNumber();
       const businessSnapshot = invoice.businessSnapshot || {};
       const amounts = computeAmounts(totalTTC, businessSnapshot);
 
-      await addDoc(avoirsRef, {
-        number,
-        date: dateInput.value || new Date().toISOString().slice(0, 10),
-        invoiceId: invoice.id,
-        invoiceNumberSnapshot: invoice.number || "",
-        clientId: invoice.clientId || "",
-        clientSnapshot: invoice.clientSnapshot || {},
-        dossierId: invoice.dossierId || "",
-        dossierTitleSnapshot: invoice.dossierTitleSnapshot || "",
-        businessSnapshot,
-        status: "EMIS",
-        lines,
-        amountHT: amounts.amountHT,
-        amountVAT: amounts.amountVAT,
-        amountTTC: amounts.amountTTC,
-        total: amounts.amountTTC,
-        notes: notesInput.value || "",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      });
+      if (editingCreditId) {
+        const existing = allAvoirs.find(a => a.id === editingCreditId);
+        const oldInvoiceId = existing?.invoiceId || null;
 
-      await syncInvoiceStatus(invoice.id, amounts.amountTTC);
+        await updateDoc(doc(db, "avoirs", editingCreditId), {
+          date: dateInput.value || new Date().toISOString().slice(0, 10),
+          invoiceId: invoice.id,
+          invoiceNumberSnapshot: invoice.number || "",
+          clientId: invoice.clientId || "",
+          clientSnapshot: invoice.clientSnapshot || {},
+          dossierId: invoice.dossierId || "",
+          dossierTitleSnapshot: invoice.dossierTitleSnapshot || "",
+          businessSnapshot,
+          lines,
+          amountHT: amounts.amountHT,
+          amountVAT: amounts.amountVAT,
+          amountTTC: amounts.amountTTC,
+          total: amounts.amountTTC,
+          notes: notesInput.value || "",
+          updatedAt: serverTimestamp()
+        });
+
+        if (oldInvoiceId) await syncInvoiceStatus(oldInvoiceId);
+        await syncInvoiceStatus(invoice.id, amounts.amountTTC, editingCreditId);
+      } else {
+        const number = await getNextNumber();
+
+        await addDoc(avoirsRef, {
+          number,
+          date: dateInput.value || new Date().toISOString().slice(0, 10),
+          invoiceId: invoice.id,
+          invoiceNumberSnapshot: invoice.number || "",
+          clientId: invoice.clientId || "",
+          clientSnapshot: invoice.clientSnapshot || {},
+          dossierId: invoice.dossierId || "",
+          dossierTitleSnapshot: invoice.dossierTitleSnapshot || "",
+          businessSnapshot,
+          status: "EMIS",
+          lines,
+          amountHT: amounts.amountHT,
+          amountVAT: amounts.amountVAT,
+          amountTTC: amounts.amountTTC,
+          total: amounts.amountTTC,
+          notes: notesInput.value || "",
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+
+        await syncInvoiceStatus(invoice.id, amounts.amountTTC);
+      }
 
       resetForm();
     } catch (err) {
-      console.error("Erreur création avoir :", err);
+      console.error("Erreur création/modification avoir :", err);
       alert("Impossible d’enregistrer l’avoir.");
     }
   });
