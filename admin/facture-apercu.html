@@ -119,8 +119,10 @@
       border-radius:18px;
       background:#fff;
       padding:18px;
-      min-height:100%;
-    }
+      min-height:220%;
+      display:flex;
+      flex-direction:column;
+      }
 
     .panel h2{
       margin:0 0 10px;
@@ -129,23 +131,23 @@
     }
 
     .logo-wrap{
-      margin-bottom:14px;
-      min-height:88px;
-      display:flex;
-      align-items:flex-start;
-    }
+      flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+}
 
     .logo-box{
       width:132px;
-      height:132px;
-      border:1px solid var(--line);
-      border-radius:10px;
-      background:var(--soft-2);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-    }
+  height:132px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--soft-2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
 
     .logo-box img{
       max-width:100%;
@@ -164,16 +166,15 @@
 
     .invoice-head{
       display:grid;
-      gap:6px;
-      margin-bottom:14px;
-    }
+      gap:8px;
+          }
 
     .invoice-title{
-      font-size:2rem;
-      font-weight:900;
-      letter-spacing:-.05em;
-      margin:0;
-    }
+      font-size:1.6rem;
+  font-weight:900;
+  letter-spacing:-.05em;
+  margin:0;
+}
 
     .invoice-number{
       font-size:1.2rem;
@@ -355,7 +356,6 @@
   /* 🔥 garde la même structure qu’écran */
   .top-grid{
     grid-template-columns:1fr 1fr !important;
-    gap:10px;
   }
 
   .summary-grid{
