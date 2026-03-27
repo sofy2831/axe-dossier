@@ -192,15 +192,6 @@
       margin-top:22px;
     }
 
-    .section-label{
-      font-size:.86rem;
-      font-weight:800;
-      letter-spacing:.03em;
-      text-transform:uppercase;
-      color:#4f4942;
-      margin:0 0 10px;
-    }
-
     .table-wrap{
       border:1px solid var(--line);
       border-radius:18px;
@@ -348,6 +339,29 @@
         border-radius:0;
         padding:0;
       }
+
+      .top-grid{
+        grid-template-columns:1fr 1fr !important;
+      }
+
+      .summary-grid{
+        grid-template-columns:1fr 360px !important;
+      }
+
+      .footer-grid{
+        grid-template-columns:1fr 1fr !important;
+      }
+
+      .panel,
+      .totals,
+      .refs-box,
+      .mentions-box,
+      .bank-box,
+      .notes-box,
+      .table-wrap{
+        break-inside:avoid;
+        page-break-inside:avoid;
+      }
     }
   </style>
 </head>
@@ -397,8 +411,6 @@
       </section>
 
       <section class="section">
-        <h2 class="section-label">Objet</h2>
-
         <div class="table-wrap">
           <table>
             <thead>
@@ -419,7 +431,12 @@
         </div>
 
         <div class="summary-grid">
-          <div></div>
+          <div>
+            <div class="refs-box">
+              <h2>Références</h2>
+              <div id="refsBlock" class="meta"></div>
+            </div>
+          </div>
 
           <div>
             <div class="totals">
@@ -437,11 +454,6 @@
                 <span>Total TTC</span>
                 <strong id="amountTTC">—</strong>
               </div>
-            </div>
-
-            <div class="refs-box" style="margin-top:18px;">
-              <h2>Références</h2>
-              <div id="refsBlock" class="meta"></div>
             </div>
           </div>
         </div>
@@ -514,7 +526,6 @@
     function renderBusiness(snapshot = {}) {
       const parts = [
         snapshot.businessName || "",
-       
         cleanSingleLine(snapshot.address || ""),
         snapshot.email || "",
         snapshot.phone || "",
@@ -530,9 +541,7 @@
     function renderClient(snapshot = {}) {
       const parts = [
         snapshot.name || "",
-       
-        cleanSingleLine(snapshot.address || ""),
-        
+        cleanSingleLine(snapshot.address || "")
       ].filter(Boolean);
 
       return parts.length
@@ -698,21 +707,25 @@
             totalTTC: Number(data.amountTTC ?? data.amount ?? 0)
           }];
 
-      body.innerHTML = lines.map(lineItem => {
-        const qty = Number(lineItem.quantity || 0);
-        const unitPriceTTC = Number(lineItem.unitPriceTTC || 0);
-        const totalTTC = Number(lineItem.totalTTC || 0);
+      const colspan = hasTVA ? 5 : 4;
 
-        return `
-          <tr>
-            <td>${escapeHtml(lineItem.designation || "")}</td>
-            <td class="num">${qty}</td>
-            <td class="num">${formatMoney(unitPriceTTC)}</td>
-            ${hasTVA ? `<td class="num">${Number(business.vatRate || 0)} %</td>` : ""}
-            <td class="num">${formatMoney(totalTTC)}</td>
-          </tr>
-        `;
-      }).join("");
+      body.innerHTML = lines.length
+        ? lines.map(lineItem => {
+            const qty = Number(lineItem.quantity || 0);
+            const unitPriceTTC = Number(lineItem.unitPriceTTC || 0);
+            const totalTTC = Number(lineItem.totalTTC || 0);
+
+            return `
+              <tr>
+                <td>${escapeHtml(lineItem.designation || "")}</td>
+                <td class="num">${qty}</td>
+                <td class="num">${formatMoney(unitPriceTTC)}</td>
+                ${hasTVA ? `<td class="num">${Number(business.vatRate || 0)} %</td>` : ""}
+                <td class="num">${formatMoney(totalTTC)}</td>
+              </tr>
+            `;
+          }).join("")
+        : `<tr><td colspan="${colspan}">Aucune ligne.</td></tr>`;
     }
 
     function buildPaymentLimitLabel(data = {}) {
