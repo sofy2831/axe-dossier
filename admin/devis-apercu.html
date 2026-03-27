@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axe Dossier — Aperçu devis</title>
+  <style>
+    :root{
+      --bg:#f3efe8;
+      --card:#ffffff;
+      --text:#171717;
+      --muted:#66615a;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --soft:#e9e1d4;
+      --soft-2:#faf7f1;
+      --shadow:0 16px 40px rgba(0,0,0,0.06);
+      --max:1120px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+
+    body{
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,0.92);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .topbar-inner{
+      width:min(var(--max),calc(100% - 32px));
+      margin:0 auto;
+      min-height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:12px 0;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+
+    .brand-mark{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:var(--accent);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      min-height:44px;
+      padding:0 16px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      text-decoration:none;
+      font:inherit;
+      font-weight:700;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+    }
+
+    .btn-dark{
+      background:var(--accent);
+      color:#fff;
+      border-color:var(--accent);
+    }
+
+    .wrap{
+      width:min(var(--max),calc(100% - 32px));
+      margin:28px auto 56px;
+    }
+
+    .sheet{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:30px;
+    }
+
+    .top-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .panel{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      padding:18px;
+      min-height:220px;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+    }
+
+    .panel h2{
+      margin:0 0 10px;
+      font-size:1rem;
+      letter-spacing:-.02em;
+    }
+
+    .logo-wrap{
+      flex:1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .logo-box{
+      width:132px;
+      height:132px;
+      border:1px solid var(--line);
+      border-radius:10px;
+      background:var(--soft-2);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .logo-box img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .logo-placeholder{
+      color:var(--muted);
+      font-size:.88rem;
+      text-align:center;
+      padding:10px;
+      line-height:1.4;
+    }
+
+    .quote-head{
+      display:grid;
+      gap:8px;
+    }
+
+    .quote-title{
+      font-size:1.6rem;
+      font-weight:900;
+      letter-spacing:-.05em;
+      margin:0;
+    }
+
+    .quote-number{
+      font-size:1.2rem;
+      font-weight:800;
+      letter-spacing:-.02em;
+    }
+
+    .meta{
+      display:grid;
+      gap:6px;
+      font-size:.97rem;
+      line-height:1.5;
+    }
+
+    .section{
+      margin-top:22px;
+    }
+
+    .table-wrap{
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      background:#fff;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    th, td{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      text-align:left;
+      vertical-align:top;
+      font-size:.96rem;
+    }
+
+    thead th{
+      background:var(--soft-2);
+      font-size:.9rem;
+      font-weight:800;
+    }
+
+    tbody tr:last-child td{
+      border-bottom:none;
+    }
+
+    .num{
+      text-align:right;
+      white-space:nowrap;
+    }
+
+    .hidden-col{
+      display:none;
+    }
+
+    .summary-grid{
+      display:grid;
+      grid-template-columns:1fr 360px;
+      gap:18px;
+      margin-top:18px;
+      align-items:start;
+    }
+
+    .totals{
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      background:#fff;
+    }
+
+    .totals-row{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+    }
+
+    .totals-row:last-child{border-bottom:none}
+
+    .grand-total{
+      background:var(--soft);
+      font-weight:900;
+    }
+
+    .refs-box,
+    .mentions-box,
+    .bank-box,
+    .notes-box{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fff;
+      padding:18px;
+    }
+
+    .refs-box h2,
+    .mentions-box h2,
+    .bank-box h2,
+    .notes-box h2{
+      margin:0 0 10px;
+      font-size:1rem;
+      letter-spacing:-.02em;
+    }
+
+    .footer-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+      margin-top:20px;
+    }
+
+    .bank-content{
+      white-space:pre-line;
+      line-height:1.55;
+    }
+
+    .notes-box{
+      margin-top:18px;
+    }
+
+    .footer{
+      margin-top:22px;
+      padding-top:16px;
+      border-top:1px solid var(--line);
+      text-align:center;
+      color:#4f4942;
+      font-size:.92rem;
+      line-height:1.6;
+    }
+
+    .empty,
+    .error{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:28px;
+    }
+
+    .error{color:#7a1f1f}
+
+    @media (max-width: 900px){
+      .top-grid,
+      .summary-grid,
+      .footer-grid{
+        grid-template-columns:1fr;
+      }
+
+      .sheet{
+        padding:22px;
+      }
+
+      .panel{
+        min-height:auto;
+      }
+    }
+
+    @media print{
+      @page{
+        size:A4;
+        margin:10mm;
+      }
+
+      body{
+        background:#fff;
+        font-size:12px;
+      }
+
+      .topbar{
+        display:none !important;
+      }
+
+      .wrap{
+        width:100%;
+        margin:0;
+      }
+
+      .sheet{
+        box-shadow:none;
+        border:none;
+        border-radius:0;
+        padding:8px;
+      }
+
+      .top-grid{
+        grid-template-columns:1fr 1fr !important;
+        gap:10px;
+      }
+
+      .summary-grid{
+        grid-template-columns:1fr 320px !important;
+        gap:10px;
+      }
+
+      .footer-grid{
+        grid-template-columns:1fr 1fr !important;
+        gap:10px;
+      }
+
+      .panel{
+        min-height:160px;
+        padding:10px;
+      }
+
+      .refs-box,
+      .mentions-box,
+      .bank-box,
+      .notes-box{
+        padding:10px;
+      }
+
+      th, td{
+        padding:8px 10px;
+        font-size:11px;
+      }
+
+      .quote-title{
+        font-size:18px;
+      }
+
+      .quote-number{
+        font-size:13px;
+      }
+
+      .panel,
+      .table-wrap,
+      .totals,
+      .refs-box,
+      .mentions-box,
+      .bank-box,
+      .notes-box{
+        page-break-inside:avoid;
+        break-inside:avoid;
+      }
+
+      html, body{
+        height:auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier · Aperçu devis</span>
+      </div>
+
+      <div class="actions">
+        <a class="btn" href="devis.html">Retour</a>
+        <button class="btn btn-dark" id="printBtn" type="button">Imprimer / PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div id="loading" class="empty">Chargement du devis…</div>
+    <div id="error" class="error" style="display:none;"></div>
+
+    <article id="sheet" class="sheet" style="display:none;">
+      <section class="top-grid">
+        <div class="panel">
+          <h2>Logo</h2>
+          <div class="logo-wrap">
+            <div id="logoBox" class="logo-box">
+              <div class="logo-placeholder">Logo non renseigné</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Devis</h2>
+          <div class="quote-head">
+            <h1 class="quote-title">Devis</h1>
+            <div id="quoteNumber" class="quote-number">—</div>
+            <div>Date : <span id="quoteDate">—</span></div>
+            <div>Validité : <span id="quoteDueDate">—</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Émetteur</h2>
+          <div id="businessBlock" class="meta"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Client</h2>
+          <div id="clientBlock" class="meta"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:46%;">Désignation</th>
+                <th class="num" style="width:12%;">Qté</th>
+                <th class="num" style="width:18%;">PU TTC</th>
+                <th id="vatHeader" class="num" style="width:12%;">TVA</th>
+                <th class="num" style="width:12%;">Total TTC</th>
+              </tr>
+            </thead>
+            <tbody id="linesBody">
+              <tr>
+                <td colspan="5">Aucune ligne.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="summary-grid">
+          <div>
+            <div class="refs-box">
+              <h2>Références</h2>
+              <div id="refsBlock" class="meta"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="totals">
+              <div class="totals-row">
+                <span>Total HT</span>
+                <strong id="amountHT">—</strong>
+              </div>
+
+              <div id="vatTotalsRow" class="totals-row">
+                <span>TVA</span>
+                <strong id="amountVAT">—</strong>
+              </div>
+
+              <div class="totals-row grand-total">
+                <span>Total TTC</span>
+                <strong id="amountTTC">—</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="footer-grid">
+        <div class="mentions-box">
+          <h2>Mentions</h2>
+          <div id="mentionsBlock" class="meta"></div>
+        </div>
+
+        <div class="bank-box">
+          <h2>Coordonnées bancaires</h2>
+          <div id="bankBlock" class="bank-content">Non renseignées.</div>
+        </div>
+      </section>
+
+      <section class="notes-box">
+        <h2>Notes internes</h2>
+        <div id="notesBlock" class="meta">Aucune note.</div>
+      </section>
+
+      <footer id="footerBlock" class="footer"></footer>
+    </article>
+  </main>
+
+  <script type="module">
+    import "./auth-guard.js";
+    import { db } from "./firebase-config.js";
+    import {
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const loadingEl = document.getElementById("loading");
+    const errorEl = document.getElementById("error");
+    const sheetEl = document.getElementById("sheet");
+    const printBtn = document.getElementById("printBtn");
+
+    function qs(name) {
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
+    }
+
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function cleanSingleLine(text = "") {
+      return String(text).replace(/\n/g, " ").trim();
+    }
+
+    function formatMoney(value) {
+      const num = Number(value || 0);
+      return num.toLocaleString("fr-FR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " €";
+    }
+
+    function line(text) {
+      return `<div>${escapeHtml(text)}</div>`;
+    }
+
+    function renderBusiness(snapshot = {}) {
+      const parts = [
+        snapshot.businessName || "",
+        cleanSingleLine(snapshot.address || ""),
+        snapshot.email || "",
+        snapshot.phone || "",
+        snapshot.siret ? `SIRET : ${snapshot.siret}` : "",
+        snapshot.ape ? `APE : ${snapshot.ape}` : ""
+      ].filter(Boolean);
+
+      return parts.length
+        ? parts.map(p => line(p)).join("")
+        : "<div>Aucune donnée émetteur.</div>";
+    }
+
+    function renderClient(snapshot = {}) {
+      const parts = [
+        snapshot.name || "",
+        cleanSingleLine(snapshot.address || "")
+      ].filter(Boolean);
+
+      return parts.length
+        ? parts.map(p => line(p)).join("")
+        : "<div>Aucune donnée client.</div>";
+    }
+
+    function renderLogo(snapshot = {}) {
+      const box = document.getElementById("logoBox");
+      const logoUrl = snapshot.logoUrl || "";
+
+      if (!logoUrl) {
+        box.innerHTML = '<div class="logo-placeholder">Logo non renseigné</div>';
+        return;
+      }
+
+      box.innerHTML = `<img src="${escapeHtml(logoUrl)}" alt="Logo émetteur" />`;
+    }
+
+    function renderMentions(snapshot = {}) {
+      const parts = [];
+
+      if (snapshot.vatMode === "YES") {
+        parts.push(`Soumis à la TVA${snapshot.vatRate ? ` : ${snapshot.vatRate} %` : ""}`);
+        if (snapshot.vatNumber) parts.push(`N° TVA : ${snapshot.vatNumber}`);
+      } else if (snapshot.tvaExemptionText) {
+        parts.push(snapshot.tvaExemptionText);
+      }
+
+      if (
+        snapshot.legalNotice &&
+        snapshot.legalNotice.trim() &&
+        snapshot.legalNotice.trim() !== (snapshot.tvaExemptionText || "").trim()
+      ) {
+        parts.push(snapshot.legalNotice);
+      }
+
+      return parts.length
+        ? parts.map(p => line(p)).join("")
+        : "<div>Aucune mention.</div>";
+    }
+
+    function renderBank(snapshot = {}) {
+      const parts = [];
+      if (snapshot.bankName) parts.push(`Banque : ${snapshot.bankName}`);
+      if (snapshot.iban) parts.push(`IBAN : ${snapshot.iban}`);
+      if (snapshot.bic) parts.push(`BIC : ${snapshot.bic}`);
+      return parts.length ? parts.join("\n") : "Non renseignées.";
+    }
+
+    function renderFooter(snapshot = {}) {
+      const parts = [
+        snapshot.businessName || "Axe Dossier",
+        cleanSingleLine(snapshot.address || ""),
+        snapshot.siret ? `SIRET : ${snapshot.siret}` : "",
+        snapshot.ape ? `APE : ${snapshot.ape}` : ""
+      ].filter(Boolean);
+
+      return escapeHtml(parts.join(" — "));
+    }
+
+    function applyTVADisplay(business = {}) {
+      const vatMode = business.vatMode || "NO";
+      const vatRate = Number(business.vatRate || 0);
+      const hasTVA = vatMode === "YES" && vatRate > 0;
+
+      const vatHeader = document.getElementById("vatHeader");
+      const vatTotalsRow = document.getElementById("vatTotalsRow");
+
+      if (hasTVA) {
+        vatHeader.classList.remove("hidden-col");
+        vatTotalsRow.style.display = "";
+      } else {
+        vatHeader.classList.add("hidden-col");
+        vatTotalsRow.style.display = "none";
+      }
+
+      return hasTVA;
+    }
+
+    function renderLines(data = {}, business = {}) {
+      const body = document.getElementById("linesBody");
+      const hasTVA = applyTVADisplay(business);
+      const lines = Array.isArray(data.lines) && data.lines.length
+        ? data.lines
+        : [{
+            designation: data.label || "Prestation",
+            quantity: 1,
+            unitPriceTTC: Number(data.amountTTC ?? data.amount ?? 0),
+            totalTTC: Number(data.amountTTC ?? data.amount ?? 0)
+          }];
+
+      const colspan = hasTVA ? 5 : 4;
+
+      body.innerHTML = lines.length
+        ? lines.map(lineItem => {
+            const qty = Number(lineItem.quantity || 0);
+            const unitPriceTTC = Number(lineItem.unitPriceTTC || 0);
+            const totalTTC = Number(lineItem.totalTTC || 0);
+
+            return `
+              <tr>
+                <td>${escapeHtml(lineItem.designation || "")}</td>
+                <td class="num">${qty}</td>
+                <td class="num">${formatMoney(unitPriceTTC)}</td>
+                ${hasTVA ? `<td class="num">${Number(business.vatRate || 0)} %</td>` : ""}
+                <td class="num">${formatMoney(totalTTC)}</td>
+              </tr>
+            `;
+          }).join("")
+        : `<tr><td colspan="${colspan}">Aucune ligne.</td></tr>`;
+    }
+
+    function buildValidityLabel(data = {}) {
+      if (data.dueDate) return data.dueDate;
+      return "—";
+    }
+
+    function renderRefs(data = {}) {
+      const parts = [];
+
+      if (data.dossierTitleSnapshot) {
+        parts.push(`Dossier : ${data.dossierTitleSnapshot}`);
+      }
+
+      if (data.mode) {
+        parts.push(`Mode prévu : ${data.mode}`);
+      }
+
+      parts.push(`Total devis : ${formatMoney(data.amountTTC ?? data.amount ?? 0)}`);
+      parts.push(`Validité : ${buildValidityLabel(data)}`);
+
+      return parts.map(p => line(p)).join("");
+    }
+
+    function showError(message) {
+      loadingEl.style.display = "none";
+      sheetEl.style.display = "none";
+      errorEl.style.display = "block";
+      errorEl.textContent = message;
+    }
+
+    async function init() {
+      const quoteId = qs("id");
+
+      if (!quoteId) {
+        showError("Aucun identifiant de devis dans l’URL.");
+        return;
+      }
+
+      try {
+        const snap = await getDoc(doc(db, "devis", quoteId));
+
+        if (!snap.exists()) {
+          showError("Devis introuvable.");
+          return;
+        }
+
+        const data = snap.data();
+        const business = data.businessSnapshot || {};
+        const client = data.clientSnapshot || {};
+
+        document.title = `${data.number || "Devis"} — Axe Dossier`;
+
+        document.getElementById("quoteNumber").textContent = data.number || "—";
+        document.getElementById("quoteDate").textContent = data.date || "—";
+        document.getElementById("quoteDueDate").textContent = buildValidityLabel(data);
+
+        renderLogo(business);
+        document.getElementById("businessBlock").innerHTML = renderBusiness(business);
+        document.getElementById("clientBlock").innerHTML = renderClient(client);
+
+        renderLines(data, business);
+
+        document.getElementById("amountHT").textContent =
+          formatMoney(data.amountHT ?? data.amountTTC ?? data.amount ?? 0);
+
+        document.getElementById("amountVAT").textContent =
+          formatMoney(data.amountVAT ?? 0);
+
+        document.getElementById("amountTTC").textContent =
+          formatMoney(data.amountTTC ?? data.amount ?? 0);
+
+        document.getElementById("refsBlock").innerHTML = renderRefs(data);
+        document.getElementById("mentionsBlock").innerHTML = renderMentions(business);
+        document.getElementById("bankBlock").textContent = renderBank(business);
+        document.getElementById("footerBlock").textContent = renderFooter(business);
+
+        document.getElementById("notesBlock").innerHTML = data.notes
+          ? `<div>${escapeHtml(data.notes).replace(/\n/g, "<br>")}</div>`
+          : "Aucune note.";
+
+        loadingEl.style.display = "none";
+        errorEl.style.display = "none";
+        sheetEl.style.display = "block";
+      } catch (err) {
+        console.error(err);
+        showError("Impossible de charger le devis.");
+      }
+    }
+
+    printBtn.addEventListener("click", () => window.print());
+
+    init();
+  </script>
+</body>
+</html>
