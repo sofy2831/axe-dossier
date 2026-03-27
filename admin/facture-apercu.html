@@ -329,40 +329,89 @@
       }
     }
 
-    @media print{
-      body{background:#fff}
-      .topbar{display:none !important}
-      .wrap{width:100%;margin:0}
-      .sheet{
-        box-shadow:none;
-        border:none;
-        border-radius:0;
-        padding:0;
-      }
+  @media print{
 
-      .top-grid{
-        grid-template-columns:1fr 1fr !important;
-      }
+  body{
+    background:#fff;
+    font-size:12px;
+  }
 
-      .summary-grid{
-        grid-template-columns:1fr 360px !important;
-      }
+  .topbar{
+    display:none !important;
+  }
 
-      .footer-grid{
-        grid-template-columns:1fr 1fr !important;
-      }
+  .wrap{
+    width:100%;
+    margin:0;
+  }
 
-      .panel,
-      .totals,
-      .refs-box,
-      .mentions-box,
-      .bank-box,
-      .notes-box,
-      .table-wrap{
-        break-inside:avoid;
-        page-break-inside:avoid;
-      }
-    }
+  .sheet{
+    box-shadow:none;
+    border:none;
+    border-radius:0;
+    padding:10px;
+  }
+
+  /* 🔥 garde la même structure qu’écran */
+  .top-grid{
+    grid-template-columns:1fr 1fr !important;
+    gap:10px;
+  }
+
+  .summary-grid{
+    grid-template-columns:1fr 1fr !important;
+    gap:10px;
+  }
+
+  .footer-grid{
+    grid-template-columns:1fr 1fr !important;
+    gap:10px;
+  }
+
+  /* 🔥 compresser les blocs */
+  .panel,
+  .refs-box,
+  .mentions-box,
+  .bank-box,
+  .notes-box{
+    padding:10px;
+  }
+
+  /* 🔥 tableau plus compact */
+  th, td{
+    padding:8px 10px;
+    font-size:11px;
+  }
+
+  .invoice-title{
+    font-size:18px;
+  }
+
+  .invoice-number{
+    font-size:13px;
+  }
+
+  .amount{
+    font-size:16px;
+  }
+
+  /* 🔥 éviter les coupures moches */
+  .panel,
+  .table-wrap,
+  .totals,
+  .refs-box,
+  .mentions-box,
+  .bank-box,
+  .notes-box{
+    page-break-inside: avoid;
+  }
+
+  /* 🔥 limiter à 1 page si possible */
+  html, body{
+    height:auto;
+  }
+
+}
   </style>
 </head>
 <body>
