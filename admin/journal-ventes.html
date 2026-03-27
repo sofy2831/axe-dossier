@@ -283,7 +283,7 @@
         <a class="pill" href="paiements.html">Paiements</a>
         <a class="pill" href="journal-reglements.html">Journal règlements</a>
         <a class="pill" href="recouvrement.html">Recouvrement</a>
-        <a class="pill" href="settings.html">Settings</a>
+        <a class="pill" href="settings.html">Réglages</a>
       </nav>
     </div>
   </header>
@@ -430,10 +430,14 @@
       return s || "—";
     }
 
+    function safeDate(value = "") {
+      return String(value || "").trim();
+    }
+
     function normalizeEntries() {
       const factures = allFactures.map(item => ({
         id: item.id,
-        date: item.date || "",
+        date: safeDate(item.date || ""),
         type: "FACTURE",
         number: item.number || "",
         clientName: item.clientSnapshot?.name || "",
@@ -447,7 +451,7 @@
         .filter(item => normalizeStatus("AVOIR", item.status) !== "ANNULE")
         .map(item => ({
           id: item.id,
-          date: item.date || "",
+          date: safeDate(item.date || ""),
           type: "AVOIR",
           number: item.number || "",
           clientName: item.clientSnapshot?.name || "",
@@ -464,10 +468,12 @@
       const sort = sortFilter.value || "DATE_DESC";
       const list = [...entries];
 
+      const sortDate = (v) => String(v || "0000-00-00");
+
       if (sort === "DATE_ASC") {
         return list.sort((a, b) => {
-          const da = a.date || "";
-          const db = b.date || "";
+          const da = sortDate(a.date);
+          const db = sortDate(b.date);
           if (da === db) return String(a.number || "").localeCompare(String(b.number || ""));
           return da.localeCompare(db);
         });
@@ -482,8 +488,8 @@
       }
 
       return list.sort((a, b) => {
-        const da = a.date || "";
-        const db = b.date || "";
+        const da = sortDate(a.date);
+        const db = sortDate(b.date);
         if (da === db) return String(b.number || "").localeCompare(String(a.number || ""));
         return db.localeCompare(da);
       });
