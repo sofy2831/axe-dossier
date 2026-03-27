@@ -279,7 +279,7 @@
             <div class="menu">
               <a href="journal-ventes.html">Journal des ventes</a>
               <a href="journal-reglements.html">Journal des règlements</a>
-              <a href="settings.html">Settings</a>
+              <a href="settings.html">Réglages</a>
             </div>
           </div>
         </div>
@@ -299,6 +299,8 @@
     const adminStatus = document.getElementById("adminStatus");
     const userInfo = document.getElementById("userInfo");
     const logoutBtn = document.getElementById("logoutBtn");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
 
     function showStatus(el, message, type = "ok") {
       el.className = `status show ${type}`;
@@ -310,11 +312,21 @@
       el.textContent = "";
     }
 
-    function setLoggedOut() {
+    function resetLoginForm() {
+      loginForm.reset();
+      passwordInput.value = "";
+    }
+
+    function setLoggedOut(message = "") {
       loginCard.classList.remove("hidden");
       adminCard.classList.add("hidden");
       userInfo.textContent = "";
       clearStatus(adminStatus);
+      passwordInput.value = "";
+
+      if (message) {
+        showStatus(loginStatus, message, "ok");
+      }
     }
 
     function setLoggedIn(user) {
@@ -322,6 +334,8 @@
       adminCard.classList.remove("hidden");
       userInfo.textContent = user?.email || "";
       clearStatus(loginStatus);
+      clearStatus(adminStatus);
+      passwordInput.value = "";
     }
 
     watchAuth((user) => {
@@ -336,12 +350,11 @@
       e.preventDefault();
       clearStatus(loginStatus);
 
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
 
       try {
         await login(email, password);
-        showStatus(loginStatus, "Connexion réussie.", "ok");
       } catch (err) {
         console.error(err);
         showStatus(loginStatus, "Connexion refusée. Vérifie l’email et le mot de passe.", "error");
@@ -351,7 +364,8 @@
     logoutBtn.addEventListener("click", async () => {
       try {
         await logout();
-        showStatus(adminStatus, "Déconnexion effectuée.", "ok");
+        resetLoginForm();
+        setLoggedOut("Déconnexion effectuée.");
       } catch (err) {
         console.error(err);
         showStatus(adminStatus, "Impossible de se déconnecter.", "error");
