@@ -343,116 +343,121 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       <a class="brand" href="index.html" aria-label="Retour admin">
         <span class="brand-mark">AD</span>
         <span>Axe Dossier · Paiements</span>
-      </a><nav class="nav" aria-label="Navigation admin">
-    <a class="pill" href="index.html">Admin</a>
-    <a class="pill" href="clients.html">Clients</a>
-    <a class="pill" href="dossiers.html">Dossiers</a>
-    <a class="pill" href="documents.html">Documents</a>
-    <a class="pill" href="factures.html">Factures</a>
-    <a class="pill" href="paiements.html">Paiements</a>
-    <a class="pill" href="settings.html">Settings</a>
-  </nav>
-</div>
+      </a>
+      <nav class="nav" aria-label="Navigation admin">
+        <a class="pill" href="index.html">Admin</a>
+        <a class="pill" href="clients.html">Clients</a>
+        <a class="pill" href="dossiers.html">Dossiers</a>
+        <a class="pill" href="documents.html">Documents</a>
+        <a class="pill" href="devis.html">Devis</a>
+        <a class="pill" href="factures.html">Factures</a>
+        <a class="pill" href="avoirs.html">Avoirs</a>
+        <a class="pill" href="paiements.html">Paiements</a>
+        <a class="pill" href="settings.html">Settings</a>
+      </nav>
+    </div>
 
-  </header>  <main>
+  </header>
+  <main>
     <div class="wrap">
       <section class="hero">
         <div>
           <h1>Paiements</h1>
           <p>Tu enregistres ici les règlements reçus, avec lien vers la facture, date, mode et montant. Cela te permet d’avoir un suivi propre avant d’automatiser davantage.</p>
         </div>
-      </section><section class="grid">
-    <article class="card">
-      <h2>Ajouter un paiement</h2>
-      <form id="paymentForm">
-        <div class="field">
-          <label for="paymentInvoice">Facture</label>
-          <select id="paymentInvoice" name="paymentInvoice" required>
-            <option value="">Sélectionner une facture</option>
-          </select>
-        </div>
+      </section>
+      <section class="grid">
+        <article class="card">
+          <h2>Ajouter un paiement</h2>
+          <form id="paymentForm">
+            <div class="field">
+              <label for="paymentInvoice">Facture</label>
+              <select id="paymentInvoice" name="paymentInvoice" required>
+                <option value="">Sélectionner une facture</option>
+              </select>
+            </div>
 
-        <div class="row-2">
-          <div class="field">
-            <label for="paymentDate">Date de paiement</label>
-            <input id="paymentDate" name="paymentDate" type="date" />
-          </div>
-          <div class="field">
-            <label for="paymentAmount">Montant reçu (€)</label>
-            <input id="paymentAmount" name="paymentAmount" type="number" step="0.01" min="0" placeholder="190.00" required />
-          </div>
-        </div>
+            <div class="row-2">
+              <div class="field">
+                <label for="paymentDate">Date de paiement</label>
+                <input id="paymentDate" name="paymentDate" type="date" />
+              </div>
+              <div class="field">
+                <label for="paymentAmount">Montant reçu (€)</label>
+                <input id="paymentAmount" name="paymentAmount" type="number" step="0.01" min="0" placeholder="190.00" required />
+              </div>
+            </div>
 
-        <div class="row-2">
-          <div class="field">
-            <label for="paymentMode">Mode</label>
-            <select id="paymentMode" name="paymentMode">
+            <div class="row-2">
+              <div class="field">
+                <label for="paymentMode">Mode</label>
+                <select id="paymentMode" name="paymentMode">
+                  <option value="VIREMENT">VIREMENT</option>
+                  <option value="CHEQUE">CHEQUE</option>
+                  <option value="ESPECES">ESPECES</option>
+                  <option value="AUTRE">AUTRE</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="paymentReference">Référence</label>
+                <input id="paymentReference" name="paymentReference" type="text" placeholder="Ex. Virement 14/04 / Chèque n°..." />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="paymentNotes">Notes internes</label>
+              <textarea id="paymentNotes" name="paymentNotes" placeholder="Ex. acompte, règlement complet, reste à recevoir, vérifié en banque..."></textarea>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="btn">Enregistrer</button>
+              <button type="reset" class="btn btn-secondary">Vider</button>
+            </div>
+          </form>
+
+          <div class="note">
+            Le paiement embarque maintenant ses snapshots facture/client au moment de l’enregistrement. C’est plus propre pour les journaux.
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="stats">
+            <div class="stat">
+              <strong id="totalPayments">0</strong>
+              <span>Paiements</span>
+            </div>
+            <div class="stat">
+              <strong id="totalPaidAmount">0 €</strong>
+              <span>Total encaissé</span>
+            </div>
+            <div class="stat">
+              <strong id="totalVirements">0</strong>
+              <span>Virements</span>
+            </div>
+            <div class="stat">
+              <strong id="totalCheques">0</strong>
+              <span>Chèques</span>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <input id="searchInput" class="search" type="text" placeholder="Rechercher un paiement..." />
+            <select id="modeFilter" class="filter">
+              <option value="">Tous les modes</option>
               <option value="VIREMENT">VIREMENT</option>
               <option value="CHEQUE">CHEQUE</option>
               <option value="ESPECES">ESPECES</option>
               <option value="AUTRE">AUTRE</option>
             </select>
           </div>
-          <div class="field">
-            <label for="paymentReference">Référence</label>
-            <input id="paymentReference" name="paymentReference" type="text" placeholder="Ex. Virement 14/04 / Chèque n°..." />
-          </div>
-        </div>
 
-        <div class="field">
-          <label for="paymentNotes">Notes internes</label>
-          <textarea id="paymentNotes" name="paymentNotes" placeholder="Ex. acompte, règlement complet, reste à recevoir, vérifié en banque..."></textarea>
-        </div>
+          <div id="paymentList" class="payment-list"></div>
+        </article>
+      </section>
+    </div>
 
-        <div class="actions">
-          <button type="submit" class="btn">Enregistrer</button>
-          <button type="reset" class="btn btn-secondary">Vider</button>
-        </div>
-      </form>
+  </main>
 
-      <div class="note">
-        Version 1 : enregistrement simple. Ensuite on pourra calculer automatiquement les soldes par facture et marquer une facture comme <strong>PAYEE</strong> selon le cumul des règlements.
-      </div>
-    </article>
-
-    <article class="card">
-      <div class="stats">
-        <div class="stat">
-          <strong id="totalPayments">0</strong>
-          <span>Paiements</span>
-        </div>
-        <div class="stat">
-          <strong id="totalPaidAmount">0 €</strong>
-          <span>Total encaissé</span>
-        </div>
-        <div class="stat">
-          <strong id="totalVirements">0</strong>
-          <span>Virements</span>
-        </div>
-        <div class="stat">
-          <strong id="totalCheques">0</strong>
-          <span>Chèques</span>
-        </div>
-      </div>
-
-      <div class="toolbar">
-        <input id="searchInput" class="search" type="text" placeholder="Rechercher un paiement..." />
-        <select id="modeFilter" class="filter">
-          <option value="">Tous les modes</option>
-          <option value="VIREMENT">VIREMENT</option>
-          <option value="CHEQUE">CHEQUE</option>
-          <option value="ESPECES">ESPECES</option>
-          <option value="AUTRE">AUTRE</option>
-        </select>
-      </div>
-
-      <div id="paymentList" class="payment-list"></div>
-    </article>
-  </section>
-</div>
-
-  </main>  
-  
  <script type="module">
   import "./auth-guard.js";
   import { db } from "./firebase-config.js";
@@ -513,16 +518,34 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     return "autre";
   }
 
+  function normalizeInvoiceStatus(status = "") {
+    const s = String(status || "").trim().toUpperCase();
+    if (s === "BROUILLON") return "BROUILLON";
+    if (s === "ENVOYEE") return "EMISE";
+    if (s === "PAYEE") return "PAYEE";
+    if (s === "RETARD") return "RETARD";
+    if (s === "ANNULEE") return "ANNULEE";
+    return s || "";
+  }
+
   function fillInvoiceSelect() {
     const current = paymentInvoice.value;
 
     const options = ['<option value="">Sélectionner une facture</option>']
       .concat(
-        allInvoices.map(invoice => `
-          <option value="${invoice.id}" data-amount="${invoice.amount || 0}">
-            ${escapeHtml(invoice.number || "")} — ${escapeHtml(invoice.label || "Sans libellé")}
-          </option>
-        `)
+        allInvoices.map(invoice => {
+          const amount = Number(invoice.amountTTC ?? invoice.amount ?? 0);
+          const label =
+            (Array.isArray(invoice.lines) && invoice.lines.length
+              ? invoice.lines[0]?.designation
+              : invoice.label) || "Sans libellé";
+
+          return `
+            <option value="${invoice.id}" data-amount="${amount}">
+              ${escapeHtml(invoice.number || "")} — ${escapeHtml(label)}
+            </option>
+          `;
+        })
       );
 
     paymentInvoice.innerHTML = options.join("");
@@ -558,14 +581,29 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
 
     const filtered = allPayments.filter(payment => {
       const invoice = invoiceMap[payment.invoiceId];
-      const clientName = invoice ? (clientMap[invoice.clientId]?.name || "") : "";
+      const clientName =
+        payment.clientNameSnapshot ||
+        (invoice ? (invoice.clientSnapshot?.name || clientMap[invoice.clientId]?.name || "") : "");
+
+      const invoiceNumber =
+        payment.invoiceNumberSnapshot ||
+        invoice?.number ||
+        "";
+
+      const invoiceLabel =
+        payment.invoiceLabelSnapshot ||
+        (invoice
+          ? (((Array.isArray(invoice.lines) && invoice.lines.length)
+              ? invoice.lines[0]?.designation
+              : invoice.label) || "")
+          : "");
 
       const blob = [
         payment.reference || "",
         payment.notes || "",
         payment.mode || "",
-        invoice?.number || "",
-        invoice?.label || "",
+        invoiceNumber,
+        invoiceLabel,
         clientName
       ].join(" ").toLowerCase();
 
@@ -576,7 +614,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
 
     renderStats(allPayments);
 
-    if (!allInvoices.length) {
+    if (!allInvoices.length && !allPayments.length) {
       paymentList.innerHTML = '<div class="empty">Ajoute d’abord au moins une facture dans factures.html.</div>';
       return;
     }
@@ -588,18 +626,35 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
 
     paymentList.innerHTML = filtered.map(payment => {
       const invoice = invoiceMap[payment.invoiceId];
-      const clientName = invoice ? (clientMap[invoice.clientId]?.name || "Client supprimé") : "Facture supprimée";
+
+      const invoiceNumber =
+        payment.invoiceNumberSnapshot ||
+        invoice?.number ||
+        "Facture supprimée";
+
+      const clientName =
+        payment.clientNameSnapshot ||
+        (invoice ? (invoice.clientSnapshot?.name || "Client supprimé") : "Facture supprimée");
+
+      const invoiceLabel =
+        payment.invoiceLabelSnapshot ||
+        (invoice
+          ? (((Array.isArray(invoice.lines) && invoice.lines.length)
+              ? invoice.lines[0]?.designation
+              : invoice.label) || "")
+          : "");
 
       return `
         <article class="payment-item">
           <div class="payment-top">
             <div>
-              <div class="payment-title">${escapeHtml(invoice?.number || "Facture supprimée")}</div>
+              <div class="payment-title">${escapeHtml(invoiceNumber)}</div>
               <div class="payment-meta">
                 <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
-                ${invoice?.label ? `<span><strong>Libellé :</strong> ${escapeHtml(invoice.label)}</span>` : ""}
+                ${invoiceLabel ? `<span><strong>Libellé :</strong> ${escapeHtml(invoiceLabel)}</span>` : ""}
                 ${payment.date ? `<span><strong>Date :</strong> ${escapeHtml(payment.date)}</span>` : ""}
                 ${payment.reference ? `<span><strong>Référence :</strong> ${escapeHtml(payment.reference)}</span>` : ""}
+                ${payment.invoiceStatusSnapshot ? `<span><strong>Statut facture :</strong> ${escapeHtml(payment.invoiceStatusSnapshot)}</span>` : ""}
               </div>
             </div>
             <div class="badges">
@@ -622,9 +677,25 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     }).join("");
   }
 
-  function createPayment(data) {
+  function buildPaymentPayload(data) {
+    const invoiceId = data.get("paymentInvoice") || "";
+    const invoice = allInvoices.find(i => i.id === invoiceId);
+
+    const invoiceNumberSnapshot = invoice?.number || "";
+    const clientNameSnapshot = invoice?.clientSnapshot?.name || "";
+    const invoiceStatusSnapshot = normalizeInvoiceStatus(invoice?.status || "");
+    const invoiceLabelSnapshot =
+      ((Array.isArray(invoice?.lines) && invoice.lines.length)
+        ? invoice.lines[0]?.designation
+        : invoice?.label) || "";
+
     return {
-      invoiceId: data.get("paymentInvoice") || "",
+      invoiceId,
+      clientIdSnapshot: invoice?.clientId || "",
+      invoiceNumberSnapshot,
+      clientNameSnapshot,
+      invoiceStatusSnapshot,
+      invoiceLabelSnapshot,
       date: data.get("paymentDate") || "",
       amount: Number(data.get("paymentAmount") || 0),
       mode: data.get("paymentMode") || "VIREMENT",
@@ -639,7 +710,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     e.preventDefault();
 
     const data = new FormData(form);
-    const payload = createPayment(data);
+    const payload = buildPaymentPayload(data);
 
     if (!payload.invoiceId || !payload.amount) return;
 
@@ -647,6 +718,11 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       if (editingPaymentId) {
         await updateDoc(doc(db, "paiements", editingPaymentId), {
           invoiceId: payload.invoiceId,
+          clientIdSnapshot: payload.clientIdSnapshot,
+          invoiceNumberSnapshot: payload.invoiceNumberSnapshot,
+          clientNameSnapshot: payload.clientNameSnapshot,
+          invoiceStatusSnapshot: payload.invoiceStatusSnapshot,
+          invoiceLabelSnapshot: payload.invoiceLabelSnapshot,
           date: payload.date,
           amount: payload.amount,
           mode: payload.mode,
