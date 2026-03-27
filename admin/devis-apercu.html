@@ -151,8 +151,8 @@
     }
 
     .logo-box img{
-      max-width:100%;
-      max-height:100%;
+      width:100%;
+      height:100%;
       object-fit:contain;
       display:block;
     }
@@ -230,7 +230,7 @@
     }
 
     .hidden-col{
-      display:none;
+      display:none !important;
     }
 
     .summary-grid{
@@ -688,7 +688,7 @@
       const lines = Array.isArray(data.lines) && data.lines.length
         ? data.lines
         : [{
-            designation: data.label || "Prestation",
+            designation: data.labelSnapshot || data.label || "Prestation",
             quantity: 1,
             unitPriceTTC: Number(data.amountTTC ?? data.amount ?? 0),
             totalTTC: Number(data.amountTTC ?? data.amount ?? 0)
@@ -716,7 +716,8 @@
     }
 
     function buildValidityLabel(data = {}) {
-      if (data.dueDate) return data.dueDate;
+      if (data.validityDelayLabel) return data.validityDelayLabel;
+      if (data.dueDate) return `Jusqu’au ${data.dueDate}`;
       return "—";
     }
 
