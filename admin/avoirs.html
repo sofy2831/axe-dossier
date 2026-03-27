@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Axe Dossier — Avoirs</title>
+
+<style>
+body{font-family:Inter,sans-serif;background:#f3efe8;margin:0;color:#171717}
+.wrap{max-width:1100px;margin:auto;padding:20px}
+.card{background:#fff;border-radius:18px;padding:20px;margin-bottom:20px;border:1px solid #ddd}
+
+h1{margin-bottom:10px}
+
+.field{margin-bottom:12px}
+input,select{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+.btn{padding:12px;border-radius:999px;border:none;background:#111;color:#fff;cursor:pointer}
+
+.line{display:grid;grid-template-columns:1fr 80px 120px 40px;gap:10px;margin-bottom:10px}
+.line input{padding:8px}
+
+.line button{background:red;color:#fff;border:none;border-radius:8px}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+
+<h1>Avoirs</h1>
+
+<div class="card">
+<h2>Créer un avoir</h2>
+
+<form id="form">
+
+<div class="row">
+<div class="field">
+<label>Date</label>
+<input type="date" id="date"/>
+</div>
+
+<div class="field">
+<label>Facture liée</label>
+<select id="invoiceSelect">
+<option value="">Aucune</option>
+</select>
+</div>
+</div>
+
+<div id="lines"></div>
+
+<button type="button" id="addLine">+ Ligne</button>
+
+<div class="field">
+<label>Notes</label>
+<input id="notes"/>
+</div>
+
+<button class="btn">Enregistrer</button>
+
+</form>
+</div>
+
+<div class="card">
+<h2>Liste</h2>
+<div id="list"></div>
+</div>
+
+</div>
+
+<script type="module">
+import "./auth-guard.js";
+import { db } from "./firebase-config.js";
+import {
+collection,addDoc,doc,getDoc,setDoc,onSnapshot,orderBy,query,serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const linesEl = document.getElementById("lines");
+const addLineBtn = document.getElementById("addLine");
+const form = document.getElementById("form");
+const listEl = document.getElementById("list");
+const invoiceSelect = document.getElementById("invoiceSelect");
+
+const avoirsRef = collection(db,"avoirs");
+const facturesRef = collection(db,"factures");
+const countersRef = doc(db,"counters","main");
+
+function addLine(data={}){
+  const div=document.createElement("div");
+  div.className="line";
+
+  div.innerHTML=`
+  <input placeholder="Désignation" value="${data.designation||""}">
+  <input type="number" value="${data.qty||1}">
+  <input type="number" value="${data.price||0}">
+  <button>x</button>
+  `;
+
+  div.querySelector("button").onclick=()=>div.remove();
+  linesEl.appendChild(div);
+}
+
+addLineBtn.onclick=()=>addLine();
+
+function getLines(){
+  return [...linesEl.children].map(l=>{
+    const i=l.querySelectorAll("input");
+    return {
+      designation:i[0].value,
+      qty:Number(i[1].value),
+      price:Number(i[2].value),
+      total:Number(i[1].value)*Number(i[2].value)
+    }
+  });
+}
+
+async function getNextNumber(){
+  const snap=await getDoc(countersRef);
+  const data=snap.exists()?snap.data():{nextAvoir:1};
+
+  const n=data.nextAvoir||1;
+  const number=`AV-${new Date().getFullYear()}-${String(n).padStart(3,"0")}`;
+
+  await setDoc(countersRef,{nextAvoir:n+1},{merge:true});
+
+  return number;
+}
+
+form.onsubmit=async e=>{
+  e.preventDefault();
+
+  const lines=getLines();
+  const total=lines.reduce((a,l)=>a+l.total,0);
+  if(!total)return;
+
+  const number=await getNextNumber();
+
+  await addDoc(avoirsRef,{
+    number,
+    date:document.getElementById("date").value,
+    invoiceId:invoiceSelect.value,
+    lines,
+    total,
+    notes:document.getElementById("notes").value,
+    createdAt:serverTimestamp()
+  });
+
+  location.reload();
+};
+
+onSnapshot(query(facturesRef,orderBy("createdAt","desc")),snap=>{
+  invoiceSelect.innerHTML='<option value="">Aucune</option>'+
+  snap.docs.map(d=>`<option value="${d.id}">${d.data().number}</option>`).join("");
+});
+
+onSnapshot(query(avoirsRef,orderBy("createdAt","desc")),snap=>{
+  listEl.innerHTML=snap.docs.map(d=>{
+    const a=d.data();
+    return `
+    <div>
+      ${a.number} — ${a.total}€
+      <a href="avoir-apercu.html?id=${d.id}" target="_blank">Voir</a>
+    </div>`;
+  }).join("");
+});
+</script>
+
+</body>
+</html>
