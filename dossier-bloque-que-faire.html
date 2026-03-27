@@ -1,4 +1,5 @@
-<!DOCTYPE html><!-- dossier bloqué / que faire / relance / absence de réponse --><html lang="fr">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -6,266 +7,291 @@
   <meta name="description" content="Dossier bloqué, absence de réponse, relances inutiles, situation qui traîne : que faire pour remettre le dossier dans l’ordre et reprendre la main ?" />
   <meta name="robots" content="index,follow" />
   <style>
-    :root {
-      --bg: #f3efe8;
-      --surface: rgba(255,255,255,0.88);
-      --text: #171717;
-      --muted: #5f5952;
-      --line: rgba(23,23,23,0.08);
-      --accent: #111111;
-      --accent-soft: #e9e1d4;
-      --radius-xl: 30px;
-      --radius-lg: 22px;
-      --shadow: 0 20px 60px rgba(0,0,0,0.07);
-      --max: 1120px;
-    }* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: var(--text);
-  line-height: 1.6;
-  background:
-    radial-gradient(circle at top left, rgba(255,255,255,0.92), transparent 28%),
-    radial-gradient(circle at right 20%, rgba(233,225,212,0.75), transparent 20%),
-    var(--bg);
-}
+    :root{
+      --bg:#f3efe8;
+      --surface:rgba(255,255,255,0.88);
+      --surface-strong:#ffffff;
+      --text:#171717;
+      --muted:#5f5952;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --accent-soft:#e9e1d4;
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:18px;
+      --shadow:0 20px 60px rgba(0,0,0,0.07);
+      --max:1120px;
+    }
 
-a { color: inherit; text-decoration: none; }
-.wrap { width: min(var(--max), calc(100% - 32px)); margin: 0 auto; }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
 
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: rgba(243,239,232,0.78);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(23,23,23,0.05);
-}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      line-height:1.6;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.92), transparent 28%),
+        radial-gradient(circle at right 20%, rgba(233,225,212,0.75), transparent 20%),
+        var(--bg);
+    }
 
-.topbar-inner {
-  min-height: 76px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
+    a{color:inherit;text-decoration:none}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,0.78);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(23,23,23,0.05);
+    }
 
-.brand-mark {
-  width: 44px;
-  height: 44px;
-  border-radius: 15px;
-  background: var(--accent);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-weight: 900;
-  font-size: 0.95rem;
-  box-shadow: var(--shadow);
-}
+    .topbar-inner{
+      min-height:76px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
 
-.nav {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
 
-.pill {
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.7);
-  border: 1px solid rgba(23,23,23,0.07);
-  font-size: 0.94rem;
-}
+    .brand-logo{
+      height:94px;
+      width:auto;
+      display:block;
+      object-fit:contain;
+    }
 
-.hero { padding: 54px 0 24px; }
+    .brand-name{
+      font-size:1.8rem;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      line-height:1;
+    }
 
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 20px;
-  align-items: stretch;
-}
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(14px);
-}
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.7);
+      border:1px solid rgba(23,23,23,0.07);
+      font-size:.94rem;
+      transition:transform .2s ease, background .2s ease;
+    }
 
-.hero-main { padding: 42px; }
-.side-card, .content-card, .cta-card, .faq-item { padding: 26px; }
+    .pill:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,0.95);
+    }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: #4b443b;
-  font-size: 0.88rem;
-  font-weight: 700;
-  margin-bottom: 18px;
-}
+    .hero{padding:54px 0 24px}
 
-h1, h2, h3, p { margin: 0; }
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:20px;
+      align-items:stretch;
+    }
 
-h1 {
-  font-size: clamp(2.2rem, 4vw, 4.5rem);
-  line-height: 1.02;
-  letter-spacing: -0.055em;
-  margin-bottom: 18px;
-  max-width: 11ch;
-}
+    .card{
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:var(--radius-xl);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+    }
 
-h2 {
-  font-size: clamp(1.6rem, 2.5vw, 2.5rem);
-  letter-spacing: -0.04em;
-  margin-bottom: 14px;
-}
+    .hero-main{padding:42px}
+    .side-card,.content-card,.cta-card,.faq-item{padding:26px}
 
-h3 {
-  font-size: 1.08rem;
-  letter-spacing: -0.02em;
-  margin-bottom: 10px;
-}
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--accent-soft);
+      color:#4b443b;
+      font-size:.88rem;
+      font-weight:700;
+      margin-bottom:18px;
+    }
 
-.lead {
-  max-width: 60ch;
-  color: #4b4640;
-  font-size: 1.08rem;
-}
+    h1,h2,h3,p{margin:0}
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 26px;
-}
+    h1{
+      font-size:clamp(2.2rem,4vw,4.5rem);
+      line-height:1.02;
+      letter-spacing:-.055em;
+      margin-bottom:18px;
+      max-width:11ch;
+    }
 
-.btn {
-  min-height: 52px;
-  padding: 0 20px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--accent);
-  font-weight: 700;
-}
+    h2{
+      font-size:clamp(1.6rem,2.5vw,2.5rem);
+      letter-spacing:-.04em;
+      margin-bottom:14px;
+    }
 
-.btn-primary { background: var(--accent); color: #fff; }
-.btn-secondary { background: rgba(255,255,255,0.75); color: var(--accent); border-color: rgba(23,23,23,0.1); }
+    h3{
+      font-size:1.08rem;
+      letter-spacing:-.02em;
+      margin-bottom:10px;
+    }
 
-.hero-side { display: grid; gap: 20px; }
+    .lead{
+      max-width:60ch;
+      color:#4b4640;
+      font-size:1.08rem;
+    }
 
-.mini-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 12px;
-}
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:26px;
+    }
 
-.mini-list li {
-  position: relative;
-  padding-left: 18px;
-  color: #49443e;
-}
+    .btn{
+      min-height:52px;
+      padding:0 20px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--accent);
+      font-weight:700;
+      transition:transform .2s ease, opacity .2s ease;
+    }
 
-.mini-list li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 10px;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--accent);
-}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-secondary{background:rgba(255,255,255,0.75);color:var(--accent);border-color:rgba(23,23,23,0.1)}
 
-section { padding: 20px 0; }
+    .hero-side{display:grid;gap:20px}
 
-.section-head {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
-}
+    .mini-list{
+      list-style:none;
+      padding:0;
+      margin:0;
+      display:grid;
+      gap:12px;
+    }
 
-.section-head p {
-  max-width: 60ch;
-  color: var(--muted);
-}
+    .mini-list li{
+      position:relative;
+      padding-left:18px;
+      color:#49443e;
+    }
 
-.grid-2, .grid-3, .faq-grid {
-  display: grid;
-  gap: 18px;
-}
+    .mini-list li::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:10px;
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:var(--accent);
+    }
 
-.grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
-.grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
-.faq-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    section{padding:20px 0}
 
-.content-card, .cta-card, .faq-item {
-  border-radius: var(--radius-lg);
-  background: rgba(255,255,255,0.82);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow);
-}
+    .section-head{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
 
-.content-card p, .cta-card p, .faq-item p { color: #4f4942; }
+    .section-head p{
+      max-width:60ch;
+      color:var(--muted);
+    }
 
-.footer { padding: 30px 0 64px; }
-.footer-box {
-  padding: 22px 24px;
-  border-radius: var(--radius-lg);
-  background: rgba(255,255,255,0.72);
-  border: 1px solid var(--line);
-  color: #605951;
-}
+    .grid-2,.grid-3,.faq-grid{
+      display:grid;
+      gap:18px;
+    }
 
-@media (max-width: 980px) {
-  .hero-grid, .grid-2, .grid-3, .faq-grid { grid-template-columns: 1fr; }
-  .section-head { flex-direction: column; align-items: start; }
-}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .faq-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 
-@media (max-width: 720px) {
-  .topbar-inner {
-    min-height: auto;
-    padding: 14px 0;
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .brand, .nav { justify-content: center; }
-  .hero-main, .side-card, .content-card, .cta-card, .faq-item, .footer-box { padding: 20px; }
-  .actions { flex-direction: column; }
-  .btn { width: 100%; }
-  h1 { max-width: none; }
-}
+    .content-card,.cta-card,.faq-item{
+      border-radius:var(--radius-lg);
+      background:rgba(255,255,255,0.82);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
 
+    .content-card p,.cta-card p,.faq-item p{color:#4f4942}
+
+    .footer{padding:30px 0 64px}
+
+    .footer-box{
+      padding:22px 24px;
+      border-radius:var(--radius-lg);
+      background:rgba(255,255,255,0.72);
+      border:1px solid var(--line);
+      color:#605951;
+    }
+
+    .footer-box small{
+      display:block;
+      margin-top:8px;
+      line-height:1.5;
+    }
+
+    @media (max-width:980px){
+      .hero-grid,.grid-2,.grid-3,.faq-grid{grid-template-columns:1fr}
+      .section-head{flex-direction:column;align-items:start}
+    }
+
+    @media (max-width:720px){
+      .topbar-inner{
+        min-height:auto;
+        padding:14px 0;
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .brand,.nav{justify-content:center}
+      .hero-main,.side-card,.content-card,.cta-card,.faq-item,.footer-box{padding:20px}
+      .actions{flex-direction:column}
+      .btn{width:100%}
+      h1{max-width:none}
+      .brand-logo{height:72px}
+      .brand-name{font-size:1.35rem;text-align:center}
+    }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="wrap topbar-inner">
       <a href="index.html" class="brand" aria-label="Axe Dossier">
-        <span class="brand-mark">AD</span>
-        <span>Axe Dossier</span>
+        <img src="images/axe-dossier.png" alt="Logo Axe Dossier" class="brand-logo" />
+        <span class="brand-name">AXE DOSSIER</span>
       </a>
+
       <nav class="nav" aria-label="Navigation principale">
         <a class="pill" href="index.html">Accueil</a>
         <a class="pill" href="#signes">Signes</a>
@@ -274,7 +300,9 @@ section { padding: 20px 0; }
         <a class="pill" href="#contact">Contact</a>
       </nav>
     </div>
-  </header>  <main>
+  </header>
+
+  <main>
     <section class="hero">
       <div class="wrap hero-grid">
         <article class="card hero-main">
@@ -287,214 +315,234 @@ section { padding: 20px 0; }
             <a class="btn btn-primary" href="mailto:contact@axe-dossier.fr?subject=Dossier%20bloqu%C3%A9&body=Bonjour,%0A%0AJe%20souhaite%20vous%20transmettre%20un%20dossier%20bloqu%C3%A9.%0A%0ASituation%20:%0A%0AInterlocuteur%20concern%C3%A9%20:%0A%0AObjectif%20:%0A">Envoyer mon dossier</a>
             <a class="btn btn-secondary" href="#actions">Voir quoi faire</a>
           </div>
-        </article><div class="hero-side">
-      <article class="card side-card">
-        <h3>Quand on cherche une solution</h3>
-        <ul class="mini-list">
-          <li>Mon dossier n’avance plus</li>
-          <li>On ne me répond pas</li>
-          <li>Je relance sans résultat</li>
-          <li>Je ne sais plus quoi envoyer</li>
-        </ul>
-      </article>
-      <article class="card side-card">
-        <h3>Le vrai besoin</h3>
-        <p>Reprendre la chronologie, isoler les pièces utiles, comprendre le point de blocage réel et préparer une réponse claire.</p>
-      </article>
-    </div>
-  </div>
-</section>
+        </article>
 
-<section id="signes">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Reconnaître un dossier réellement bloqué</h2>
-        <p>Un dossier n’est pas seulement lent. Il devient bloqué quand les relances ne produisent plus rien et que la situation perd toute lisibilité.</p>
+        <div class="hero-side">
+          <article class="card side-card">
+            <h3>Quand on cherche une solution</h3>
+            <ul class="mini-list">
+              <li>Mon dossier n’avance plus</li>
+              <li>On ne me répond pas</li>
+              <li>Je relance sans résultat</li>
+              <li>Je ne sais plus quoi envoyer</li>
+            </ul>
+          </article>
+
+          <article class="card side-card">
+            <h3>Le vrai besoin</h3>
+            <p>Reprendre la chronologie, isoler les pièces utiles, comprendre le point de blocage réel et préparer une réponse claire.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid-3">
-      <article class="content-card">
-        <h3>Les réponses sont floues</h3>
-        <p>On te répond à côté, trop tard, ou pas du tout. Tu n’obtiens ni décision claire, ni explication vraiment exploitable.</p>
-      </article>
-      <article class="content-card">
-        <h3>Les mêmes pièces reviennent</h3>
-        <p>Tu renvoies des documents déjà transmis, on te redemande ce qui a déjà été envoyé, et rien ne se règle vraiment.</p>
-      </article>
-      <article class="content-card">
-        <h3>Tu perds la vue d’ensemble</h3>
-        <p>Dates, mails, courriers, formulaires, preuves, interlocuteurs : tout existe, mais plus rien n’est structuré ni priorisé.</p>
-      </article>
-    </div>
-  </div>
-</section>
+    <section id="signes">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Reconnaître un dossier réellement bloqué</h2>
+            <p>Un dossier n’est pas seulement lent. Il devient bloqué quand les relances ne produisent plus rien et que la situation perd toute lisibilité.</p>
+          </div>
+        </div>
 
-<section>
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Pourquoi un dossier bloque souvent</h2>
-        <p>Le blocage ne vient pas toujours d’un refus. Très souvent, il vient d’un dossier mal cadré, mal relancé, ou devenu trop confus.</p>
+        <div class="grid-3">
+          <article class="content-card">
+            <h3>Les réponses sont floues</h3>
+            <p>On te répond à côté, trop tard, ou pas du tout. Tu n’obtiens ni décision claire, ni explication vraiment exploitable.</p>
+          </article>
+          <article class="content-card">
+            <h3>Les mêmes pièces reviennent</h3>
+            <p>Tu renvoies des documents déjà transmis, on te redemande ce qui a déjà été envoyé, et rien ne se règle vraiment.</p>
+          </article>
+          <article class="content-card">
+            <h3>Tu perds la vue d’ensemble</h3>
+            <p>Dates, mails, courriers, formulaires, preuves, interlocuteurs : tout existe, mais plus rien n’est structuré ni priorisé.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid-2">
-      <article class="content-card">
-        <h3>Le point de demande est mal formulé</h3>
-        <p>Tu sais qu’il y a un problème, mais l’interlocuteur ne comprend pas exactement ce que tu demandes, ni sur quelle base il doit répondre.</p>
-      </article>
-      <article class="content-card">
-        <h3>Le dossier s’est noyé dans les échanges</h3>
-        <p>Trop de mails, trop de relances, trop de pièces non triées : au bout d’un moment, la logique du dossier se perd.</p>
-      </article>
-    </div>
-  </div>
-</section>
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Pourquoi un dossier bloque souvent</h2>
+            <p>Le blocage ne vient pas toujours d’un refus. Très souvent, il vient d’un dossier mal cadré, mal relancé, ou devenu trop confus.</p>
+          </div>
+        </div>
 
-<section id="actions">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Que faire quand un dossier n’avance plus ?</h2>
-        <p>Avant toute nouvelle relance, il faut reprendre le dossier comme un bloc unique. Sinon tu ajoutes du bruit à un problème déjà flou.</p>
+        <div class="grid-2">
+          <article class="content-card">
+            <h3>Le point de demande est mal formulé</h3>
+            <p>Tu sais qu’il y a un problème, mais l’interlocuteur ne comprend pas exactement ce que tu demandes, ni sur quelle base il doit répondre.</p>
+          </article>
+          <article class="content-card">
+            <h3>Le dossier s’est noyé dans les échanges</h3>
+            <p>Trop de mails, trop de relances, trop de pièces non triées : au bout d’un moment, la logique du dossier se perd.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid-2">
-      <article class="content-card">
-        <h3>1. Reprendre la chronologie</h3>
-        <p>Quand la demande est partie, à qui, avec quelles pièces, quelles réponses ont été reçues, quelles relances ont déjà été faites. Tout part de là.</p>
-      </article>
-      <article class="content-card">
-        <h3>2. Trier les documents utiles</h3>
-        <p>Il faut garder ce qui prouve, éclaire ou débloque. Le reste alourdit la lecture et affaiblit la portée de la relance.</p>
-      </article>
-      <article class="content-card">
-        <h3>3. Identifier le vrai blocage</h3>
-        <p>Pièce manquante, erreur de destinataire, mauvaise formulation, contradiction, absence de suivi : tant que le vrai nœud n’est pas vu, rien ne bouge.</p>
-      </article>
-      <article class="content-card">
-        <h3>4. Préparer une réponse exploitable</h3>
-        <p>Un courrier clair, structuré, daté et ciblé pèse davantage qu’une relance émotionnelle ou répétitive. C’est là que le dossier reprend de la tenue.</p>
-      </article>
-    </div>
-  </div>
-</section>
+    <section id="actions">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Que faire quand un dossier n’avance plus ?</h2>
+            <p>Avant toute nouvelle relance, il faut reprendre le dossier comme un bloc unique. Sinon tu ajoutes du bruit à un problème déjà flou.</p>
+          </div>
+        </div>
 
-<section>
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Dans quels types de situations ?</h2>
-        <p>La logique reste la même, même si l’interlocuteur change.</p>
+        <div class="grid-2">
+          <article class="content-card">
+            <h3>1. Reprendre la chronologie</h3>
+            <p>Quand la demande est partie, à qui, avec quelles pièces, quelles réponses ont été reçues, quelles relances ont déjà été faites. Tout part de là.</p>
+          </article>
+          <article class="content-card">
+            <h3>2. Trier les documents utiles</h3>
+            <p>Il faut garder ce qui prouve, éclaire ou débloque. Le reste alourdit la lecture et affaiblit la portée de la relance.</p>
+          </article>
+          <article class="content-card">
+            <h3>3. Identifier le vrai blocage</h3>
+            <p>Pièce manquante, erreur de destinataire, mauvaise formulation, contradiction, absence de suivi : tant que le vrai nœud n’est pas vu, rien ne bouge.</p>
+          </article>
+          <article class="content-card">
+            <h3>4. Préparer une réponse exploitable</h3>
+            <p>Un courrier clair, structuré, daté et ciblé pèse davantage qu’une relance émotionnelle ou répétitive. C’est là que le dossier reprend de la tenue.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid-3">
-      <article class="cta-card">
-        <h3>Succession</h3>
-        <p>Notaire qui répond peu, héritiers en conflit, échanges dispersés, inventaire flou, dossier qui traîne sans cap clair.</p>
-      </article>
-      <article class="cta-card">
-        <h3>Organisme / administration</h3>
-        <p>URSSAF, CAF, CPAM, médecine du travail, caisse ou service interne qui laisse le dossier sans réponse exploitable.</p>
-      </article>
-      <article class="cta-card">
-        <h3>Assurance / banque / mutuelle</h3>
-        <p>Refus, silence, dossier incomplet, remboursement bloqué, compte gelé ou réponse incohérente.</p>
-      </article>
-    </div>
-  </div>
-</section>
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Dans quels types de situations ?</h2>
+            <p>La logique reste la même, même si l’interlocuteur change.</p>
+          </div>
+        </div>
 
-<section>
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Comment Axe Dossier intervient</h2>
-        <p>Le travail repose sur l’analyse documentaire, la synthèse et la rédaction administrative. Pas sur le bavardage inutile.</p>
+        <div class="grid-3">
+          <article class="cta-card">
+            <h3>Succession</h3>
+            <p>Notaire qui répond peu, héritiers en conflit, échanges dispersés, inventaire flou, dossier qui traîne sans cap clair.</p>
+          </article>
+          <article class="cta-card">
+            <h3>Organisme / administration</h3>
+            <p>URSSAF, CAF, CPAM, caisse, mutuelle ou service interne qui laisse le dossier sans réponse exploitable.</p>
+          </article>
+          <article class="cta-card">
+            <h3>Assurance / banque</h3>
+            <p>Refus, silence, dossier incomplet, remboursement bloqué, compte gelé ou réponse incohérente.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid-3">
-      <article class="cta-card">
-        <h3>Analyse</h3>
-        <p>Lecture du dossier, reprise des dates, vérification de la logique d’ensemble et des pièces utiles.</p>
-      </article>
-      <article class="cta-card">
-        <h3>Synthèse</h3>
-        <p>Retour écrit avec les points clés, les incohérences et les priorités à traiter pour reprendre la main.</p>
-      </article>
-      <article class="cta-card">
-        <h3>Rédaction</h3>
-        <p>Préparation d’un courrier, d’une relance ou d’une reformulation claire pour remettre le dossier dans l’axe.</p>
-      </article>
-    </div>
-  </div>
-</section>
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Comment Axe Dossier intervient</h2>
+            <p>Le travail repose sur l’analyse documentaire, la synthèse et la rédaction administrative. Pas sur le bavardage inutile.</p>
+          </div>
+        </div>
 
-<section id="faq">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Questions fréquentes</h2>
-        <p>Ce sont les formulations les plus tapées quand une situation s’enlise.</p>
+        <div class="grid-3">
+          <article class="cta-card">
+            <h3>Analyse</h3>
+            <p>Lecture du dossier, reprise des dates, vérification de la logique d’ensemble et des pièces utiles.</p>
+          </article>
+          <article class="cta-card">
+            <h3>Synthèse</h3>
+            <p>Retour écrit avec les points clés, les incohérences et les priorités à traiter pour reprendre la main.</p>
+          </article>
+          <article class="cta-card">
+            <h3>Rédaction</h3>
+            <p>Préparation d’un courrier, d’une relance ou d’une reformulation claire pour remettre le dossier dans l’axe.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="faq-grid">
-      <article class="faq-item">
-        <h3>Que faire quand un dossier est bloqué ?</h3>
-        <p>Commencer par reprendre les dates, les échanges et les pièces utiles. Sans cette remise à plat, chaque relance supplémentaire risque d’être inutile.</p>
-      </article>
-      <article class="faq-item">
-        <h3>Faut-il relancer encore ?</h3>
-        <p>Oui, mais pas n’importe comment. Une relance claire, structurée et appuyée sur les bons éléments vaut mieux que plusieurs messages improvisés.</p>
-      </article>
-      <article class="faq-item">
-        <h3>Comment savoir ce qui bloque vraiment ?</h3>
-        <p>Il faut reprendre le dossier comme un tout : demande initiale, réponses reçues, pièces déjà envoyées, et point précis resté sans traitement.</p>
-      </article>
-      <article class="faq-item">
-        <h3>Peut-on être aidé sans lancer immédiatement une procédure ?</h3>
-        <p>Oui. Sur le plan documentaire et rédactionnel, il est possible de clarifier le dossier et de préparer une réponse solide avant d’aller plus loin.</p>
-      </article>
-    </div>
-  </div>
-</section>
+    <section id="faq">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Questions fréquentes</h2>
+            <p>Ce sont les formulations les plus tapées quand une situation s’enlise.</p>
+          </div>
+        </div>
 
-<section id="contact">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Envoyer un dossier bloqué</h2>
-        <p>Un résumé simple, les pièces utiles, et un objectif clair. C’est suffisant pour commencer proprement.</p>
+        <div class="faq-grid">
+          <article class="faq-item">
+            <h3>Que faire quand un dossier est bloqué ?</h3>
+            <p>Commencer par reprendre les dates, les échanges et les pièces utiles. Sans cette remise à plat, chaque relance supplémentaire risque d’être inutile.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Faut-il relancer encore ?</h3>
+            <p>Oui, mais pas n’importe comment. Une relance claire, structurée et appuyée sur les bons éléments vaut mieux que plusieurs messages improvisés.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Comment savoir ce qui bloque vraiment ?</h3>
+            <p>Il faut reprendre le dossier comme un tout : demande initiale, réponses reçues, pièces déjà envoyées, et point précis resté sans traitement.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Peut-on être aidé sans lancer immédiatement une procédure ?</h3>
+            <p>Oui. Sur le plan documentaire et rédactionnel, il est possible de clarifier le dossier et de préparer une réponse solide avant d’aller plus loin.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid-2">
-      <article class="cta-card">
-        <h3>À envoyer</h3>
-        <p>Résumé en quelques lignes, dernier échange important, pièces principales, relances déjà faites et objectif recherché.</p>
-      </article>
-      <article class="cta-card">
-        <h3>À éviter</h3>
-        <p>Dossier noyé sous les doublons, captures inutiles, mails trop longs, ou transmission sans point clair sur le blocage réel.</p>
-      </article>
-    </div>
+    <section id="contact">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Envoyer un dossier bloqué</h2>
+            <p>Un résumé simple, les pièces utiles, et un objectif clair. C’est suffisant pour commencer proprement.</p>
+          </div>
+        </div>
 
-    <div class="actions" style="justify-content:center; margin-top:24px;">
-      <a class="btn btn-primary" href="mailto:contact@axe-dossier.fr?subject=Dossier%20bloqu%C3%A9&body=Bonjour,%0A%0AJe%20vous%20transmets%20un%20dossier%20bloqu%C3%A9.%0A%0ASituation%20:%0A%0AInterlocuteur%20concern%C3%A9%20:%0A%0AObjectif%20:%0A">Envoyer mon dossier</a>
-    </div>
-  </div>
-</section>
+        <div class="grid-2">
+          <article class="cta-card">
+            <h3>À envoyer</h3>
+            <p>Résumé en quelques lignes, dernier échange important, pièces principales, relances déjà faites et objectif recherché.</p>
+          </article>
+          <article class="cta-card">
+            <h3>À éviter</h3>
+            <p>Dossier noyé sous les doublons, captures inutiles, mails trop longs, ou transmission sans point clair sur le blocage réel.</p>
+          </article>
+        </div>
 
-  </main>  <footer class="footer">
+        <div class="actions" style="justify-content:center; margin-top:24px;">
+          <a class="btn btn-primary" href="mailto:contact@axe-dossier.fr?subject=Dossier%20bloqu%C3%A9&body=Bonjour,%0A%0AJe%20vous%20transmets%20un%20dossier%20bloqu%C3%A9.%0A%0ASituation%20:%0A%0AInterlocuteur%20concern%C3%A9%20:%0A%0AObjectif%20:%0A">Envoyer mon dossier</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
     <div class="wrap footer-box">
-      <strong>Axe Dossier</strong>
-      <p style="margin-top:8px;">Service d’accompagnement documentaire et rédactionnel. Ne constitue pas une consultation juridique, une représentation en justice ou une prise en charge judiciaire.</p>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;">
+        <div>
+          <strong style="display:block; font-size:1.05rem; margin-bottom:6px;">Axe Dossier</strong>
+          <small>Analyse · Structure · Rédaction</small>
+        </div>
+
+        <div style="text-align:right;">
+          <a href="mentions-legales.html" style="font-size:0.9rem; color:#666;">Mentions légales</a>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; padding-top:14px; border-top:1px solid rgba(23,23,23,0.08);">
+        <small>
+          Service d’accompagnement documentaire et rédactionnel. Ne constitue pas une consultation juridique,
+          une représentation en justice ou une prise en charge judiciaire.<br>
+          © 2026 Axe Dossier
+        </small>
+      </div>
     </div>
   </footer>
 </body>
