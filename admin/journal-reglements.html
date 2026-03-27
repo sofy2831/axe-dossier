@@ -329,4 +329,223 @@
             <option value="DATE_DESC">Date décroissante</option>
             <option value="DATE_ASC">Date croissante</option>
             <option value="AMOUNT_DESC">Montant décroissant</option>
-            <option value="AMOUNT_ASC">
+            <option value="AMOUNT_ASC">Montant croissant</option>
+          </select>
+          <button id="printBtn" class="btn-dark" type="button">Imprimer</button>
+        </div>
+
+        <div id="emptyState" class="empty" style="display:none;">Aucun règlement pour le moment.</div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:12%;">Date</th>
+                <th style="width:14%;">Facture</th>
+                <th style="width:18%;">Client</th>
+                <th style="width:14%;">Mode</th>
+                <th style="width:22%;">Référence</th>
+                <th style="width:10%;">Statut facture</th>
+                <th class="num" style="width:10%;">Montant</th>
+              </tr>
+            </thead>
+            <tbody id="journalBody"></tbody>
+          </table>
+        </div>
+
+        <div class="footer-note">
+          Journal basé sur les règlements saisis dans <strong>paiements.html</strong>.
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module">
+    import "./auth-guard.js";
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      onSnapshot,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const paiementsRef = collection(db, "paiements");
+    const facturesRef = collection(db, "factures");
+
+    const searchInput = document.getElementById("searchInput");
+    const modeFilter = document.getElementById("modeFilter");
+    const dateFrom = document.getElementById("dateFrom");
+    const dateTo = document.getElementById("dateTo");
+    const sortFilter = document.getElementById("sortFilter");
+    const printBtn = document.getElementById("printBtn");
+
+    const totalPayments = document.getElementById("totalPayments");
+    const totalAmount = document.getElementById("totalAmount");
+    const totalVirements = document.getElementById("totalVirements");
+    const totalCheques = document.getElementById("totalCheques");
+    const journalBody = document.getElementById("journalBody");
+    const emptyState = document.getElementById("emptyState");
+
+    let allPaiements = [];
+    let allFactures = [];
+
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatMoney(value) {
+      const num = Number(value || 0);
+      return num.toLocaleString("fr-FR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " €";
+    }
+
+    function modeBadgeClass(mode = "") {
+      if (mode === "VIREMENT") return "virement";
+      if (mode === "CHEQUE") return "cheque";
+      if (mode === "ESPECES") return "especes";
+      return "autre";
+    }
+
+    function normalizeEntries() {
+      const invoiceMap = Object.fromEntries(
+        allFactures.map(f => [f.id, f])
+      );
+
+      return allPaiements.map(item => {
+        const invoice = invoiceMap[item.invoiceId] || {};
+        return {
+          id: item.id,
+          date: item.date || "",
+          invoiceNumber: invoice.number || "",
+          clientName: invoice.clientSnapshot?.name || "",
+          mode: item.mode || "",
+          reference: item.reference || "",
+          invoiceStatus: invoice.status || "",
+          amount: Number(item.amount || 0),
+          notes: item.notes || ""
+        };
+      });
+    }
+
+    function sortEntries(entries) {
+      const sort = sortFilter.value || "DATE_DESC";
+      const list = [...entries];
+
+      if (sort === "DATE_ASC") {
+        return list.sort((a, b) => String(a.date || "").localeCompare(String(b.date || "")));
+      }
+      if (sort === "AMOUNT_DESC") {
+        return list.sort((a, b) => Number(b.amount || 0) - Number(a.amount || 0));
+      }
+      if (sort === "AMOUNT_ASC") {
+        return list.sort((a, b) => Number(a.amount || 0) - Number(b.amount || 0));
+      }
+
+      return list.sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+    }
+
+    function render() {
+      const q = (searchInput.value || "").trim().toLowerCase();
+      const mode = modeFilter.value;
+      const from = dateFrom.value || "";
+      const to = dateTo.value || "";
+
+      const allEntries = normalizeEntries();
+
+      const filtered = allEntries.filter(item => {
+        const blob = [
+          item.invoiceNumber,
+          item.clientName,
+          item.reference,
+          item.mode,
+          item.invoiceStatus,
+          item.notes
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = blob.includes(q);
+        const matchesMode = !mode || item.mode === mode;
+        const matchesFrom = !from || (item.date && item.date >= from);
+        const matchesTo = !to || (item.date && item.date <= to);
+
+        return matchesSearch && matchesMode && matchesFrom && matchesTo;
+      });
+
+      const sorted = sortEntries(filtered);
+
+      totalPayments.textContent = sorted.length;
+      totalAmount.textContent = formatMoney(
+        sorted.reduce((acc, i) => acc + Number(i.amount || 0), 0)
+      );
+      totalVirements.textContent = sorted.filter(i => i.mode === "VIREMENT").length;
+      totalCheques.textContent = sorted.filter(i => i.mode === "CHEQUE").length;
+
+      if (!sorted.length) {
+        journalBody.innerHTML = "";
+        emptyState.style.display = "";
+        return;
+      }
+
+      emptyState.style.display = "none";
+
+      journalBody.innerHTML = sorted.map(item => `
+        <tr>
+          <td>${escapeHtml(item.date || "—")}</td>
+          <td>${escapeHtml(item.invoiceNumber || "—")}</td>
+          <td>${escapeHtml(item.clientName || "—")}</td>
+          <td>
+            <span class="badge ${modeBadgeClass(item.mode)}">
+              ${escapeHtml(item.mode || "—")}
+            </span>
+          </td>
+          <td>${escapeHtml(item.reference || "—")}</td>
+          <td>${escapeHtml(item.invoiceStatus || "—")}</td>
+          <td class="num">${formatMoney(item.amount)}</td>
+        </tr>
+      `).join("");
+    }
+
+    searchInput.addEventListener("input", render);
+    modeFilter.addEventListener("change", render);
+    dateFrom.addEventListener("change", render);
+    dateTo.addEventListener("change", render);
+    sortFilter.addEventListener("change", render);
+    printBtn.addEventListener("click", () => window.print());
+
+    onSnapshot(
+      query(facturesRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allFactures = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        render();
+      },
+      (err) => {
+        console.error("Erreur chargement factures :", err);
+      }
+    );
+
+    onSnapshot(
+      query(paiementsRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allPaiements = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        render();
+      },
+      (err) => {
+        console.error("Erreur chargement paiements :", err);
+      }
+    );
+  </script>
+</body>
+</html>
