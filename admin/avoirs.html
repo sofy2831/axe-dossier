@@ -119,12 +119,12 @@ function getLines(){
 
 async function getNextNumber(){
   const snap=await getDoc(countersRef);
-  const data=snap.exists()?snap.data():{nextAvoir:1};
+  const data=snap.exists()?snap.data():{nextAvoirNumber:1};
 
-  const n=data.nextAvoir||1;
+  const n=data.nextAvoirNumber||1;
   const number=`AV-${new Date().getFullYear()}-${String(n).padStart(3,"0")}`;
 
-  await setDoc(countersRef,{nextAvoir:n+1},{merge:true});
+  await setDoc(countersRef,{nextAvoirNumber:n+1},{merge:true});
 
   return number;
 }
