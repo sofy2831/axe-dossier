@@ -473,30 +473,30 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     addDoc,
     deleteDoc,
     doc,
-    updateDoc,
     onSnapshot,
     query,
     orderBy,
-    serverTimestamp
+    serverTimestamp,
+    updateDoc
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-  const form = document.getElementById("dossierForm");
-  const clientSelect = document.getElementById("dossierClient");
-  const dossierList = document.getElementById("dossierList");
+  const form = document.getElementById("clientForm");
+  const clientList = document.getElementById("clientList");
   const searchInput = document.getElementById("searchInput");
-  const statusFilter = document.getElementById("statusFilter");
-
-  const totalDossiers = document.getElementById("totalDossiers");
-  const totalEnCours = document.getElementById("totalEnCours");
-  const totalAttente = document.getElementById("totalAttente");
-  const totalClos = document.getElementById("totalClos");
+  const totalClients = document.getElementById("totalClients");
+  const totalParticuliers = document.getElementById("totalParticuliers");
+  const totalPros = document.getElementById("totalPros");
 
   const clientsRef = collection(db, "clients");
   const dossiersRef = collection(db, "dossiers");
+  const invoicesRef = collection(db, "factures");
+  const quotesRef = collection(db, "devis");
 
   let allClients = [];
   let allDossiers = [];
-  let editingDossierId = null;
+  let allInvoices = [];
+  let allQuotes = [];
+  let editingClientId = null;
 
   function escapeHtml(text = "") {
     return String(text)
@@ -507,121 +507,101 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       .replace(/'/g, "&#039;");
   }
 
-  function formatStatusClass(status = "") {
-    if (status === "EN_COURS") return "status-en-cours";
-    if (status === "EN_ATTENTE") return "status-attente";
-    if (status === "CLOS") return "status-clos";
-    if (status === "ARCHIVE") return "status-archive";
-    return "";
+  function normalizeText(value = "") {
+    return String(value || "").trim();
   }
 
-  function fillClientSelect() {
-    const current = clientSelect.value;
-    const options = ['<option value="">Sélectionner un client</option>']
-      .concat(
-        allClients.map(client => `<option value="${client.id}">${escapeHtml(client.name || "")}</option>`)
-      );
-
-    clientSelect.innerHTML = options.join("");
-    if (current && allClients.some(c => c.id === current)) {
-      clientSelect.value = current;
-    }
+  function renderStats(clients) {
+    totalClients.textContent = clients.length;
+    totalParticuliers.textContent = clients.filter(c => c.type === "Particulier").length;
+    totalPros.textContent = clients.filter(c => c.type === "Professionnel").length;
   }
 
-  function fillForm(dossier) {
-    document.getElementById("dossierTitle").value = dossier.title || "";
-    document.getElementById("dossierClient").value = dossier.clientId || "";
-    document.getElementById("dossierType").value = dossier.type || "Autre";
-    document.getElementById("dossierStatus").value = dossier.status || "EN_COURS";
-    document.getElementById("dossierOpenedAt").value = dossier.openedAt || "";
-    document.getElementById("dossierReference").value = dossier.reference || "";
-    document.getElementById("dossierSummary").value = dossier.summary || "";
-    document.getElementById("dossierNotes").value = dossier.notes || "";
+  function fillForm(client) {
+    document.getElementById("clientName").value = client.name || "";
+    document.getElementById("clientType").value = client.type || "Particulier";
+    document.getElementById("clientEmail").value = client.email || "";
+    document.getElementById("clientPhone").value = client.phone || "";
+    document.getElementById("clientAddress").value = client.address || "";
+    document.getElementById("clientNotes").value = client.notes || "";
   }
 
-  function renderStats(dossiers) {
-    totalDossiers.textContent = dossiers.length;
-    totalEnCours.textContent = dossiers.filter(d => d.status === "EN_COURS").length;
-    totalAttente.textContent = dossiers.filter(d => d.status === "EN_ATTENTE").length;
-    totalClos.textContent = dossiers.filter(d => d.status === "CLOS" || d.status === "ARCHIVE").length;
+  function getClientUsage(clientId) {
+    const dossiersCount = allDossiers.filter(d => d.clientId === clientId).length;
+    const invoicesCount = allInvoices.filter(i => i.clientId === clientId).length;
+    const quotesCount = allQuotes.filter(q => q.clientId === clientId).length;
+
+    return {
+      dossiersCount,
+      invoicesCount,
+      quotesCount,
+      total: dossiersCount + invoicesCount + quotesCount
+    };
   }
 
-  function renderDossiers() {
-    const q = (searchInput.value || "").trim().toLowerCase();
-    const filter = statusFilter.value;
-    const clientMap = Object.fromEntries(allClients.map(client => [client.id, client]));
+  function renderClients() {
+    const q = normalizeText(searchInput.value).toLowerCase();
 
-    const filtered = allDossiers.filter(dossier => {
-      const clientName = clientMap[dossier.clientId]?.name || "";
+    const filtered = allClients.filter(client => {
       const blob = [
-        dossier.title || "",
-        dossier.type || "",
-        dossier.status || "",
-        dossier.reference || "",
-        dossier.summary || "",
-        dossier.notes || "",
-        clientName
+        client.name || "",
+        client.type || "",
+        client.email || "",
+        client.phone || "",
+        client.address || "",
+        client.notes || ""
       ].join(" ").toLowerCase();
 
-      const matchesSearch = blob.includes(q);
-      const matchesStatus = !filter || dossier.status === filter;
-      return matchesSearch && matchesStatus;
+      return blob.includes(q);
     });
 
-    renderStats(allDossiers);
-
-    if (!allClients.length) {
-      dossierList.innerHTML = '<div class="empty">Ajoute d’abord au moins un client dans clients.html.</div>';
-      return;
-    }
+    renderStats(allClients);
 
     if (!filtered.length) {
-      dossierList.innerHTML = '<div class="empty">Aucun dossier pour le moment.</div>';
+      clientList.innerHTML = '<div class="empty">Aucun client pour le moment.</div>';
       return;
     }
 
-    dossierList.innerHTML = filtered.map(dossier => {
-      const clientName = clientMap[dossier.clientId]?.name || "Client supprimé";
+    clientList.innerHTML = filtered.map(client => {
+      const usage = getClientUsage(client.id);
+      const usageLine = usage.total
+        ? `<span><strong>Utilisation :</strong> ${usage.dossiersCount} dossier(s), ${usage.invoicesCount} facture(s), ${usage.quotesCount} devis</span>`
+        : "";
 
       return `
-        <article class="dossier-item">
-          <div class="dossier-top">
+        <article class="client-item">
+          <div class="client-top">
             <div>
-              <div class="dossier-title">${escapeHtml(dossier.title || "")}</div>
-              <div class="dossier-meta">
-                <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
-                ${dossier.reference ? `<span><strong>Réf. :</strong> ${escapeHtml(dossier.reference)}</span>` : ""}
-                ${dossier.openedAt ? `<span><strong>Ouverture :</strong> ${escapeHtml(dossier.openedAt)}</span>` : ""}
+              <div class="client-name">${escapeHtml(client.name || "")}</div>
+              <div class="client-meta">
+                ${client.email ? `<span>${escapeHtml(client.email)}</span>` : ""}
+                ${client.phone ? `<span>${escapeHtml(client.phone)}</span>` : ""}
+                ${usageLine}
               </div>
             </div>
-            <div class="badges">
-              <span class="badge">${escapeHtml(dossier.type || "")}</span>
-              <span class="badge ${formatStatusClass(dossier.status)}">${escapeHtml(dossier.status || "")}</span>
-            </div>
+            <span class="badge">${escapeHtml(client.type || "")}</span>
           </div>
 
-          ${dossier.summary ? `<div class="dossier-meta"><span><strong>Résumé :</strong> ${escapeHtml(dossier.summary).replace(/\n/g, "<br>")}</span></div>` : ""}
-          ${dossier.notes ? `<div class="dossier-notes">${escapeHtml(dossier.notes).replace(/\n/g, "<br>")}</div>` : ""}
+          ${client.address ? `<div class="client-meta"><span>${escapeHtml(client.address).replace(/\n/g, "<br>")}</span></div>` : ""}
+          ${client.notes ? `<div class="client-notes">${escapeHtml(client.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
           <div class="mini-actions">
-            <button class="mini-btn" type="button" data-edit-id="${dossier.id}">Modifier</button>
-            <button class="mini-btn" type="button" data-delete-id="${dossier.id}">Supprimer</button>
+            <button class="mini-btn" type="button" data-edit-id="${client.id}">Modifier</button>
+            <button class="mini-btn" type="button" data-delete-id="${client.id}">Supprimer</button>
           </div>
         </article>
       `;
     }).join("");
   }
 
-  function createDossier(data) {
+  function createClient(data) {
     return {
-      title: (data.get("dossierTitle") || "").trim(),
-      clientId: data.get("dossierClient") || "",
-      type: data.get("dossierType") || "Autre",
-      status: data.get("dossierStatus") || "EN_COURS",
-      openedAt: data.get("dossierOpenedAt") || "",
-      reference: (data.get("dossierReference") || "").trim(),
-      summary: (data.get("dossierSummary") || "").trim(),
-      notes: (data.get("dossierNotes") || "").trim(),
+      name: normalizeText(data.get("clientName")),
+      type: data.get("clientType") || "Particulier",
+      email: normalizeText(data.get("clientEmail")),
+      phone: normalizeText(data.get("clientPhone")),
+      address: normalizeText(data.get("clientAddress")),
+      notes: normalizeText(data.get("clientNotes")),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
@@ -631,49 +611,61 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     e.preventDefault();
 
     const data = new FormData(form);
-    const payload = createDossier(data);
+    const payload = createClient(data);
 
-    if (!payload.title || !payload.clientId) return;
+    if (!payload.name) {
+      alert("Nom obligatoire.");
+      return;
+    }
 
     try {
-      if (editingDossierId) {
-        await updateDoc(doc(db, "dossiers", editingDossierId), {
-          title: payload.title,
-          clientId: payload.clientId,
+      if (editingClientId) {
+        const usage = getClientUsage(editingClientId);
+
+        if (usage.total > 0) {
+          alert("Modification bloquée : ce client est déjà utilisé par un dossier, un devis ou une facture.");
+          return;
+        }
+
+        await updateDoc(doc(db, "clients", editingClientId), {
+          name: payload.name,
           type: payload.type,
-          status: payload.status,
-          openedAt: payload.openedAt,
-          reference: payload.reference,
-          summary: payload.summary,
+          email: payload.email,
+          phone: payload.phone,
+          address: payload.address,
           notes: payload.notes,
           updatedAt: serverTimestamp()
         });
-        editingDossierId = null;
+        editingClientId = null;
       } else {
-        await addDoc(dossiersRef, payload);
+        await addDoc(clientsRef, payload);
       }
 
       form.reset();
-      document.getElementById("dossierStatus").value = "EN_COURS";
-      document.getElementById("dossierType").value = "Succession";
+      document.getElementById("clientType").value = "Particulier";
     } catch (err) {
-      console.error("Erreur enregistrement dossier :", err);
-      alert("Impossible d’enregistrer le dossier.");
+      console.error("Erreur enregistrement client :", err);
+      alert("Impossible d’enregistrer le client.");
     }
   });
 
-  searchInput.addEventListener("input", renderDossiers);
-  statusFilter.addEventListener("change", renderDossiers);
+  searchInput.addEventListener("input", renderClients);
 
-  dossierList.addEventListener("click", async (e) => {
+  clientList.addEventListener("click", async (e) => {
     const editBtn = e.target.closest("[data-edit-id]");
     if (editBtn) {
       const id = editBtn.getAttribute("data-edit-id");
-      const dossier = allDossiers.find(d => d.id === id);
-      if (!dossier) return;
+      const client = allClients.find(c => c.id === id);
+      if (!client) return;
 
-      editingDossierId = id;
-      fillForm(dossier);
+      const usage = getClientUsage(id);
+      if (usage.total > 0) {
+        alert("Modification bloquée : ce client est déjà utilisé par un dossier, un devis ou une facture.");
+        return;
+      }
+
+      editingClientId = id;
+      fillForm(client);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -682,21 +674,27 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     if (!deleteBtn) return;
 
     const id = deleteBtn.getAttribute("data-delete-id");
-    const ok = confirm("Supprimer ce dossier ?");
+    const usage = getClientUsage(id);
+
+    if (usage.total > 0) {
+      alert("Suppression bloquée : ce client est déjà utilisé.");
+      return;
+    }
+
+    const ok = confirm("Supprimer ce client ?");
     if (!ok) return;
 
     try {
-      await deleteDoc(doc(db, "dossiers", id));
+      await deleteDoc(doc(db, "clients", id));
 
-      if (editingDossierId === id) {
-        editingDossierId = null;
+      if (editingClientId === id) {
+        editingClientId = null;
         form.reset();
-        document.getElementById("dossierStatus").value = "EN_COURS";
-        document.getElementById("dossierType").value = "Succession";
+        document.getElementById("clientType").value = "Particulier";
       }
     } catch (err) {
-      console.error("Erreur suppression dossier :", err);
-      alert("Impossible de supprimer le dossier.");
+      console.error("Erreur suppression client :", err);
+      alert("Impossible de supprimer le client.");
     }
   });
 
@@ -707,11 +705,12 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
         id: docSnap.id,
         ...docSnap.data()
       }));
-      fillClientSelect();
-      renderDossiers();
+      renderClients();
     },
     (err) => {
       console.error("Erreur chargement clients :", err);
+      clientList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
+      renderStats([]);
     }
   );
 
@@ -722,13 +721,33 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
         id: docSnap.id,
         ...docSnap.data()
       }));
-      renderDossiers();
+      renderClients();
     },
-    (err) => {
-      console.error("Erreur chargement dossiers :", err);
-      dossierList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
-      renderStats([]);
-    }
+    (err) => console.error("Erreur chargement dossiers :", err)
+  );
+
+  onSnapshot(
+    query(invoicesRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allInvoices = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      renderClients();
+    },
+    (err) => console.error("Erreur chargement factures :", err)
+  );
+
+  onSnapshot(
+    query(quotesRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allQuotes = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      renderClients();
+    },
+    (err) => console.error("Erreur chargement devis :", err)
   );
 </script>
 
