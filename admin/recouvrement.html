@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axe Dossier — Recouvrement</title>
+  <style>
+    :root{
+      --bg:#f3efe8;
+      --card:#ffffff;
+      --text:#171717;
+      --muted:#66615a;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --soft:#e9e1d4;
+      --shadow:0 16px 40px rgba(0,0,0,0.06);
+      --max:1200px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    a{text-decoration:none;color:inherit}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,0.85);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
+
+    .topbar-inner{
+      min-height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+
+    .brand-mark{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:var(--accent);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
+
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--line);
+      font-size:.94rem;
+    }
+
+    main{padding:32px 0 56px}
+
+    .hero{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:22px;
+    }
+
+    h1,h2,h3,p{margin:0}
+    h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
+    .hero p{color:var(--muted);max-width:72ch;margin-top:8px}
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:24px;
+      margin-bottom:20px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-bottom:20px;
+    }
+
+    .stat{
+      background:#faf7f1;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+    }
+
+    .stat strong{
+      display:block;
+      font-size:1.35rem;
+      letter-spacing:-.04em;
+      margin-bottom:4px;
+    }
+
+    .stat span{
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    .toolbar{
+      display:grid;
+      grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .toolbar input,
+    .toolbar select,
+    .toolbar button{
+      min-height:48px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:0 14px;
+      font:inherit;
+      background:#fff;
+      color:var(--text);
+    }
+
+    .toolbar button{
+      cursor:pointer;
+      font-weight:700;
+    }
+
+    .btn-dark{
+      background:var(--accent) !important;
+      color:#fff !important;
+      border-color:var(--accent) !important;
+    }
+
+    .table-wrap{
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      background:#fff;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    th,td{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      text-align:left;
+      vertical-align:top;
+      font-size:.95rem;
+    }
+
+    thead th{
+      background:#faf7f1;
+      font-size:.9rem;
+      font-weight:800;
+    }
+
+    tbody tr:last-child td{border-bottom:none}
+
+    .num{
+      text-align:right;
+      white-space:nowrap;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      font-size:.82rem;
+      font-weight:700;
+      border:1px solid rgba(23,23,23,0.06);
+      background:var(--soft);
+      color:#4f493f;
+    }
+
+    .badge.open{background:#efe8dd}
+    .badge.partial{background:#f6edd8}
+    .badge.late{background:#f7e3df}
+    .badge.paid{background:#e8efe4}
+
+    .empty{
+      padding:26px;
+      text-align:center;
+      color:var(--muted);
+      background:#fcfbf8;
+      border:1px dashed var(--line);
+      border-radius:18px;
+    }
+
+    .footer-note{
+      margin-top:12px;
+      color:var(--muted);
+      font-size:.92rem;
+    }
+
+    @media (max-width: 980px){
+      .stats{grid-template-columns:1fr 1fr}
+      .toolbar{grid-template-columns:1fr 1fr}
+    }
+
+    @media (max-width: 720px){
+      .topbar-inner{
+        min-height:auto;
+        padding:14px 0;
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .brand,.nav{justify-content:center}
+      .hero{flex-direction:column;align-items:start}
+      .stats{grid-template-columns:1fr}
+      .toolbar{grid-template-columns:1fr}
+      .table-wrap{overflow:auto}
+    }
+
+    @media print{
+      body{background:#fff}
+      .topbar{display:none !important}
+      .wrap{width:100%;margin:0}
+      .card{
+        box-shadow:none;
+        border:none;
+        border-radius:0;
+        padding:0;
+      }
+      .toolbar{display:none !important}
+      .stats{
+        grid-template-columns:repeat(4,1fr);
+        gap:8px;
+      }
+      .stat{
+        border:1px solid #ddd;
+        background:#fff;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="index.html" aria-label="Retour admin">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier · Recouvrement</span>
+      </a>
+      <nav class="nav" aria-label="Navigation admin">
+        <a class="pill" href="index.html">Admin</a>
+        <a class="pill" href="clients.html">Clients</a>
+        <a class="pill" href="dossiers.html">Dossiers</a>
+        <a class="pill" href="documents.html">Documents</a>
+        <a class="pill" href="devis.html">Devis</a>
+        <a class="pill" href="factures.html">Factures</a>
+        <a class="pill" href="paiements.html">Paiements</a>
+        <a class="pill" href="settings.html">Settings</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <h1>Recouvrement</h1>
+          <p>Suivi simple des factures à encaisser, avec reste dû, échéance et retard. Pas de cirque, juste l’essentiel utile.</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="stats">
+          <div class="stat">
+            <strong id="totalOpenCount">0</strong>
+            <span>Factures à suivre</span>
+          </div>
+          <div class="stat">
+            <strong id="totalRemaining">0,00 €</strong>
+            <span>Reste à encaisser</span>
+          </div>
+          <div class="stat">
+            <strong id="totalLateCount">0</strong>
+            <span>En retard</span>
+          </div>
+          <div class="stat">
+            <strong id="totalPartialCount">0</strong>
+            <span>Partiellement réglées</span>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <input id="searchInput" type="text" placeholder="Rechercher numéro, client, dossier..." />
+          <select id="statusFilter">
+            <option value="">Tous</option>
+            <option value="OPEN">Non réglées</option>
+            <option value="PARTIAL">Partielles</option>
+            <option value="LATE">En retard</option>
+          </select>
+          <input id="dateFrom" type="date" />
+          <input id="dateTo" type="date" />
+          <select id="sortFilter">
+            <option value="DUE_ASC">Échéance proche</option>
+            <option value="DUE_DESC">Échéance lointaine</option>
+            <option value="REMAINING_DESC">Reste dû décroissant</option>
+            <option value="REMAINING_ASC">Reste dû croissant</option>
+          </select>
+          <button id="printBtn" class="btn-dark" type="button">Imprimer</button>
+        </div>
+
+        <div id="emptyState" class="empty" style="display:none;">Aucune facture à relancer.</div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:12%;">Échéance</th>
+                <th style="width:14%;">Facture</th>
+                <th style="width:18%;">Client</th>
+                <th style="width:16%;">Dossier</th>
+                <th class="num" style="width:10%;">TTC</th>
+                <th class="num" style="width:10%;">Encaissé</th>
+                <th class="num" style="width:10%;">Reste dû</th>
+                <th style="width:10%;">Situation</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="footer-note">
+          Le calcul repose sur les factures et paiements enregistrés dans l’admin.
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script type="module">
+    import "./auth-guard.js";
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      onSnapshot,
+      query,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const facturesRef = collection(db, "factures");
+    const paiementsRef = collection(db, "paiements");
+
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const dateFrom = document.getElementById("dateFrom");
+    const dateTo = document.getElementById("dateTo");
+    const sortFilter = document.getElementById("sortFilter");
+    const printBtn = document.getElementById("printBtn");
+
+    const totalOpenCount = document.getElementById("totalOpenCount");
+    const totalRemaining = document.getElementById("totalRemaining");
+    const totalLateCount = document.getElementById("totalLateCount");
+    const totalPartialCount = document.getElementById("totalPartialCount");
+
+    const tableBody = document.getElementById("tableBody");
+    const emptyState = document.getElementById("emptyState");
+
+    let allFactures = [];
+    let allPaiements = [];
+
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatMoney(value) {
+      const num = Number(value || 0);
+      return num.toLocaleString("fr-FR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " €";
+    }
+
+    function normalizeDate(dateStr = "") {
+      return String(dateStr || "").trim();
+    }
+
+    function getToday() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function getInvoicePaymentMap() {
+      const map = {};
+      for (const p of allPaiements) {
+        const invoiceId = p.invoiceId || "";
+        if (!invoiceId) continue;
+        map[invoiceId] = (map[invoiceId] || 0) + Number(p.amount || 0);
+      }
+      return map;
+    }
+
+    function getRecoveryRows() {
+      const paymentMap = getInvoicePaymentMap();
+      const today = getToday();
+
+      return allFactures.map(inv => {
+        const total = Number(inv.amountTTC ?? inv.amount ?? 0);
+        const paid = Number(paymentMap[inv.id] || 0);
+        const remaining = Number((total - paid).toFixed(2));
+        const dueDate = normalizeDate(inv.dueDate || "");
+        const isLate = remaining > 0 && dueDate && dueDate < today;
+        const isPartial = paid > 0 && remaining > 0;
+        const isPaid = remaining <= 0;
+
+        let recoveryStatus = "OPEN";
+        if (isPaid) recoveryStatus = "PAID";
+        else if (isLate) recoveryStatus = "LATE";
+        else if (isPartial) recoveryStatus = "PARTIAL";
+
+        return {
+          id: inv.id,
+          invoiceNumber: inv.number || "",
+          clientName: inv.clientSnapshot?.name || "",
+          dossierTitle: inv.dossierTitleSnapshot || "",
+          dueDate,
+          total,
+          paid,
+          remaining,
+          recoveryStatus,
+          invoiceStatus: inv.status || "",
+          date: normalizeDate(inv.date || "")
+        };
+      }).filter(row => row.remaining > 0);
+    }
+
+    function sortRows(rows) {
+      const sort = sortFilter.value || "DUE_ASC";
+      const list = [...rows];
+
+      if (sort === "DUE_DESC") {
+        return list.sort((a, b) => String(b.dueDate || "").localeCompare(String(a.dueDate || "")));
+      }
+      if (sort === "REMAINING_DESC") {
+        return list.sort((a, b) => Number(b.remaining || 0) - Number(a.remaining || 0));
+      }
+      if (sort === "REMAINING_ASC") {
+        return list.sort((a, b) => Number(a.remaining || 0) - Number(b.remaining || 0));
+      }
+
+      return list.sort((a, b) => String(a.dueDate || "").localeCompare(String(b.dueDate || "")));
+    }
+
+    function badgeClass(status) {
+      if (status === "LATE") return "late";
+      if (status === "PARTIAL") return "partial";
+      if (status === "PAID") return "paid";
+      return "open";
+    }
+
+    function statusLabel(status) {
+      if (status === "LATE") return "EN RETARD";
+      if (status === "PARTIAL") return "PARTIEL";
+      if (status === "PAID") return "PAYÉE";
+      return "À RELANCER";
+    }
+
+    function render() {
+      const q = (searchInput.value || "").trim().toLowerCase();
+      const filter = statusFilter.value;
+      const from = dateFrom.value || "";
+      const to = dateTo.value || "";
+
+      const allRows = getRecoveryRows();
+
+      const filtered = allRows.filter(row => {
+        const blob = [
+          row.invoiceNumber,
+          row.clientName,
+          row.dossierTitle,
+          row.recoveryStatus,
+          row.invoiceStatus
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = blob.includes(q);
+
+        const matchesStatus =
+          !filter ||
+          row.recoveryStatus === filter ||
+          (filter === "OPEN" && row.recoveryStatus === "OPEN");
+
+        const due = row.dueDate || "";
+        const matchesFrom = !from || (due && due >= from);
+        const matchesTo = !to || (due && due <= to);
+
+        return matchesSearch && matchesStatus && matchesFrom && matchesTo;
+      });
+
+      const sorted = sortRows(filtered);
+
+      totalOpenCount.textContent = sorted.length;
+      totalRemaining.textContent = formatMoney(
+        sorted.reduce((acc, row) => acc + Number(row.remaining || 0), 0)
+      );
+      totalLateCount.textContent = sorted.filter(r => r.recoveryStatus === "LATE").length;
+      totalPartialCount.textContent = sorted.filter(r => r.recoveryStatus === "PARTIAL").length;
+
+      if (!sorted.length) {
+        tableBody.innerHTML = "";
+        emptyState.style.display = "";
+        return;
+      }
+
+      emptyState.style.display = "none";
+
+      tableBody.innerHTML = sorted.map(row => `
+        <tr>
+          <td>${escapeHtml(row.dueDate || "—")}</td>
+          <td>${escapeHtml(row.invoiceNumber || "—")}</td>
+          <td>${escapeHtml(row.clientName || "—")}</td>
+          <td>${escapeHtml(row.dossierTitle || "—")}</td>
+          <td class="num">${formatMoney(row.total)}</td>
+          <td class="num">${formatMoney(row.paid)}</td>
+          <td class="num">${formatMoney(row.remaining)}</td>
+          <td>
+            <span class="badge ${badgeClass(row.recoveryStatus)}">
+              ${statusLabel(row.recoveryStatus)}
+            </span>
+          </td>
+        </tr>
+      `).join("");
+    }
+
+    searchInput.addEventListener("input", render);
+    statusFilter.addEventListener("change", render);
+    dateFrom.addEventListener("change", render);
+    dateTo.addEventListener("change", render);
+    sortFilter.addEventListener("change", render);
+    printBtn.addEventListener("click", () => window.print());
+
+    onSnapshot(
+      query(facturesRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allFactures = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        render();
+      },
+      (err) => {
+        console.error("Erreur chargement factures :", err);
+      }
+    );
+
+    onSnapshot(
+      query(paiementsRef, orderBy("createdAt", "desc")),
+      (snapshot) => {
+        allPaiements = snapshot.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        render();
+      },
+      (err) => {
+        console.error("Erreur chargement paiements :", err);
+      }
+    );
+  </script>
+</body>
+</html>
