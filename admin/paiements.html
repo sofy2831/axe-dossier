@@ -457,884 +457,471 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     </div>
 
   </main>
+<script type="module">
+  import "./auth-guard.js";
+  import { db } from "./firebase-config.js";
+  import {
+    collection,
+    addDoc,
+    deleteDoc,
+    doc,
+    updateDoc,
+    onSnapshot,
+    query,
+    orderBy,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
- <!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Axe Dossier — Aperçu facture</title>
-  <style>
-    :root{
-      --bg:#f3efe8;
-      --card:#ffffff;
-      --text:#171717;
-      --muted:#66615a;
-      --line:rgba(23,23,23,0.08);
-      --accent:#111111;
-      --soft:#e9e1d4;
-      --soft-2:#faf7f1;
-      --shadow:0 16px 40px rgba(0,0,0,0.06);
-      --max:1120px;
-    }
+  const form = document.getElementById("paymentForm");
+  const paymentInvoice = document.getElementById("paymentInvoice");
+  const paymentAmount = document.getElementById("paymentAmount");
+  const paymentList = document.getElementById("paymentList");
+  const searchInput = document.getElementById("searchInput");
+  const modeFilter = document.getElementById("modeFilter");
 
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
+  const totalPayments = document.getElementById("totalPayments");
+  const totalPaidAmount = document.getElementById("totalPaidAmount");
+  const totalVirements = document.getElementById("totalVirements");
+  const totalCheques = document.getElementById("totalCheques");
 
-    body{
-      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
+  const invoicesRef = collection(db, "factures");
+  const paymentsRef = collection(db, "paiements");
+  const creditsRef = collection(db, "avoirs");
 
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:20;
-      background:rgba(243,239,232,0.92);
-      backdrop-filter:blur(16px);
-      border-bottom:1px solid var(--line);
-    }
+  let allInvoices = [];
+  let allPayments = [];
+  let allCredits = [];
+  let editingPaymentId = null;
+  let editingOriginalInvoiceId = null;
 
-    .topbar-inner{
-      width:min(var(--max),calc(100% - 32px));
-      margin:0 auto;
-      min-height:72px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      padding:12px 0;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      font-weight:800;
-      letter-spacing:.02em;
-    }
-
-    .brand-mark{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      background:var(--accent);
-      color:#fff;
-      display:grid;
-      place-items:center;
-      font-weight:900;
-    }
-
-    .actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .btn{
-      min-height:44px;
-      padding:0 16px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:#fff;
-      color:var(--text);
-      text-decoration:none;
-      font:inherit;
-      font-weight:700;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      cursor:pointer;
-    }
-
-    .btn-dark{
-      background:var(--accent);
-      color:#fff;
-      border-color:var(--accent);
-    }
-
-    .wrap{
-      width:min(var(--max),calc(100% - 32px));
-      margin:28px auto 56px;
-    }
-
-    .sheet{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      padding:30px;
-    }
-
-    .top-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:18px;
-      align-items:stretch;
-    }
-
-    .panel{
-      border:1px solid var(--line);
-      border-radius:18px;
-      background:#fff;
-      padding:18px;
-      min-height:220%;
-      display:flex;
-      flex-direction:column;
-      }
-
-    .panel h2{
-      margin:0 0 10px;
-      font-size:1rem;
-      letter-spacing:-.02em;
-    }
-
-    .logo-wrap{
-      flex:1;
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-}
-
-    .logo-box{
-      width:132px;
-  height:132px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:var(--soft-2);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-}
-
-    .logo-box img{
-      max-width:100%;
-      max-height:100%;
-      object-fit:contain;
-      display:block;
-    }
-
-    .logo-placeholder{
-      color:var(--muted);
-      font-size:.88rem;
-      text-align:center;
-      padding:10px;
-      line-height:1.4;
-    }
-
-    .invoice-head{
-      display:grid;
-      gap:8px;
-          }
-
-    .invoice-title{
-      font-size:1.6rem;
-  font-weight:900;
-  letter-spacing:-.05em;
-  margin:0;
-}
-
-    .invoice-number{
-      font-size:1.2rem;
-      font-weight:800;
-      letter-spacing:-.02em;
-    }
-
-    .meta{
-      display:grid;
-      gap:6px;
-      font-size:.97rem;
-      line-height:1.5;
-    }
-
-    .section{
-      margin-top:22px;
-    }
-
-    .table-wrap{
-      border:1px solid var(--line);
-      border-radius:18px;
-      overflow:hidden;
-      background:#fff;
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-    }
-
-    th, td{
-      padding:14px 16px;
-      border-bottom:1px solid var(--line);
-      text-align:left;
-      vertical-align:top;
-      font-size:.96rem;
-    }
-
-    thead th{
-      background:var(--soft-2);
-      font-size:.9rem;
-      font-weight:800;
-    }
-
-    tbody tr:last-child td{
-      border-bottom:none;
-    }
-
-    .num{
-      text-align:right;
-      white-space:nowrap;
-    }
-
-    .hidden-col{
-      display:none;
-    }
-
-    .summary-grid{
-      display:grid;
-      grid-template-columns:1fr 360px;
-      gap:18px;
-      margin-top:18px;
-      align-items:start;
-    }
-
-    .totals{
-      border:1px solid var(--line);
-      border-radius:18px;
-      overflow:hidden;
-      background:#fff;
-    }
-
-    .totals-row{
-      display:grid;
-      grid-template-columns:1fr auto;
-      gap:12px;
-      padding:14px 16px;
-      border-bottom:1px solid var(--line);
-    }
-
-    .totals-row:last-child{border-bottom:none}
-
-    .grand-total{
-      background:var(--soft);
-      font-weight:900;
-    }
-
-    .refs-box,
-    .mentions-box,
-    .bank-box,
-    .notes-box{
-      border:1px solid var(--line);
-      border-radius:18px;
-      background:#fff;
-      padding:18px;
-    }
-
-    .refs-box h2,
-    .mentions-box h2,
-    .bank-box h2,
-    .notes-box h2{
-      margin:0 0 10px;
-      font-size:1rem;
-      letter-spacing:-.02em;
-    }
-
-    .footer-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:18px;
-      margin-top:20px;
-    }
-
-    .bank-content{
-      white-space:pre-line;
-      line-height:1.55;
-    }
-
-    .notes-box{
-      margin-top:18px;
-    }
-
-    .footer{
-      margin-top:22px;
-      padding-top:16px;
-      border-top:1px solid var(--line);
-      text-align:center;
-      color:#4f4942;
-      font-size:.92rem;
-      line-height:1.6;
-    }
-
-    .empty,
-    .error{
-      background:#fff;
-      border:1px solid var(--line);
-      border-radius:24px;
-      box-shadow:var(--shadow);
-      padding:28px;
-    }
-
-    .error{color:#7a1f1f}
-
-    @media (max-width: 900px){
-      .top-grid,
-      .summary-grid,
-      .footer-grid{
-        grid-template-columns:1fr;
-      }
-
-      .sheet{
-        padding:22px;
-      }
-    }
-
-  @media print{
-
-  body{
-    background:#fff;
-    font-size:12px;
+  function escapeHtml(text = "") {
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
-  .topbar{
-    display:none !important;
+  function formatMoney(value) {
+    const num = Number(value || 0);
+    return num.toLocaleString("fr-FR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }) + " €";
   }
 
-  .wrap{
-    width:100%;
-    margin:0;
+  function modeBadgeClass(mode = "") {
+    if (mode === "VIREMENT") return "virement";
+    if (mode === "CHEQUE") return "cheque";
+    if (mode === "ESPECES") return "especes";
+    return "autre";
   }
 
-  .sheet{
-    box-shadow:none;
-    border:none;
-    border-radius:0;
-    padding:10px;
+  function getToday() {
+    return new Date().toISOString().slice(0, 10);
   }
 
-  /* 🔥 garde la même structure qu’écran */
-  .top-grid{
-    grid-template-columns:1fr 1fr !important;
+  function getCreditsTotal(invoiceId) {
+    return allCredits
+      .filter(a => a.invoiceId === invoiceId && (a.status || "EMIS") !== "ANNULE")
+      .reduce((sum, a) => sum + Number(a.amountTTC ?? a.total ?? 0), 0);
   }
 
-  .summary-grid{
-    grid-template-columns:1fr 1fr !important;
-    gap:10px;
+  function getPaymentsTotal(invoiceId, excludedPaymentId = null) {
+    return allPayments
+      .filter(p => p.invoiceId === invoiceId && p.id !== excludedPaymentId)
+      .reduce((sum, p) => sum + Number(p.amount || 0), 0);
   }
 
-  .footer-grid{
-    grid-template-columns:1fr 1fr !important;
-    gap:10px;
+  function computeInvoiceRemaining(invoiceId, excludedPaymentId = null) {
+    const invoice = allInvoices.find(i => i.id === invoiceId);
+    if (!invoice) return 0;
+
+    const total = Number(invoice.amountTTC ?? invoice.amount ?? 0);
+    const credits = getCreditsTotal(invoiceId);
+    const paid = getPaymentsTotal(invoiceId, excludedPaymentId);
+
+    const netAfterCredits = Math.max(0, Number((total - credits).toFixed(2)));
+    const remaining = Math.max(0, Number((netAfterCredits - paid).toFixed(2)));
+
+    return remaining;
   }
 
-  /* 🔥 compresser les blocs */
-  .panel,
-  .refs-box,
-  .mentions-box,
-  .bank-box,
-  .notes-box{
-    padding:10px;
+  async function syncInvoiceStatus(invoiceId) {
+    const invoice = allInvoices.find(inv => inv.id === invoiceId);
+    if (!invoice) return;
+
+    const currentStatus = String(invoice.status || "").toUpperCase();
+    if (currentStatus === "ANNULEE") return;
+
+    const total = Number(invoice.amountTTC ?? invoice.amount ?? 0);
+    const credits = getCreditsTotal(invoiceId);
+    const paid = getPaymentsTotal(invoiceId);
+
+    const netAfterCredits = Math.max(0, Number((total - credits).toFixed(2)));
+    const remaining = Math.max(0, Number((netAfterCredits - paid).toFixed(2)));
+    const dueDate = String(invoice.dueDate || "");
+    const today = getToday();
+
+    let newStatus = "ENVOYEE";
+    if (remaining <= 0) newStatus = "PAYEE";
+    else if (dueDate && dueDate < today) newStatus = "RETARD";
+
+    await updateDoc(doc(db, "factures", invoiceId), {
+      status: newStatus,
+      updatedAt: serverTimestamp()
+    });
   }
 
-  /* 🔥 tableau plus compact */
-  th, td{
-    padding:8px 10px;
-    font-size:11px;
+  function fillInvoiceSelect() {
+    const current = paymentInvoice.value;
+
+    const eligibleInvoices = allInvoices.filter(invoice => {
+      const status = String(invoice.status || "").toUpperCase();
+      if (status === "ANNULEE") return false;
+
+      const remaining = computeInvoiceRemaining(invoice.id, editingPaymentId);
+      if (editingPaymentId && invoice.id === editingOriginalInvoiceId) return true;
+
+      return remaining > 0;
+    });
+
+    const options = ['<option value="">Sélectionner une facture</option>']
+      .concat(
+        eligibleInvoices.map(invoice => {
+          const amount = computeInvoiceRemaining(invoice.id, editingPaymentId);
+          const label =
+            (Array.isArray(invoice.lines) && invoice.lines.length
+              ? invoice.lines[0]?.designation
+              : invoice.label) || "Sans libellé";
+
+          return `
+            <option value="${invoice.id}" data-remaining="${amount}">
+              ${escapeHtml(invoice.number || "")} — ${escapeHtml(label)} — reste ${formatMoney(amount)}
+            </option>
+          `;
+        })
+      );
+
+    paymentInvoice.innerHTML = options.join("");
+
+    if (current && eligibleInvoices.some(i => i.id === current)) {
+      paymentInvoice.value = current;
+    }
   }
 
-  .invoice-title{
-    font-size:18px;
+  function fillForm(payment) {
+    editingOriginalInvoiceId = payment.invoiceId || null;
+    document.getElementById("paymentInvoice").value = payment.invoiceId || "";
+    document.getElementById("paymentDate").value = payment.date || "";
+    document.getElementById("paymentAmount").value = payment.amount ?? "";
+    document.getElementById("paymentMode").value = payment.mode || "VIREMENT";
+    document.getElementById("paymentReference").value = payment.reference || "";
+    document.getElementById("paymentNotes").value = payment.notes || "";
+    fillInvoiceSelect();
+    document.getElementById("paymentInvoice").value = payment.invoiceId || "";
   }
 
-  .invoice-number{
-    font-size:13px;
+  function renderStats(payments) {
+    totalPayments.textContent = payments.length;
+    totalPaidAmount.textContent = formatMoney(
+      payments.reduce((acc, p) => acc + Number(p.amount || 0), 0)
+    );
+    totalVirements.textContent = payments.filter(p => p.mode === "VIREMENT").length;
+    totalCheques.textContent = payments.filter(p => p.mode === "CHEQUE").length;
   }
 
-  .amount{
-    font-size:16px;
-  }
+  function renderPayments() {
+    const invoiceMap = Object.fromEntries(allInvoices.map(i => [i.id, i]));
+    const q = (searchInput.value || "").trim().toLowerCase();
+    const filter = modeFilter.value;
 
-  /* 🔥 éviter les coupures moches */
-  .panel,
-  .table-wrap,
-  .totals,
-  .refs-box,
-  .mentions-box,
-  .bank-box,
-  .notes-box{
-    page-break-inside: avoid;
-  }
+    const filtered = allPayments.filter(payment => {
+      const invoice = invoiceMap[payment.invoiceId];
 
-  /* 🔥 limiter à 1 page si possible */
-  html, body{
-    height:auto;
-  }
+      const clientName =
+        payment.clientNameSnapshot ||
+        invoice?.clientSnapshot?.name ||
+        "";
 
-}
-  </style>
-</head>
-<body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <span class="brand-mark">AD</span>
-        <span>Axe Dossier · Aperçu facture</span>
-      </div>
+      const invoiceNumber =
+        payment.invoiceNumberSnapshot ||
+        invoice?.number ||
+        "";
 
-      <div class="actions">
-        <a class="btn" href="factures.html">Retour</a>
-        <button class="btn btn-dark" id="printBtn" type="button">Imprimer / PDF</button>
-      </div>
-    </div>
-  </header>
+      const invoiceLabel =
+        payment.invoiceLabelSnapshot ||
+        (((Array.isArray(invoice?.lines) && invoice.lines.length)
+          ? invoice.lines[0]?.designation
+          : invoice?.label) || "");
 
-  <main class="wrap">
-    <div id="loading" class="empty">Chargement de la facture…</div>
-    <div id="error" class="error" style="display:none;"></div>
+      const blob = [
+        payment.reference || "",
+        payment.notes || "",
+        payment.mode || "",
+        invoiceNumber,
+        invoiceLabel,
+        clientName
+      ].join(" ").toLowerCase();
 
-    <article id="sheet" class="sheet" style="display:none;">
-     <section class="top-grid">
-  <div class="panel">
-    <h2>Logo</h2>
-    <div class="logo-wrap">
-      <div id="logoBox" class="logo-box">
-        <div class="logo-placeholder">Logo non renseigné</div>
-      </div>
-    </div>
-  </div>
+      const matchesSearch = blob.includes(q);
+      const matchesMode = !filter || payment.mode === filter;
+      return matchesSearch && matchesMode;
+    });
 
-  <div class="panel">
-    <h2>Facture</h2>
-    <div class="invoice-head">
-      <div id="invoiceNumber" class="invoice-number">—</div>
-      <div>Date : <span id="invoiceDate">—</span></div>
-      <div>Échéance : <span id="invoiceDueDate">—</span></div>
-    </div>
-  </div>
+    renderStats(allPayments);
 
-  <div class="panel">
-    <h2>Émetteur</h2>
-    <div id="businessBlock" class="meta"></div>
-  </div>
+    if (!allInvoices.length && !allPayments.length) {
+      paymentList.innerHTML = '<div class="empty">Ajoute d’abord au moins une facture dans factures.html.</div>';
+      return;
+    }
 
-  <div class="panel">
-    <h2>Client</h2>
-    <div id="clientBlock" class="meta"></div>
-  </div>
-</section>
+    if (!filtered.length) {
+      paymentList.innerHTML = '<div class="empty">Aucun paiement pour le moment.</div>';
+      return;
+    }
 
-      <section class="section">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th style="width:46%;">Désignation</th>
-                <th class="num" style="width:12%;">Qté</th>
-                <th class="num" style="width:18%;">PU TTC</th>
-                <th id="vatHeader" class="num" style="width:12%;">TVA</th>
-                <th class="num" style="width:12%;">Total TTC</th>
-              </tr>
-            </thead>
-            <tbody id="linesBody">
-              <tr>
-                <td colspan="5">Aucune ligne.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+    paymentList.innerHTML = filtered.map(payment => {
+      const invoice = invoiceMap[payment.invoiceId];
 
-        <div class="summary-grid">
-          <div>
-            <div class="refs-box">
-              <h2>Références</h2>
-              <div id="refsBlock" class="meta"></div>
+      const invoiceNumber =
+        payment.invoiceNumberSnapshot ||
+        invoice?.number ||
+        "Facture supprimée";
+
+      const clientName =
+        payment.clientNameSnapshot ||
+        invoice?.clientSnapshot?.name ||
+        "Facture supprimée";
+
+      const invoiceLabel =
+        payment.invoiceLabelSnapshot ||
+        (((Array.isArray(invoice?.lines) && invoice.lines.length)
+          ? invoice.lines[0]?.designation
+          : invoice?.label) || "");
+
+      const invoiceStatus =
+        invoice?.status ||
+        payment.invoiceStatusSnapshot ||
+        "";
+
+      return `
+        <article class="payment-item">
+          <div class="payment-top">
+            <div>
+              <div class="payment-title">${escapeHtml(invoiceNumber)}</div>
+              <div class="payment-meta">
+                <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
+                ${invoiceLabel ? `<span><strong>Libellé :</strong> ${escapeHtml(invoiceLabel)}</span>` : ""}
+                ${payment.date ? `<span><strong>Date :</strong> ${escapeHtml(payment.date)}</span>` : ""}
+                ${payment.reference ? `<span><strong>Référence :</strong> ${escapeHtml(payment.reference)}</span>` : ""}
+                ${invoiceStatus ? `<span><strong>Statut facture :</strong> ${escapeHtml(invoiceStatus)}</span>` : ""}
+              </div>
+            </div>
+            <div class="badges">
+              <span class="badge ${modeBadgeClass(payment.mode)}">${escapeHtml(payment.mode || "")}</span>
             </div>
           </div>
 
-          <div>
-            <div class="totals">
-              <div class="totals-row">
-                <span>Total HT</span>
-                <strong id="amountHT">—</strong>
-              </div>
-
-              <div id="vatTotalsRow" class="totals-row">
-                <span>TVA</span>
-                <strong id="amountVAT">—</strong>
-              </div>
-
-              <div class="totals-row grand-total">
-                <span>Total TTC</span>
-                <strong id="amountTTC">—</strong>
-              </div>
-            </div>
+          <div class="payment-meta">
+            <span class="amount">${formatMoney(payment.amount)}</span>
           </div>
-        </div>
-      </section>
 
-      <section class="footer-grid">
-        <div class="mentions-box">
-          <h2>Mentions</h2>
-          <div id="mentionsBlock" class="meta"></div>
-        </div>
+          ${payment.notes ? `<div class="payment-notes">${escapeHtml(payment.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
-        <div class="bank-box">
-          <h2>Coordonnées bancaires</h2>
-          <div id="bankBlock" class="bank-content">Non renseignées.</div>
-        </div>
-      </section>
+          <div class="mini-actions">
+            <button class="mini-btn" type="button" data-edit-id="${payment.id}">Modifier</button>
+            <button class="mini-btn" type="button" data-delete-id="${payment.id}">Supprimer</button>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
 
-      <section class="notes-box">
-        <h2>Notes internes</h2>
-        <div id="notesBlock" class="meta">Aucune note.</div>
-      </section>
+  function buildPaymentPayload(data) {
+    const invoiceId = data.get("paymentInvoice") || "";
+    const invoice = allInvoices.find(i => i.id === invoiceId);
 
-      <footer id="footerBlock" class="footer"></footer>
-    </article>
-  </main>
+    return {
+      invoiceId,
+      clientIdSnapshot: invoice?.clientId || "",
+      invoiceNumberSnapshot: invoice?.number || "",
+      clientNameSnapshot: invoice?.clientSnapshot?.name || "",
+      invoiceStatusSnapshot: invoice?.status || "",
+      invoiceLabelSnapshot:
+        ((Array.isArray(invoice?.lines) && invoice.lines.length)
+          ? invoice.lines[0]?.designation
+          : invoice?.label) || "",
+      date: data.get("paymentDate") || "",
+      amount: Number(data.get("paymentAmount") || 0),
+      mode: data.get("paymentMode") || "VIREMENT",
+      reference: (data.get("paymentReference") || "").trim(),
+      notes: (data.get("paymentNotes") || "").trim(),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+  }
 
-  <script type="module">
-    import "./auth-guard.js";
-    import { db } from "./firebase-config.js";
-    import {
-      doc,
-      getDoc
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-    const loadingEl = document.getElementById("loading");
-    const errorEl = document.getElementById("error");
-    const sheetEl = document.getElementById("sheet");
-    const printBtn = document.getElementById("printBtn");
+    const data = new FormData(form);
+    const payload = buildPaymentPayload(data);
 
-    function qs(name) {
-      const url = new URL(window.location.href);
-      return url.searchParams.get(name);
+    if (!payload.invoiceId || !payload.amount) {
+      alert("Facture et montant obligatoires.");
+      return;
     }
 
-    function escapeHtml(text = "") {
-      return String(text)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+    const invoice = allInvoices.find(i => i.id === payload.invoiceId);
+    if (!invoice) {
+      alert("Facture introuvable.");
+      return;
     }
 
-    function cleanSingleLine(text = "") {
-      return String(text).replace(/\n/g, " ").trim();
+    if (String(invoice.status || "").toUpperCase() === "ANNULEE") {
+      alert("Impossible d’enregistrer un paiement sur une facture annulée.");
+      return;
     }
 
-    function formatMoney(value) {
-      const num = Number(value || 0);
-      return num.toLocaleString("fr-FR", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      }) + " €";
+    const available = computeInvoiceRemaining(payload.invoiceId, editingPaymentId);
+
+    if (payload.amount > available) {
+      alert(`Montant trop élevé. Reste encaissable maximum : ${formatMoney(available)}.`);
+      return;
     }
 
-    function line(text) {
-      return `<div>${escapeHtml(text)}</div>`;
-    }
+    try {
+      if (editingPaymentId) {
+        const oldPayment = allPayments.find(p => p.id === editingPaymentId);
+        const oldInvoiceId = oldPayment?.invoiceId || null;
 
-    function renderBusiness(snapshot = {}) {
-      const parts = [
-        snapshot.businessName || "",
-        cleanSingleLine(snapshot.address || ""),
-        snapshot.email || "",
-        snapshot.phone || "",
-        snapshot.siret ? `SIRET : ${snapshot.siret}` : "",
-        snapshot.ape ? `APE : ${snapshot.ape}` : ""
-      ].filter(Boolean);
+        await updateDoc(doc(db, "paiements", editingPaymentId), {
+          invoiceId: payload.invoiceId,
+          clientIdSnapshot: payload.clientIdSnapshot,
+          invoiceNumberSnapshot: payload.invoiceNumberSnapshot,
+          clientNameSnapshot: payload.clientNameSnapshot,
+          invoiceStatusSnapshot: payload.invoiceStatusSnapshot,
+          invoiceLabelSnapshot: payload.invoiceLabelSnapshot,
+          date: payload.date,
+          amount: payload.amount,
+          mode: payload.mode,
+          reference: payload.reference,
+          notes: payload.notes,
+          updatedAt: serverTimestamp()
+        });
 
-      return parts.length
-        ? parts.map(p => line(p)).join("")
-        : "<div>Aucune donnée émetteur.</div>";
-    }
+        if (oldInvoiceId) await syncInvoiceStatus(oldInvoiceId);
+        await syncInvoiceStatus(payload.invoiceId);
 
-    function renderClient(snapshot = {}) {
-      const parts = [
-        snapshot.name || "",
-        cleanSingleLine(snapshot.address || "")
-      ].filter(Boolean);
-
-      return parts.length
-        ? parts.map(p => line(p)).join("")
-        : "<div>Aucune donnée client.</div>";
-    }
-
-    function numberToFrenchUnder100(n) {
-      const units = ["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize"];
-      if (n < 17) return units[n];
-      if (n < 20) return "dix-" + units[n - 10];
-      if (n < 70) {
-        const tens = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante"];
-        const ten = Math.floor(n / 10);
-        const unit = n % 10;
-        if (unit === 0) return tens[ten];
-        if (unit === 1) return tens[ten] + "-et-un";
-        return tens[ten] + "-" + units[unit];
-      }
-      if (n < 80) {
-        if (n === 71) return "soixante-et-onze";
-        return "soixante-" + numberToFrenchUnder100(n - 60);
-      }
-      if (n === 80) return "quatre-vingts";
-      if (n < 100) {
-        return "quatre-vingt-" + numberToFrenchUnder100(n - 80);
-      }
-      return "";
-    }
-
-    function numberToFrench(n) {
-      n = Math.floor(Number(n || 0));
-
-      if (n === 0) return "zéro";
-      if (n < 100) return numberToFrenchUnder100(n);
-
-      if (n < 1000) {
-        const hundreds = Math.floor(n / 100);
-        const rest = n % 100;
-        let text = "";
-        if (hundreds === 1) text = "cent";
-        else text = numberToFrench(hundreds) + " cent";
-        if (hundreds > 1 && rest === 0) text += "s";
-        if (rest > 0) text += " " + numberToFrench(rest);
-        return text;
-      }
-
-      if (n < 1000000) {
-        const thousands = Math.floor(n / 1000);
-        const rest = n % 1000;
-        let text = thousands === 1 ? "mille" : numberToFrench(thousands) + " mille";
-        if (rest > 0) text += " " + numberToFrench(rest);
-        return text;
-      }
-
-      if (n < 1000000000) {
-        const millions = Math.floor(n / 1000000);
-        const rest = n % 1000000;
-        let text = millions === 1 ? "un million" : numberToFrench(millions) + " millions";
-        if (rest > 0) text += " " + numberToFrench(rest);
-        return text;
-      }
-
-      return String(n);
-    }
-
-    function amountToWords(value) {
-      const amount = Number(value || 0);
-      const euros = Math.floor(amount);
-      const cents = Math.round((amount - euros) * 100);
-
-      let text = numberToFrench(euros) + (euros > 1 ? " euros" : " euro");
-
-      if (cents > 0) {
-        text += " et " + numberToFrench(cents) + (cents > 1 ? " centimes" : " centime");
-      }
-
-      return text;
-    }
-
-    function renderLogo(snapshot = {}) {
-      const box = document.getElementById("logoBox");
-      const logoUrl = snapshot.logoUrl || "";
-
-      if (!logoUrl) {
-        box.innerHTML = '<div class="logo-placeholder">Logo non renseigné</div>';
-        return;
-      }
-
-      box.innerHTML = `<img src="${escapeHtml(logoUrl)}" alt="Logo émetteur" />`;
-    }
-
-    function renderMentions(snapshot = {}) {
-      const parts = [];
-
-      if (snapshot.vatMode === "YES") {
-        parts.push(`Soumis à la TVA${snapshot.vatRate ? ` : ${snapshot.vatRate} %` : ""}`);
-        if (snapshot.vatNumber) parts.push(`N° TVA : ${snapshot.vatNumber}`);
-      } else if (snapshot.tvaExemptionText) {
-        parts.push(snapshot.tvaExemptionText);
-      }
-
-      if (
-        snapshot.legalNotice &&
-        snapshot.legalNotice.trim() &&
-        snapshot.legalNotice.trim() !== (snapshot.tvaExemptionText || "").trim()
-      ) {
-        parts.push(snapshot.legalNotice);
-      }
-
-      return parts.length
-        ? parts.map(p => line(p)).join("")
-        : "<div>Aucune mention.</div>";
-    }
-
-    function renderBank(snapshot = {}) {
-      const parts = [];
-      if (snapshot.bankName) parts.push(`Banque : ${snapshot.bankName}`);
-      if (snapshot.iban) parts.push(`IBAN : ${snapshot.iban}`);
-      if (snapshot.bic) parts.push(`BIC : ${snapshot.bic}`);
-      return parts.length ? parts.join("\n") : "Non renseignées.";
-    }
-
-    function renderFooter(snapshot = {}) {
-      const parts = [
-        snapshot.businessName || "Axe Dossier",
-        cleanSingleLine(snapshot.address || ""),
-        snapshot.siret ? `SIRET : ${snapshot.siret}` : "",
-        snapshot.ape ? `APE : ${snapshot.ape}` : ""
-      ].filter(Boolean);
-
-      return escapeHtml(parts.join(" — "));
-    }
-
-    function applyTVADisplay(business = {}) {
-      const vatMode = business.vatMode || "NO";
-      const vatRate = Number(business.vatRate || 0);
-      const hasTVA = vatMode === "YES" && vatRate > 0;
-
-      const vatHeader = document.getElementById("vatHeader");
-      const vatTotalsRow = document.getElementById("vatTotalsRow");
-
-      if (hasTVA) {
-        vatHeader.classList.remove("hidden-col");
-        vatTotalsRow.style.display = "";
+        editingPaymentId = null;
+        editingOriginalInvoiceId = null;
       } else {
-        vatHeader.classList.add("hidden-col");
-        vatTotalsRow.style.display = "none";
+        await addDoc(paymentsRef, payload);
+        await syncInvoiceStatus(payload.invoiceId);
       }
 
-      return hasTVA;
+      form.reset();
+      document.getElementById("paymentMode").value = "VIREMENT";
+      fillInvoiceSelect();
+    } catch (err) {
+      console.error("Erreur enregistrement paiement :", err);
+      alert("Impossible d’enregistrer le paiement.");
+    }
+  });
+
+  paymentInvoice.addEventListener("change", (e) => {
+    const option = e.target.selectedOptions[0];
+    if (!paymentAmount.value && option?.dataset?.remaining) {
+      paymentAmount.value = option.dataset.remaining;
+    }
+  });
+
+  searchInput.addEventListener("input", renderPayments);
+  modeFilter.addEventListener("change", renderPayments);
+
+  paymentList.addEventListener("click", async (e) => {
+    const editBtn = e.target.closest("[data-edit-id]");
+    if (editBtn) {
+      const id = editBtn.getAttribute("data-edit-id");
+      const payment = allPayments.find(p => p.id === id);
+      if (!payment) return;
+
+      editingPaymentId = id;
+      fillForm(payment);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
     }
 
-    function renderLines(data = {}, business = {}) {
-      const body = document.getElementById("linesBody");
-      const hasTVA = applyTVADisplay(business);
-      const lines = Array.isArray(data.lines) && data.lines.length
-        ? data.lines
-        : [{
-            designation: data.label || "Prestation",
-            quantity: 1,
-            unitPriceTTC: Number(data.amountTTC ?? data.amount ?? 0),
-            totalTTC: Number(data.amountTTC ?? data.amount ?? 0)
-          }];
+    const deleteBtn = e.target.closest("[data-delete-id]");
+    if (!deleteBtn) return;
 
-      const colspan = hasTVA ? 5 : 4;
+    const id = deleteBtn.getAttribute("data-delete-id");
+    const payment = allPayments.find(p => p.id === id);
+    const oldInvoiceId = payment?.invoiceId || null;
 
-      body.innerHTML = lines.length
-        ? lines.map(lineItem => {
-            const qty = Number(lineItem.quantity || 0);
-            const unitPriceTTC = Number(lineItem.unitPriceTTC || 0);
-            const totalTTC = Number(lineItem.totalTTC || 0);
+    const ok = confirm("Supprimer ce paiement ?");
+    if (!ok) return;
 
-            return `
-              <tr>
-                <td>${escapeHtml(lineItem.designation || "")}</td>
-                <td class="num">${qty}</td>
-                <td class="num">${formatMoney(unitPriceTTC)}</td>
-                ${hasTVA ? `<td class="num">${Number(business.vatRate || 0)} %</td>` : ""}
-                <td class="num">${formatMoney(totalTTC)}</td>
-              </tr>
-            `;
-          }).join("")
-        : `<tr><td colspan="${colspan}">Aucune ligne.</td></tr>`;
-    }
+    try {
+      await deleteDoc(doc(db, "paiements", id));
 
-    function buildPaymentLimitLabel(data = {}) {
-      if (data.dueDate) return data.dueDate;
-      return "À réception";
-    }
+      if (oldInvoiceId) await syncInvoiceStatus(oldInvoiceId);
 
-    function renderRefs(data = {}) {
-      const parts = [];
-
-      if (data.dossierTitleSnapshot) {
-        parts.push(`Dossier : ${data.dossierTitleSnapshot}`);
+      if (editingPaymentId === id) {
+        editingPaymentId = null;
+        editingOriginalInvoiceId = null;
+        form.reset();
+        document.getElementById("paymentMode").value = "VIREMENT";
       }
-
-      if (data.mode) {
-        parts.push(`Mode prévu : ${data.mode}`);
-      }
-
-      parts.push(`À payer : ${formatMoney(data.amountTTC ?? data.amount ?? 0)}`);
-      parts.push(`En lettres : ${amountToWords(data.amountTTC ?? data.amount ?? 0)}`);
-      parts.push(`Date limite de règlement : ${buildPaymentLimitLabel(data)}`);
-
-      return parts.map(p => line(p)).join("");
+    } catch (err) {
+      console.error("Erreur suppression paiement :", err);
+      alert("Impossible de supprimer le paiement.");
     }
+  });
 
-    function showError(message) {
-      loadingEl.style.display = "none";
-      sheetEl.style.display = "none";
-      errorEl.style.display = "block";
-      errorEl.textContent = message;
+  onSnapshot(
+    query(invoicesRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allInvoices = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      fillInvoiceSelect();
+      renderPayments();
+    },
+    (err) => console.error("Erreur chargement factures :", err)
+  );
+
+  onSnapshot(
+    query(creditsRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allCredits = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      fillInvoiceSelect();
+      renderPayments();
+    },
+    (err) => console.error("Erreur chargement avoirs :", err)
+  );
+
+  onSnapshot(
+    query(paymentsRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allPayments = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      fillInvoiceSelect();
+      renderPayments();
+    },
+    (err) => {
+      console.error("Erreur chargement paiements :", err);
+      paymentList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
+      renderStats([]);
     }
-
-    async function init() {
-      const invoiceId = qs("id");
-
-      if (!invoiceId) {
-        showError("Aucun identifiant de facture dans l’URL.");
-        return;
-      }
-
-      try {
-        const snap = await getDoc(doc(db, "factures", invoiceId));
-
-        if (!snap.exists()) {
-          showError("Facture introuvable.");
-          return;
-        }
-
-        const data = snap.data();
-        const business = data.businessSnapshot || {};
-        const client = data.clientSnapshot || {};
-
-        document.title = `${data.number || "Facture"} — Axe Dossier`;
-
-        document.getElementById("invoiceNumber").textContent = data.number || "—";
-        document.getElementById("invoiceDate").textContent = data.date || "—";
-        document.getElementById("invoiceDueDate").textContent = buildPaymentLimitLabel(data);
-
-        renderLogo(business);
-        document.getElementById("businessBlock").innerHTML = renderBusiness(business);
-        document.getElementById("clientBlock").innerHTML = renderClient(client);
-
-        renderLines(data, business);
-
-        document.getElementById("amountHT").textContent =
-          formatMoney(data.amountHT ?? data.amountTTC ?? data.amount ?? 0);
-
-        document.getElementById("amountVAT").textContent =
-          formatMoney(data.amountVAT ?? 0);
-
-        document.getElementById("amountTTC").textContent =
-          formatMoney(data.amountTTC ?? data.amount ?? 0);
-
-        document.getElementById("refsBlock").innerHTML = renderRefs(data);
-        document.getElementById("mentionsBlock").innerHTML = renderMentions(business);
-        document.getElementById("bankBlock").textContent = renderBank(business);
-        document.getElementById("footerBlock").textContent = renderFooter(business);
-
-        document.getElementById("notesBlock").innerHTML = data.notes
-          ? `<div>${escapeHtml(data.notes).replace(/\n/g, "<br>")}</div>`
-          : "Aucune note.";
-
-        loadingEl.style.display = "none";
-        errorEl.style.display = "none";
-        sheetEl.style.display = "block";
-      } catch (err) {
-        console.error(err);
-        showError("Impossible de charger la facture.");
-      }
-    }
-
-    printBtn.addEventListener("click", () => window.print());
-
-    init();
-  </script>
-</body>
-</html>
-
+  );
+</script>
+ 
