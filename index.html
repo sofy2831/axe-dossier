@@ -64,16 +64,23 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      font-weight: 800;
-      letter-spacing: 0.02em;
+      min-width: 0;
     }
 
     .brand-logo {
       height: 52px;
       width: auto;
-      max-width: 220px;
       display: block;
       object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .brand-text {
+      font-weight: 800;
+      font-size: 1.02rem;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      color: var(--text);
     }
 
     .nav {
@@ -412,9 +419,19 @@
       .metrics { grid-template-columns: 1fr; }
       h1 { max-width: none; }
 
+      .brand {
+        justify-content: center;
+        flex-direction: column;
+        text-align: center;
+      }
+
       .brand-logo {
         height: 46px;
         margin: 0 auto;
+      }
+
+      .brand-text {
+        white-space: normal;
       }
     }
   </style>
@@ -424,6 +441,7 @@
     <div class="wrap topbar-inner">
       <a href="#top" class="brand" aria-label="Axe Dossier">
         <img src="images/axe-dossier.png" alt="Axe Dossier" class="brand-logo" />
+        <span class="brand-text">Axe Dossier</span>
       </a>
 
       <nav class="nav" aria-label="Navigation principale">
