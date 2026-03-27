@@ -1,172 +1,963 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Axe Dossier — Avoirs</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Axe Dossier — Avoirs</title>
 
-<style>
-body{font-family:Inter,sans-serif;background:#f3efe8;margin:0;color:#171717}
-.wrap{max-width:1100px;margin:auto;padding:20px}
-.card{background:#fff;border-radius:18px;padding:20px;margin-bottom:20px;border:1px solid #ddd}
+  <style>
+    :root{
+      --bg:#f3efe8;
+      --card:#ffffff;
+      --text:#171717;
+      --muted:#66615a;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --soft:#e9e1d4;
+      --soft2:#faf7f1;
+      --shadow:0 16px 40px rgba(0,0,0,0.06);
+      --max:1180px;
+    }
 
-h1{margin-bottom:10px}
+    *{box-sizing:border-box}
 
-.field{margin-bottom:12px}
-input,select{width:100%;padding:10px;border-radius:10px;border:1px solid #ddd}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    a{text-decoration:none;color:inherit}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
 
-.btn{padding:12px;border-radius:999px;border:none;background:#111;color:#fff;cursor:pointer}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,0.85);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
 
-.line{display:grid;grid-template-columns:1fr 80px 120px 40px;gap:10px;margin-bottom:10px}
-.line input{padding:8px}
+    .topbar-inner{
+      min-height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
 
-.line button{background:red;color:#fff;border:none;border-radius:8px}
-</style>
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+
+    .brand-mark{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:var(--accent);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
+
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--line);
+      font-size:.94rem;
+    }
+
+    main{padding:32px 0 56px}
+
+    .hero{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:22px;
+    }
+
+    h1,h2,h3,p{margin:0}
+    h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
+    .hero p{color:var(--muted);max-width:68ch;margin-top:8px}
+
+    .grid{
+      display:grid;
+      grid-template-columns:460px 1fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:24px;
+    }
+
+    .card h2{
+      font-size:1.2rem;
+      margin-bottom:14px;
+      letter-spacing:-.02em;
+    }
+
+    .field{margin-bottom:14px}
+    .field label{
+      display:block;
+      font-size:.92rem;
+      font-weight:700;
+      margin-bottom:6px;
+    }
+
+    .field input,
+    .field textarea,
+    .field select{
+      width:100%;
+      min-height:48px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      font:inherit;
+      color:var(--text);
+      background:#fff;
+    }
+
+    .field textarea{
+      min-height:100px;
+      resize:vertical;
+    }
+
+    .row-2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+
+    .btn{
+      min-height:48px;
+      padding:0 18px;
+      border-radius:999px;
+      border:1px solid var(--accent);
+      background:var(--accent);
+      color:#fff;
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .btn-secondary{
+      background:#fff;
+      color:var(--accent);
+      border-color:var(--line);
+    }
+
+    .btn-line{
+      min-height:40px;
+      padding:0 14px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      color:var(--text);
+      font:inherit;
+      cursor:pointer;
+    }
+
+    .auto-note{
+      margin-bottom:14px;
+      padding:12px 14px;
+      border-radius:14px;
+      background:#faf7f1;
+      border:1px solid var(--line);
+      color:#4f4942;
+      font-size:.92rem;
+      line-height:1.5;
+    }
+
+    .lines-wrap{
+      display:grid;
+      gap:12px;
+      margin-bottom:16px;
+    }
+
+    .line-item{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:var(--soft2);
+      padding:14px;
+      display:grid;
+      gap:12px;
+    }
+
+    .line-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+
+    .line-title{
+      font-size:.92rem;
+      font-weight:700;
+      color:#4f4942;
+    }
+
+    .line-total{
+      margin-top:4px;
+      font-size:.9rem;
+      color:#4f4942;
+      text-align:right;
+    }
+
+    .summary-box{
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fcfbf8;
+      padding:16px;
+      display:grid;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .summary-row{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      font-size:.95rem;
+    }
+
+    .summary-row strong{
+      font-size:1rem;
+    }
+
+    .toolbar{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .search,
+    .filter{
+      min-height:48px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:0 16px;
+      font:inherit;
+      background:#fff;
+    }
+
+    .search{flex:1 1 260px}
+    .filter{min-width:190px}
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(0,1fr));
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .stat{
+      background:#faf7f1;
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:16px;
+    }
+
+    .stat strong{
+      display:block;
+      font-size:1.35rem;
+      letter-spacing:-.04em;
+      margin-bottom:4px;
+    }
+
+    .stat span{color:var(--muted);font-size:.92rem}
+
+    .empty{
+      padding:24px;
+      border:1px dashed var(--line);
+      border-radius:18px;
+      color:var(--muted);
+      text-align:center;
+      background:#fcfbf8;
+    }
+
+    .credit-list{display:grid;gap:14px}
+
+    .credit-item{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      background:#fff;
+      display:grid;
+      gap:12px;
+    }
+
+    .credit-top{
+      display:flex;
+      align-items:start;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .credit-title{
+      font-size:1.08rem;
+      font-weight:800;
+      letter-spacing:-.02em;
+      margin-bottom:4px;
+    }
+
+    .credit-meta{
+      display:grid;
+      gap:6px;
+      color:#4f4942;
+      font-size:.95rem;
+    }
+
+    .badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      background:var(--soft);
+      font-size:.82rem;
+      font-weight:700;
+      color:#4f493f;
+      border:1px solid rgba(23,23,23,0.06);
+    }
+
+    .badge.emis{background:#f7e3df}
+    .badge.applique{background:#e8efe4}
+    .badge.annule{background:#ececec}
+
+    .credit-notes{
+      color:var(--muted);
+      font-size:.94rem;
+      line-height:1.5;
+    }
+
+    .mini-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .mini-btn{
+      min-height:36px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background:#fff;
+      font:inherit;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      color:var(--text);
+    }
+
+    .amount{
+      font-size:1.35rem;
+      font-weight:800;
+      letter-spacing:-.04em;
+    }
+
+    .note{
+      margin-top:12px;
+      padding:14px 16px;
+      border-radius:14px;
+      background:#faf7f1;
+      border:1px solid var(--line);
+      color:#4f4942;
+      font-size:.92rem;
+    }
+
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr 1fr}
+    }
+
+    @media (max-width: 720px){
+      .topbar-inner{
+        min-height:auto;
+        padding:14px 0;
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .brand,.nav{justify-content:center}
+      .hero{flex-direction:column;align-items:start}
+      .credit-top{flex-direction:column}
+      .row-2{grid-template-columns:1fr}
+      .stats{grid-template-columns:1fr}
+      .actions .btn{width:100%}
+    }
+  </style>
 </head>
 
 <body>
-<div class="wrap">
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="index.html" aria-label="Retour admin">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier · Avoirs</span>
+      </a>
+      <nav class="nav" aria-label="Navigation admin">
+        <a class="pill" href="index.html">Admin</a>
+        <a class="pill" href="clients.html">Clients</a>
+        <a class="pill" href="dossiers.html">Dossiers</a>
+        <a class="pill" href="documents.html">Documents</a>
+        <a class="pill" href="devis.html">Devis</a>
+        <a class="pill" href="factures.html">Factures</a>
+        <a class="pill" href="avoirs.html">Avoirs</a>
+        <a class="pill" href="paiements.html">Paiements</a>
+        <a class="pill" href="settings.html">Settings</a>
+      </nav>
+    </div>
+  </header>
 
-<h1>Avoirs</h1>
+  <main>
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <h1>Avoirs</h1>
+          <p>Création propre d’avoirs liés aux factures, avec lignes multiples et impact comptable exploitable ensuite dans les journaux et le recouvrement.</p>
+        </div>
+      </section>
 
-<div class="card">
-<h2>Créer un avoir</h2>
+      <section class="grid">
+        <article class="card">
+          <h2>Créer un avoir</h2>
 
-<form id="form">
+          <div class="auto-note">
+            L’avoir doit être rattaché à une facture.  
+            Le numéro est généré automatiquement à l’enregistrement.
+          </div>
 
-<div class="row">
-<div class="field">
-<label>Date</label>
-<input type="date" id="date"/>
-</div>
+          <form id="form">
+            <div class="row-2">
+              <div class="field">
+                <label for="date">Date</label>
+                <input type="date" id="date" />
+              </div>
 
-<div class="field">
-<label>Facture liée</label>
-<select id="invoiceSelect">
-<option value="">Aucune</option>
-</select>
-</div>
-</div>
+              <div class="field">
+                <label for="invoiceSelect">Facture liée</label>
+                <select id="invoiceSelect" required>
+                  <option value="">Sélectionner une facture</option>
+                </select>
+              </div>
+            </div>
 
-<div id="lines"></div>
+            <div class="field">
+              <label>Lignes de l’avoir</label>
+              <div id="lines" class="lines-wrap"></div>
+              <button type="button" id="addLine" class="btn-line">Ajouter une ligne</button>
+            </div>
 
-<button type="button" id="addLine">+ Ligne</button>
+            <div class="summary-box">
+              <div class="summary-row">
+                <span>Total HT</span>
+                <span id="summaryHT">0,00 €</span>
+              </div>
+              <div class="summary-row">
+                <span>TVA</span>
+                <span id="summaryVAT">0,00 €</span>
+              </div>
+              <div class="summary-row">
+                <strong>Total TTC</strong>
+                <strong id="summaryTTC">0,00 €</strong>
+              </div>
+            </div>
 
-<div class="field">
-<label>Notes</label>
-<input id="notes"/>
-</div>
+            <div class="field" style="margin-top:14px;">
+              <label for="notes">Notes</label>
+              <textarea id="notes" placeholder="Ex. annulation partielle, geste commercial, correction de ligne..."></textarea>
+            </div>
 
-<button class="btn">Enregistrer</button>
+            <div class="actions">
+              <button class="btn" type="submit">Enregistrer</button>
+              <button id="resetBtn" class="btn btn-secondary" type="button">Vider</button>
+            </div>
+          </form>
 
-</form>
-</div>
+          <div class="note">
+            Cet avoir sera utilisé dans le journal des ventes et déduit du recouvrement de la facture liée.
+          </div>
+        </article>
 
-<div class="card">
-<h2>Liste</h2>
-<div id="list"></div>
-</div>
+        <article class="card">
+          <div class="stats">
+            <div class="stat">
+              <strong id="totalCreditsCount">0</strong>
+              <span>Avoirs</span>
+            </div>
+            <div class="stat">
+              <strong id="totalCreditsAmount">0,00 €</strong>
+              <span>Total TTC</span>
+            </div>
+            <div class="stat">
+              <strong id="totalAppliedCount">0</strong>
+              <span>Liés à une facture</span>
+            </div>
+            <div class="stat">
+              <strong id="totalStatusCount">0</strong>
+              <span>Émis</span>
+            </div>
+          </div>
 
-</div>
+          <div class="toolbar">
+            <input id="searchInput" class="search" type="text" placeholder="Rechercher un avoir..." />
+            <select id="statusFilter" class="filter">
+              <option value="">Tous les statuts</option>
+              <option value="EMIS">EMIS</option>
+              <option value="APPLIQUE">APPLIQUE</option>
+              <option value="ANNULE">ANNULE</option>
+            </select>
+          </div>
 
-<script type="module">
-import "./auth-guard.js";
-import { db } from "./firebase-config.js";
-import {
-collection,addDoc,doc,getDoc,setDoc,onSnapshot,orderBy,query,serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+          <div id="list" class="credit-list"></div>
+        </article>
+      </section>
+    </div>
+  </main>
 
-const linesEl = document.getElementById("lines");
-const addLineBtn = document.getElementById("addLine");
-const form = document.getElementById("form");
-const listEl = document.getElementById("list");
-const invoiceSelect = document.getElementById("invoiceSelect");
+  <script type="module">
+    import "./auth-guard.js";
+    import { db } from "./firebase-config.js";
+    import {
+      collection,
+      addDoc,
+      deleteDoc,
+      doc,
+      getDoc,
+      setDoc,
+      onSnapshot,
+      orderBy,
+      query,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const avoirsRef = collection(db,"avoirs");
-const facturesRef = collection(db,"factures");
-const countersRef = doc(db,"counters","main");
+    const linesEl = document.getElementById("lines");
+    const addLineBtn = document.getElementById("addLine");
+    const form = document.getElementById("form");
+    const resetBtn = document.getElementById("resetBtn");
+    const listEl = document.getElementById("list");
+    const invoiceSelect = document.getElementById("invoiceSelect");
+    const dateInput = document.getElementById("date");
+    const notesInput = document.getElementById("notes");
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
 
-function addLine(data={}){
-  const div=document.createElement("div");
-  div.className="line";
+    const summaryHT = document.getElementById("summaryHT");
+    const summaryVAT = document.getElementById("summaryVAT");
+    const summaryTTC = document.getElementById("summaryTTC");
 
-  div.innerHTML=`
-  <input placeholder="Désignation" value="${data.designation||""}">
-  <input type="number" value="${data.qty||1}">
-  <input type="number" value="${data.price||0}">
-  <button>x</button>
-  `;
+    const totalCreditsCount = document.getElementById("totalCreditsCount");
+    const totalCreditsAmount = document.getElementById("totalCreditsAmount");
+    const totalAppliedCount = document.getElementById("totalAppliedCount");
+    const totalStatusCount = document.getElementById("totalStatusCount");
 
-  div.querySelector("button").onclick=()=>div.remove();
-  linesEl.appendChild(div);
-}
+    const avoirsRef = collection(db, "avoirs");
+    const facturesRef = collection(db, "factures");
+    const countersRef = doc(db, "counters", "main");
 
-addLineBtn.onclick=()=>addLine();
+    let allInvoices = [];
+    let allAvoirs = [];
+    let lineCounter = 0;
 
-function getLines(){
-  return [...linesEl.children].map(l=>{
-    const i=l.querySelectorAll("input");
-    return {
-      designation:i[0].value,
-      qty:Number(i[1].value),
-      price:Number(i[2].value),
-      total:Number(i[1].value)*Number(i[2].value)
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
-  });
-}
 
-async function getNextNumber(){
-  const snap=await getDoc(countersRef);
-  const data=snap.exists()?snap.data():{nextAvoirNumber:1};
+    function formatMoney(value) {
+      const num = Number(value || 0);
+      return num.toLocaleString("fr-FR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " €";
+    }
 
-  const n=data.nextAvoirNumber||1;
-  const number=`AV-${new Date().getFullYear()}-${String(n).padStart(3,"0")}`;
+    function ensureDate() {
+      if (!dateInput.value) {
+        dateInput.value = new Date().toISOString().slice(0, 10);
+      }
+    }
 
-  await setDoc(countersRef,{nextAvoirNumber:n+1},{merge:true});
+    function createLineElement(line = {}) {
+      lineCounter += 1;
+      const id = lineCounter;
 
-  return number;
-}
+      const wrapper = document.createElement("div");
+      wrapper.className = "line-item";
+      wrapper.dataset.lineId = String(id);
 
-form.onsubmit=async e=>{
-  e.preventDefault();
+      wrapper.innerHTML = `
+        <div class="line-head">
+          <div class="line-title">Ligne ${id}</div>
+          <button type="button" class="btn-line" data-remove-line="${id}">Supprimer</button>
+        </div>
 
-  const lines=getLines();
-  const total=lines.reduce((a,l)=>a+l.total,0);
-  if(!total)return;
+        <div class="field" style="margin-bottom:0;">
+          <label>Désignation</label>
+          <input type="text" class="line-designation" placeholder="Ex. Correction de prestation" value="${escapeHtml(line.designation || "")}" />
+        </div>
 
-  const number=await getNextNumber();
+        <div class="row-2">
+          <div class="field" style="margin-bottom:0;">
+            <label>Quantité</label>
+            <input type="number" class="line-qty" step="1" min="1" value="${escapeHtml(String(line.qty ?? line.quantity ?? 1))}" />
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Prix unitaire TTC (€)</label>
+            <input type="number" class="line-unit-price" step="0.01" min="0" placeholder="75.00" value="${escapeHtml(String(line.price ?? line.unitPriceTTC ?? ""))}" />
+          </div>
+        </div>
 
-  await addDoc(avoirsRef,{
-    number,
-    date:document.getElementById("date").value,
-    invoiceId:invoiceSelect.value,
-    lines,
-    total,
-    notes:document.getElementById("notes").value,
-    createdAt:serverTimestamp()
-  });
+        <div class="line-total">Total ligne : <strong class="line-total-value">0,00 €</strong></div>
+      `;
 
-  location.reload();
-};
+      linesEl.appendChild(wrapper);
+      bindLineEvents(wrapper);
+      updateSingleLineTotal(wrapper);
+      updateSummary();
+    }
 
-onSnapshot(query(facturesRef,orderBy("createdAt","desc")),snap=>{
-  invoiceSelect.innerHTML='<option value="">Aucune</option>'+
-  snap.docs.map(d=>`<option value="${d.id}">${d.data().number}</option>`).join("");
-});
+    function bindLineEvents(wrapper) {
+      const qty = wrapper.querySelector(".line-qty");
+      const unit = wrapper.querySelector(".line-unit-price");
+      const removeBtn = wrapper.querySelector("[data-remove-line]");
 
-onSnapshot(query(avoirsRef,orderBy("createdAt","desc")),snap=>{
-  listEl.innerHTML=snap.docs.map(d=>{
-    const a=d.data();
-    return `
-    <div>
-      ${a.number} — ${a.total}€
-      <a href="avoir-apercu.html?id=${d.id}" target="_blank">Voir</a>
-    </div>`;
-  }).join("");
-});
-</script>
+      qty.addEventListener("input", () => {
+        updateSingleLineTotal(wrapper);
+        updateSummary();
+      });
 
+      unit.addEventListener("input", () => {
+        updateSingleLineTotal(wrapper);
+        updateSummary();
+      });
+
+      removeBtn.addEventListener("click", () => {
+        if (linesEl.children.length <= 1) return;
+        wrapper.remove();
+        refreshLineTitles();
+        updateSummary();
+      });
+    }
+
+    function refreshLineTitles() {
+      [...linesEl.children].forEach((item, index) => {
+        const title = item.querySelector(".line-title");
+        if (title) title.textContent = `Ligne ${index + 1}`;
+      });
+    }
+
+    function updateSingleLineTotal(wrapper) {
+      const qty = Number(wrapper.querySelector(".line-qty")?.value || 0);
+      const unit = Number(wrapper.querySelector(".line-unit-price")?.value || 0);
+      const total = Number((qty * unit).toFixed(2));
+      const output = wrapper.querySelector(".line-total-value");
+      if (output) output.textContent = formatMoney(total);
+    }
+
+    function getSelectedInvoice() {
+      const id = invoiceSelect.value || "";
+      return allInvoices.find(inv => inv.id === id) || null;
+    }
+
+    function buildLines() {
+      const rows = [...linesEl.querySelectorAll(".line-item")];
+
+      return rows.map(row => {
+        const designation = (row.querySelector(".line-designation")?.value || "").trim();
+        const qty = Number(row.querySelector(".line-qty")?.value || 0);
+        const price = Number(row.querySelector(".line-unit-price")?.value || 0);
+        const total = Number((qty * price).toFixed(2));
+
+        return {
+          designation,
+          qty,
+          price,
+          quantity: qty,
+          unitPriceTTC: price,
+          total,
+          totalTTC: total
+        };
+      }).filter(line => line.designation && line.qty > 0 && line.price > 0);
+    }
+
+    function computeAmounts(totalTTC, businessSnapshot) {
+      const amountTTC = Number(totalTTC || 0);
+      const vatMode = businessSnapshot?.vatMode || "NO";
+      const vatRate = Number(businessSnapshot?.vatRate || 0);
+
+      if (vatMode === "YES" && vatRate > 0) {
+        const amountHT = Number((amountTTC / (1 + vatRate / 100)).toFixed(2));
+        const amountVAT = Number((amountTTC - amountHT).toFixed(2));
+        return { amountHT, amountVAT, amountTTC };
+      }
+
+      return {
+        amountHT: amountTTC,
+        amountVAT: 0,
+        amountTTC
+      };
+    }
+
+    function updateSummary() {
+      const invoice = getSelectedInvoice();
+      const lines = buildLines();
+      const totalTTC = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
+      const businessSnapshot = invoice?.businessSnapshot || {};
+      const amounts = computeAmounts(totalTTC, businessSnapshot);
+
+      summaryHT.textContent = formatMoney(amounts.amountHT);
+      summaryVAT.textContent = formatMoney(amounts.amountVAT);
+      summaryTTC.textContent = formatMoney(amounts.amountTTC);
+    }
+
+    async function getNextNumber() {
+      const snap = await getDoc(countersRef);
+      const data = snap.exists() ? snap.data() : { nextAvoirNumber: 1 };
+
+      const n = data.nextAvoirNumber || 1;
+      const number = `AV-${new Date().getFullYear()}-${String(n).padStart(3, "0")}`;
+
+      await setDoc(countersRef, { nextAvoirNumber: n + 1 }, { merge: true });
+      return number;
+    }
+
+    function fillInvoiceSelect() {
+      const current = invoiceSelect.value;
+
+      invoiceSelect.innerHTML =
+        '<option value="">Sélectionner une facture</option>' +
+        allInvoices.map(inv => {
+          const clientName = inv.clientSnapshot?.name || "Client";
+          return `<option value="${inv.id}">${escapeHtml(inv.number || "")} — ${escapeHtml(clientName)}</option>`;
+        }).join("");
+
+      if (current && allInvoices.some(i => i.id === current)) {
+        invoiceSelect.value = current;
+      }
+    }
+
+    function resetForm() {
+      form.reset();
+      linesEl.innerHTML = "";
+      lineCounter = 0;
+      createLineElement();
+      ensureDate();
+      updateSummary();
+    }
+
+    function renderStats(items) {
+      totalCreditsCount.textContent = items.length;
+      totalCreditsAmount.textContent = formatMoney(
+        items.reduce((acc, item) => acc + Number(item.amountTTC ?? item.total ?? 0), 0)
+      );
+      totalAppliedCount.textContent = items.filter(item => !!item.invoiceId).length;
+      totalStatusCount.textContent = items.filter(item => (item.status || "EMIS") === "EMIS").length;
+    }
+
+    function renderList() {
+      const q = (searchInput.value || "").trim().toLowerCase();
+      const status = statusFilter.value;
+
+      const filtered = allAvoirs.filter(item => {
+        const blob = [
+          item.number || "",
+          item.status || "",
+          item.invoiceNumberSnapshot || "",
+          item.clientSnapshot?.name || "",
+          item.dossierTitleSnapshot || "",
+          item.notes || ""
+        ].join(" ").toLowerCase();
+
+        const matchesSearch = blob.includes(q);
+        const matchesStatus = !status || (item.status || "EMIS") === status;
+        return matchesSearch && matchesStatus;
+      });
+
+      renderStats(allAvoirs);
+
+      if (!filtered.length) {
+        listEl.innerHTML = '<div class="empty">Aucun avoir pour le moment.</div>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(item => {
+        const amountTTC = Number(item.amountTTC ?? item.total ?? 0);
+        const clientName = item.clientSnapshot?.name || "Client supprimé";
+        const statusValue = item.status || "EMIS";
+        const badgeClass = statusValue === "APPLIQUE" ? "applique" : (statusValue === "ANNULE" ? "annule" : "emis");
+
+        return `
+          <article class="credit-item">
+            <div class="credit-top">
+              <div>
+                <div class="credit-title">${escapeHtml(item.number || "")}</div>
+                <div class="credit-meta">
+                  ${item.date ? `<span><strong>Date :</strong> ${escapeHtml(item.date)}</span>` : ""}
+                  ${item.invoiceNumberSnapshot ? `<span><strong>Facture liée :</strong> ${escapeHtml(item.invoiceNumberSnapshot)}</span>` : ""}
+                  <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
+                  ${item.dossierTitleSnapshot ? `<span><strong>Dossier :</strong> ${escapeHtml(item.dossierTitleSnapshot)}</span>` : ""}
+                </div>
+              </div>
+
+              <div class="badges">
+                <span class="badge ${badgeClass}">${escapeHtml(statusValue)}</span>
+              </div>
+            </div>
+
+            <div class="credit-meta">
+              <span><strong>Montant TTC :</strong> <span class="amount">${formatMoney(amountTTC)}</span></span>
+            </div>
+
+            ${item.notes ? `<div class="credit-notes">${escapeHtml(item.notes).replace(/\n/g, "<br>")}</div>` : ""}
+
+            <div class="mini-actions">
+              <a class="mini-btn" href="avoir-apercu.html?id=${item.id}" target="_blank" rel="noopener noreferrer">Aperçu</a>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    addLineBtn.addEventListener("click", () => {
+      createLineElement();
+      refreshLineTitles();
+      updateSummary();
+    });
+
+    invoiceSelect.addEventListener("change", updateSummary);
+    searchInput.addEventListener("input", renderList);
+    statusFilter.addEventListener("change", renderList);
+    resetBtn.addEventListener("click", resetForm);
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const invoice = getSelectedInvoice();
+      if (!invoice) {
+        alert("Sélectionne une facture.");
+        return;
+      }
+
+      const lines = buildLines();
+      if (!lines.length) {
+        alert("Ajoute au moins une ligne valide.");
+        return;
+      }
+
+      const totalTTC = lines.reduce((sum, line) => sum + Number(line.totalTTC || 0), 0);
+      if (!totalTTC) {
+        alert("Montant nul.");
+        return;
+      }
+
+      try {
+        const number = await getNextNumber();
+        const businessSnapshot = invoice.businessSnapshot || {};
+        const amounts = computeAmounts(totalTTC, businessSnapshot);
+
+        await addDoc(avoirsRef, {
+          number,
+          date: dateInput.value || new Date().toISOString().slice(0, 10),
+          invoiceId: invoice.id,
+          invoiceNumberSnapshot: invoice.number || "",
+          clientId: invoice.clientId || "",
+          clientSnapshot: invoice.clientSnapshot || {},
+          dossierId: invoice.dossierId || "",
+          dossierTitleSnapshot: invoice.dossierTitleSnapshot || "",
+          businessSnapshot,
+          status: "EMIS",
+          lines,
+          amountHT: amounts.amountHT,
+          amountVAT: amounts.amountVAT,
+          amountTTC: amounts.amountTTC,
+          total: amounts.amountTTC,
+          notes: notesInput.value || "",
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+
+        resetForm();
+      } catch (err) {
+        console.error("Erreur création avoir :", err);
+        alert("Impossible d’enregistrer l’avoir.");
+      }
+    });
+
+    onSnapshot(
+      query(facturesRef, orderBy("createdAt", "desc")),
+      (snap) => {
+        allInvoices = snap.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        fillInvoiceSelect();
+        updateSummary();
+      },
+      (err) => {
+        console.error("Erreur chargement factures :", err);
+      }
+    );
+
+    onSnapshot(
+      query(avoirsRef, orderBy("createdAt", "desc")),
+      (snap) => {
+        allAvoirs = snap.docs.map(docSnap => ({
+          id: docSnap.id,
+          ...docSnap.data()
+        }));
+        renderList();
+      },
+      (err) => {
+        console.error("Erreur chargement avoirs :", err);
+      }
+    );
+
+    ensureDate();
+    createLineElement();
+    updateSummary();
+  </script>
 </body>
 </html>
