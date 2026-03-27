@@ -510,14 +510,26 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       .replace(/'/g, "&#039;");
   }
 
+  function normalizeText(value = "") {
+    return String(value || "").trim();
+  }
+
   function fillDossierSelect() {
     const current = dossierSelect.value;
+
     const options = ['<option value="">Sélectionner un dossier</option>']
       .concat(
-        allDossiers.map(dossier => `<option value="${dossier.id}">${escapeHtml(dossier.title || "")}</option>`)
+        allDossiers.map(dossier => {
+          const client = allClients.find(c => c.id === dossier.clientId);
+          const label = client?.name
+            ? `${dossier.title || ""} — ${client.name}`
+            : `${dossier.title || ""}`;
+          return `<option value="${dossier.id}">${escapeHtml(label)}</option>`;
+        })
       );
 
     dossierSelect.innerHTML = options.join("");
+
     if (current && allDossiers.some(d => d.id === current)) {
       dossierSelect.value = current;
     }
@@ -543,12 +555,12 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   function renderDocuments() {
     const dossierMap = Object.fromEntries(allDossiers.map(dossier => [dossier.id, dossier]));
     const clientMap = Object.fromEntries(allClients.map(client => [client.id, client]));
-    const q = (searchInput.value || "").trim().toLowerCase();
+    const q = normalizeText(searchInput.value).toLowerCase();
     const filter = typeFilter.value;
 
     const filtered = allDocuments.filter(item => {
       const dossier = dossierMap[item.dossierId];
-      const clientName = dossier ? (clientMap[dossier.clientId]?.name || "") : "";
+      const clientName = item.clientNameSnapshot || (dossier ? (clientMap[dossier.clientId]?.name || "") : "");
 
       const blob = [
         item.title || "",
@@ -556,7 +568,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
         item.notes || "",
         item.url || "",
         item.fileName || "",
-        dossier?.title || "",
+        item.dossierTitleSnapshot || dossier?.title || "",
         clientName
       ].join(" ").toLowerCase();
 
@@ -579,7 +591,8 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
 
     documentList.innerHTML = filtered.map(item => {
       const dossier = dossierMap[item.dossierId];
-      const clientName = dossier ? (clientMap[dossier.clientId]?.name || "Client supprimé") : "Dossier supprimé";
+      const clientName = item.clientNameSnapshot || (dossier ? (clientMap[dossier.clientId]?.name || "Client supprimé") : "Dossier supprimé");
+      const dossierTitle = item.dossierTitleSnapshot || dossier?.title || "Dossier supprimé";
 
       return `
         <article class="doc-item">
@@ -587,7 +600,7 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
             <div>
               <div class="doc-title">${escapeHtml(item.title || "")}</div>
               <div class="doc-meta">
-                <span><strong>Dossier :</strong> ${escapeHtml(dossier?.title || "Dossier supprimé")}</span>
+                <span><strong>Dossier :</strong> ${escapeHtml(dossierTitle)}</span>
                 <span><strong>Client :</strong> ${escapeHtml(clientName)}</span>
                 ${item.date ? `<span><strong>Date :</strong> ${escapeHtml(item.date)}</span>` : ""}
                 ${item.fileName ? `<span><strong>Fichier :</strong> ${escapeHtml(item.fileName)}</span>` : ""}
@@ -633,13 +646,20 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   }
 
   function createDocument(data) {
+    const dossierId = data.get("documentDossier") || "";
+    const dossier = allDossiers.find(d => d.id === dossierId);
+    const client = allClients.find(c => c.id === dossier?.clientId);
+
     return {
-      title: (data.get("documentTitle") || "").trim(),
-      dossierId: data.get("documentDossier") || "",
+      title: normalizeText(data.get("documentTitle")),
+      dossierId,
+      dossierTitleSnapshot: dossier?.title || "",
+      clientIdSnapshot: dossier?.clientId || "",
+      clientNameSnapshot: client?.name || "",
       type: data.get("documentType") || "Autre",
       date: data.get("documentDate") || "",
-      url: (data.get("documentUrl") || "").trim(),
-      notes: (data.get("documentNotes") || "").trim(),
+      url: normalizeText(data.get("documentUrl")),
+      notes: normalizeText(data.get("documentNotes")),
       fileName: "",
       filePath: "",
       createdAt: serverTimestamp(),
@@ -654,14 +674,21 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     const payload = createDocument(data);
     const file = documentFileInput?.files?.[0] || null;
 
-    if (!payload.title || !payload.dossierId) return;
+    if (!payload.title || !payload.dossierId) {
+      alert("Titre et dossier obligatoires.");
+      return;
+    }
 
     try {
       if (editingDocumentId) {
         const existing = allDocuments.find(d => d.id === editingDocumentId);
+
         const updatePayload = {
           title: payload.title,
           dossierId: payload.dossierId,
+          dossierTitleSnapshot: payload.dossierTitleSnapshot,
+          clientIdSnapshot: payload.clientIdSnapshot,
+          clientNameSnapshot: payload.clientNameSnapshot,
           type: payload.type,
           date: payload.date,
           notes: payload.notes,
@@ -767,11 +794,10 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
         id: docSnap.id,
         ...docSnap.data()
       }));
+      fillDossierSelect();
       renderDocuments();
     },
-    (err) => {
-      console.error("Erreur chargement clients :", err);
-    }
+    (err) => console.error("Erreur chargement clients :", err)
   );
 
   onSnapshot(
