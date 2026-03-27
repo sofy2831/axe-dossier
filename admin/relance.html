@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Axe Dossier — Relances</title>
+  <style>
+    :root{
+      --bg:#f3efe8;
+      --card:#ffffff;
+      --text:#171717;
+      --muted:#66615a;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --soft:#e9e1d4;
+      --soft2:#faf7f1;
+      --shadow:0 16px 40px rgba(0,0,0,0.06);
+      --max:1180px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+    a{text-decoration:none;color:inherit}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,.88);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      min-height:72px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
+    .brand-mark{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      background:var(--accent);
+      color:#fff;
+      display:grid;
+      place-items:center;
+      font-weight:900;
+      box-shadow:var(--shadow);
+    }
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.7);
+      border:1px solid var(--line);
+      font-size:.94rem;
+    }
+
+    main{padding:32px 0 56px}
+
+    .hero{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:22px;
+    }
+    h1,h2,h3,p{margin:0}
+    h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
+    .hero p{color:var(--muted);max-width:72ch;margin-top:8px}
+
+    .grid{
+      display:grid;
+      grid-template-columns:360px 1fr;
+      gap:20px;
+      align-items:start;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:24px;
+    }
+
+    .info-grid{
+      display:grid;
+      gap:12px;
+    }
+
+    .info-box{
+      background:#faf7f1;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+    }
+
+    .info-box strong{
+      display:block;
+      font-size:1.1rem;
+      margin-bottom:4px;
+      letter-spacing:-.03em;
+    }
+
+    .meta{
+      display:grid;
+      gap:6px;
+      color:#4f4942;
+      font-size:.95rem;
+      line-height:1.5;
+    }
+
+    .relance-list{
+      display:grid;
+      gap:18px;
+    }
+
+    .relance-item{
+      border:1px solid var(--line);
+      border-radius:20px;
+      background:#fff;
+      overflow:hidden;
+    }
+
+    .relance-head{
+      padding:16px 18px;
+      border-bottom:1px solid var(--line);
+      background:#faf7f1;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .relance-title{
+      font-size:1.06rem;
+      font-weight:800;
+      letter-spacing:-.02em;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:28px;
+      padding:0 10px;
+      border-radius:999px;
+      background:var(--soft);
+      font-size:.82rem;
+      font-weight:700;
+      color:#4f493f;
+      border:1px solid rgba(23,23,23,.06);
+    }
+
+    .relance-body{
+      padding:18px;
+      display:grid;
+      gap:14px;
+    }
+
+    .field{
+      display:grid;
+      gap:6px;
+    }
+
+    .field label{
+      font-size:.92rem;
+      font-weight:700;
+    }
+
+    .field input,
+    .field textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      font:inherit;
+      color:var(--text);
+      background:#fff;
+    }
+
+    .field textarea{
+      min-height:220px;
+      resize:vertical;
+      white-space:pre-wrap;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      min-height:44px;
+      padding:0 16px;
+      border-radius:999px;
+      border:1px solid var(--accent);
+      background:var(--accent);
+      color:#fff;
+      font:inherit;
+      font-weight:700;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+
+    .btn-secondary{
+      background:#fff;
+      color:var(--accent);
+      border-color:var(--line);
+    }
+
+    .empty,
+    .error{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:28px;
+    }
+    .error{color:#7a1f1f}
+
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    @media (max-width: 720px){
+      .topbar-inner{
+        min-height:auto;
+        padding:14px 0;
+        flex-direction:column;
+        align-items:stretch;
+      }
+      .brand,.nav{justify-content:center}
+      .hero{flex-direction:column;align-items:start}
+      .actions .btn{width:100%}
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="recouvrement.html" aria-label="Retour recouvrement">
+        <span class="brand-mark">AD</span>
+        <span>Axe Dossier · Relances</span>
+      </a>
+      <nav class="nav" aria-label="Navigation admin">
+        <a class="pill" href="index.html">Admin</a>
+        <a class="pill" href="factures.html">Factures</a>
+        <a class="pill" href="paiements.html">Paiements</a>
+        <a class="pill" href="avoirs.html">Avoirs</a>
+        <a class="pill" href="recouvrement.html">Recouvrement</a>
+        <a class="pill" href="settings.html">Réglages</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <h1>Relances</h1>
+          <p>Préparation de 3 relances et d’une mise en demeure, avec sujet et corps de mail préremplis.</p>
+        </div>
+      </section>
+
+      <div id="loading" class="empty">Chargement…</div>
+      <div id="error" class="error" style="display:none;"></div>
+
+      <section id="content" class="grid" style="display:none;">
+        <article class="card">
+          <div class="info-grid">
+            <div class="info-box">
+              <strong id="invoiceNumber">—</strong>
+              <div class="meta">
+                <div><strong>Client :</strong> <span id="clientName">—</span></div>
+                <div><strong>Email :</strong> <span id="clientEmail">—</span></div>
+                <div><strong>Dossier :</strong> <span id="dossierTitle">—</span></div>
+              </div>
+            </div>
+
+            <div class="info-box">
+              <strong>Situation</strong>
+              <div class="meta">
+                <div><strong>Date facture :</strong> <span id="invoiceDate">—</span></div>
+                <div><strong>Échéance :</strong> <span id="dueDate">—</span></div>
+                <div><strong>Jours de retard :</strong> <span id="daysLate">—</span></div>
+              </div>
+            </div>
+
+            <div class="info-box">
+              <strong>Montants</strong>
+              <div class="meta">
+                <div><strong>Facture TTC :</strong> <span id="totalTTC">—</span></div>
+                <div><strong>Avoirs :</strong> <span id="creditsTTC">—</span></div>
+                <div><strong>Encaissé :</strong> <span id="paidTTC">—</span></div>
+                <div><strong>Reste dû :</strong> <span id="remainingTTC">—</span></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card">
+          <div id="relanceList" class="relance-list"></div>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <script type="module">
+    import "./auth-guard.js";
+    import { db } from "./firebase-config.js";
+    import {
+      doc,
+      getDoc,
+      collection,
+      query,
+      where,
+      getDocs,
+      addDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const loadingEl = document.getElementById("loading");
+    const errorEl = document.getElementById("error");
+    const contentEl = document.getElementById("content");
+    const relanceList = document.getElementById("relanceList");
+
+    function qs(name) {
+      return new URL(window.location.href).searchParams.get(name);
+    }
+
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function formatMoney(value) {
+      const num = Number(value || 0);
+      return num.toLocaleString("fr-FR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " €";
+    }
+
+    function encodeMailto(value = "") {
+      return encodeURIComponent(String(value || ""));
+    }
+
+    function normalizeDate(dateStr = "") {
+      return String(dateStr || "").trim();
+    }
+
+    function daysBetween(dateStr) {
+      if (!dateStr) return 0;
+      const today = new Date();
+      const due = new Date(dateStr + "T00:00:00");
+      if (Number.isNaN(due.getTime())) return 0;
+
+      const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const diff = todayStart.getTime() - due.getTime();
+      return diff > 0 ? Math.floor(diff / 86400000) : 0;
+    }
+
+    function amountToWords(value) {
+      function numberToFrenchUnder100(n) {
+        const units = ["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize"];
+        if (n < 17) return units[n];
+        if (n < 20) return "dix-" + units[n - 10];
+        if (n < 70) {
+          const tens = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante"];
+          const ten = Math.floor(n / 10);
+          const unit = n % 10;
+          if (unit === 0) return tens[ten];
+          if (unit === 1) return tens[ten] + "-et-un";
+          return tens[ten] + "-" + units[unit];
+        }
+        if (n < 80) {
+          if (n === 71) return "soixante-et-onze";
+          return "soixante-" + numberToFrenchUnder100(n - 60);
+        }
+        if (n === 80) return "quatre-vingts";
+        if (n < 100) return "quatre-vingt-" + numberToFrenchUnder100(n - 80);
+        return "";
+      }
+
+      function numberToFrench(n) {
+        n = Math.floor(Number(n || 0));
+        if (n === 0) return "zéro";
+        if (n < 100) return numberToFrenchUnder100(n);
+        if (n < 1000) {
+          const hundreds = Math.floor(n / 100);
+          const rest = n % 100;
+          let text = hundreds === 1 ? "cent" : numberToFrench(hundreds) + " cent";
+          if (hundreds > 1 && rest === 0) text += "s";
+          if (rest > 0) text += " " + numberToFrench(rest);
+          return text;
+        }
+        if (n < 1000000) {
+          const thousands = Math.floor(n / 1000);
+          const rest = n % 1000;
+          let text = thousands === 1 ? "mille" : numberToFrench(thousands) + " mille";
+          if (rest > 0) text += " " + numberToFrench(rest);
+          return text;
+        }
+        if (n < 1000000000) {
+          const millions = Math.floor(n / 1000000);
+          const rest = n % 1000000;
+          let text = millions === 1 ? "un million" : numberToFrench(millions) + " millions";
+          if (rest > 0) text += " " + numberToFrench(rest);
+          return text;
+        }
+        return String(n);
+      }
+
+      const amount = Number(value || 0);
+      const euros = Math.floor(amount);
+      const cents = Math.round((amount - euros) * 100);
+
+      let text = numberToFrench(euros) + (euros > 1 ? " euros" : " euro");
+      if (cents > 0) {
+        text += " et " + numberToFrench(cents) + (cents > 1 ? " centimes" : " centime");
+      }
+      return text;
+    }
+
+    function buildRelanceTemplates(data) {
+      const {
+        invoiceNumber,
+        clientName,
+        dueDate,
+        invoiceDate,
+        remainingTTC,
+        daysLate,
+        businessName
+      } = data;
+
+      const montant = formatMoney(remainingTTC);
+      const montantEnLettres = amountToWords(remainingTTC);
+
+      const commonFooter = `
+Cordialement,
+
+${businessName}
+`.trim();
+
+      return [
+        {
+          type: "RELANCE_1",
+          label: "Relance 1",
+          tone: "Courtoise",
+          subject: `Relance 1 – facture ${invoiceNumber}`,
+          body: `Bonjour ${clientName || ""},
+
+Sauf erreur de notre part, la facture ${invoiceNumber}, émise le ${invoiceDate || "—"} et arrivée à échéance le ${dueDate || "—"}, reste impayée à ce jour.
+
+Le montant restant dû est de ${montant} (${montantEnLettres}).
+
+Nous vous remercions de bien vouloir procéder à son règlement dans les meilleurs délais.
+
+Si le paiement a déjà été effectué, merci de ne pas tenir compte du présent message.
+
+${commonFooter}`
+        },
+        {
+          type: "RELANCE_2",
+          label: "Relance 2",
+          tone: "Ferme",
+          subject: `Relance 2 – facture ${invoiceNumber}`,
+          body: `Bonjour ${clientName || ""},
+
+Nous revenons vers vous concernant la facture ${invoiceNumber}, émise le ${invoiceDate || "—"} et échue depuis ${daysLate} jour(s).
+
+À ce jour, sauf erreur de notre part, le montant restant dû est toujours de ${montant} (${montantEnLettres}).
+
+Nous vous demandons de régulariser cette situation sans délai.
+
+À défaut de règlement rapide, nous serons contraints de poursuivre nos démarches de recouvrement.
+
+${commonFooter}`
+        },
+        {
+          type: "RELANCE_3",
+          label: "Relance 3",
+          tone: "Dernier rappel",
+          subject: `Dernière relance – facture ${invoiceNumber}`,
+          body: `Bonjour ${clientName || ""},
+
+Malgré nos précédents messages, la facture ${invoiceNumber}, arrivée à échéance le ${dueDate || "—"}, demeure impayée.
+
+Le solde restant dû est de ${montant} (${montantEnLettres}).
+
+Nous vous mettons en conséquence en demeure officieuse de procéder au règlement sous 48 heures.
+
+À défaut, une mise en demeure formelle pourra être adressée.
+
+${commonFooter}`
+        },
+        {
+          type: "MISE_EN_DEMEURE",
+          label: "Mise en demeure",
+          tone: "Juridique",
+          subject: `Mise en demeure de régler – facture ${invoiceNumber}`,
+          body: `Bonjour ${clientName || ""},
+
+Par la présente, nous vous mettons en demeure de régler la facture ${invoiceNumber}, émise le ${invoiceDate || "—"} et échue le ${dueDate || "—"}.
+
+À ce jour, le montant restant dû s’élève à ${montant} (${montantEnLettres}).
+
+Nous vous demandons de procéder au paiement intégral sous 8 jours à compter de la réception du présent message.
+
+À défaut de règlement dans ce délai, nous nous réservons le droit d’engager toute démarche utile au recouvrement de cette créance.
+
+${commonFooter}`
+        }
+      ];
+    }
+
+    async function saveRelance(entry, sent = false) {
+      await addDoc(collection(db, "relances"), {
+        invoiceId: entry.invoiceId,
+        invoiceNumber: entry.invoiceNumber,
+        clientId: entry.clientId,
+        clientName: entry.clientName,
+        clientEmail: entry.clientEmail,
+        dossierId: entry.dossierId,
+        dossierTitle: entry.dossierTitle,
+        type: entry.type,
+        subject: entry.subject,
+        body: entry.body,
+        channel: "EMAIL",
+        status: sent ? "SENT" : "PREPARED",
+        invoiceDate: entry.invoiceDate,
+        dueDate: entry.dueDate,
+        totalTTC: entry.totalTTC,
+        creditsTTC: entry.creditsTTC,
+        paidTTC: entry.paidTTC,
+        remainingTTC: entry.remainingTTC,
+        daysLate: entry.daysLate,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        sentAt: sent ? serverTimestamp() : null
+      });
+    }
+
+    function renderTemplates(baseData, templates) {
+      relanceList.innerHTML = templates.map((tpl, index) => {
+        const mailto = `mailto:${encodeMailto(baseData.clientEmail)}?subject=${encodeMailto(tpl.subject)}&body=${encodeMailto(tpl.body)}`;
+
+        return `
+          <article class="relance-item">
+            <div class="relance-head">
+              <div>
+                <div class="relance-title">${escapeHtml(tpl.label)}</div>
+              </div>
+              <span class="badge">${escapeHtml(tpl.tone)}</span>
+            </div>
+
+            <div class="relance-body">
+              <div class="field">
+                <label>Sujet</label>
+                <input type="text" value="${escapeHtml(tpl.subject)}" readonly />
+              </div>
+
+              <div class="field">
+                <label>Corps du mail</label>
+                <textarea readonly>${tpl.body}</textarea>
+              </div>
+
+              <div class="actions">
+                <button class="btn btn-secondary" type="button" data-copy-index="${index}">Copier</button>
+                <button class="btn btn-secondary" type="button" data-save-index="${index}">Préparer</button>
+                <a class="btn" href="${mailto}" data-send-index="${index}">Envoyer par mail</a>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      relanceList.addEventListener("click", async (e) => {
+        const copyBtn = e.target.closest("[data-copy-index]");
+        if (copyBtn) {
+          const i = Number(copyBtn.getAttribute("data-copy-index"));
+          const tpl = templates[i];
+          try {
+            await navigator.clipboard.writeText(`Sujet : ${tpl.subject}\n\n${tpl.body}`);
+            alert("Relance copiée.");
+          } catch {
+            alert("Impossible de copier.");
+          }
+          return;
+        }
+
+        const saveBtn = e.target.closest("[data-save-index]");
+        if (saveBtn) {
+          const i = Number(saveBtn.getAttribute("data-save-index"));
+          const tpl = templates[i];
+          try {
+            await saveRelance({
+              ...baseData,
+              type: tpl.type,
+              subject: tpl.subject,
+              body: tpl.body
+            }, false);
+            alert("Relance enregistrée comme PREPARED.");
+          } catch (err) {
+            console.error(err);
+            alert("Impossible d’enregistrer la relance.");
+          }
+          return;
+        }
+
+        const sendLink = e.target.closest("[data-send-index]");
+        if (sendLink) {
+          const i = Number(sendLink.getAttribute("data-send-index"));
+          const tpl = templates[i];
+          try {
+            await saveRelance({
+              ...baseData,
+              type: tpl.type,
+              subject: tpl.subject,
+              body: tpl.body
+            }, true);
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      }, { once: true });
+    }
+
+    async function init() {
+      const invoiceId = qs("id");
+      if (!invoiceId) {
+        loadingEl.style.display = "none";
+        errorEl.style.display = "block";
+        errorEl.textContent = "Aucun identifiant de facture dans l’URL.";
+        return;
+      }
+
+      try {
+        const invoiceSnap = await getDoc(doc(db, "factures", invoiceId));
+        if (!invoiceSnap.exists()) {
+          loadingEl.style.display = "none";
+          errorEl.style.display = "block";
+          errorEl.textContent = "Facture introuvable.";
+          return;
+        }
+
+        const invoice = { id: invoiceSnap.id, ...invoiceSnap.data() };
+
+        const paymentsSnap = await getDocs(query(collection(db, "paiements"), where("invoiceId", "==", invoiceId)));
+        const creditsSnap = await getDocs(query(collection(db, "avoirs"), where("invoiceId", "==", invoiceId)));
+
+        const payments = paymentsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const credits = creditsSnap.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .filter(a => (a.status || "EMIS") !== "ANNULE");
+
+        const totalTTC = Number(invoice.amountTTC ?? invoice.amount ?? 0);
+        const creditsTTC = credits.reduce((sum, a) => sum + Number(a.amountTTC ?? a.total ?? 0), 0);
+        const paidTTC = payments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
+        const remainingTTC = Math.max(0, Number((totalTTC - creditsTTC - paidTTC).toFixed(2)));
+        const dueDate = normalizeDate(invoice.dueDate || "");
+        const daysLate = daysBetween(dueDate);
+
+        const clientName = invoice.clientSnapshot?.name || "";
+        const clientEmail = invoice.clientSnapshot?.email || "";
+        const dossierTitle = invoice.dossierTitleSnapshot || "";
+        const businessName = invoice.businessSnapshot?.businessName || "Axe Dossier";
+
+        document.getElementById("invoiceNumber").textContent = invoice.number || "—";
+        document.getElementById("clientName").textContent = clientName || "—";
+        document.getElementById("clientEmail").textContent = clientEmail || "—";
+        document.getElementById("dossierTitle").textContent = dossierTitle || "—";
+        document.getElementById("invoiceDate").textContent = invoice.date || "—";
+        document.getElementById("dueDate").textContent = dueDate || "—";
+        document.getElementById("daysLate").textContent = String(daysLate);
+        document.getElementById("totalTTC").textContent = formatMoney(totalTTC);
+        document.getElementById("creditsTTC").textContent = formatMoney(creditsTTC);
+        document.getElementById("paidTTC").textContent = formatMoney(paidTTC);
+        document.getElementById("remainingTTC").textContent = formatMoney(remainingTTC);
+
+        const baseData = {
+          invoiceId: invoice.id,
+          invoiceNumber: invoice.number || "",
+          clientId: invoice.clientId || "",
+          clientName,
+          clientEmail,
+          dossierId: invoice.dossierId || "",
+          dossierTitle,
+          invoiceDate: invoice.date || "",
+          dueDate,
+          totalTTC,
+          creditsTTC,
+          paidTTC,
+          remainingTTC,
+          daysLate,
+          businessName
+        };
+
+        const templates = buildRelanceTemplates(baseData);
+        renderTemplates(baseData, templates);
+
+        loadingEl.style.display = "none";
+        contentEl.style.display = "grid";
+      } catch (err) {
+        console.error(err);
+        loadingEl.style.display = "none";
+        errorEl.style.display = "block";
+        errorEl.textContent = "Impossible de charger les données de relance.";
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
