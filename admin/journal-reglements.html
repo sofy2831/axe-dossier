@@ -104,7 +104,7 @@
 
     .stats{
       display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
+      grid-template-columns:repeat(5,minmax(0,1fr));
       gap:12px;
       margin-bottom:20px;
     }
@@ -255,7 +255,7 @@
       }
       .toolbar{display:none !important}
       .stats{
-        grid-template-columns:repeat(4,1fr);
+        grid-template-columns:repeat(5,1fr);
         gap:8px;
       }
       .stat{
@@ -279,7 +279,10 @@
         <a class="pill" href="documents.html">Documents</a>
         <a class="pill" href="devis.html">Devis</a>
         <a class="pill" href="factures.html">Factures</a>
+        <a class="pill" href="avoirs.html">Avoirs</a>
         <a class="pill" href="paiements.html">Paiements</a>
+        <a class="pill" href="journal-ventes.html">Journal ventes</a>
+        <a class="pill" href="recouvrement.html">Recouvrement</a>
         <a class="pill" href="settings.html">Settings</a>
       </nav>
     </div>
@@ -312,6 +315,10 @@
             <strong id="totalCheques">0</strong>
             <span>Chèques</span>
           </div>
+          <div class="stat">
+            <strong id="totalOthers">0</strong>
+            <span>Espèces / autres</span>
+          </div>
         </div>
 
         <div class="toolbar">
@@ -340,13 +347,14 @@
           <table>
             <thead>
               <tr>
-                <th style="width:12%;">Date</th>
-                <th style="width:14%;">Facture</th>
-                <th style="width:18%;">Client</th>
-                <th style="width:14%;">Mode</th>
-                <th style="width:22%;">Référence</th>
-                <th style="width:10%;">Statut facture</th>
-                <th class="num" style="width:10%;">Montant</th>
+                <th style="width:11%;">Date</th>
+                <th style="width:13%;">Facture</th>
+                <th style="width:16%;">Client</th>
+                <th style="width:12%;">Mode</th>
+                <th style="width:18%;">Référence</th>
+                <th style="width:12%;">Statut facture</th>
+                <th style="width:10%;">Notes</th>
+                <th class="num" style="width:8%;">Montant</th>
               </tr>
             </thead>
             <tbody id="journalBody"></tbody>
@@ -354,7 +362,8 @@
         </div>
 
         <div class="footer-note">
-          Journal basé sur les règlements saisis dans <strong>paiements.html</strong>.
+          Journal basé sur les règlements saisis dans <strong>paiements.html</strong>.  
+          Si une facture disparaît, le règlement reste visible avec ses données propres.
         </div>
       </section>
     </div>
@@ -384,6 +393,7 @@
     const totalAmount = document.getElementById("totalAmount");
     const totalVirements = document.getElementById("totalVirements");
     const totalCheques = document.getElementById("totalCheques");
+    const totalOthers = document.getElementById("totalOthers");
     const journalBody = document.getElementById("journalBody");
     const emptyState = document.getElementById("emptyState");
 
@@ -414,6 +424,16 @@
       return "autre";
     }
 
+    function normalizeInvoiceStatus(status = "") {
+      const s = String(status || "").trim().toUpperCase();
+      if (s === "BROUILLON") return "BROUILLON";
+      if (s === "ENVOYEE") return "EMISE";
+      if (s === "PAYEE") return "PAYEE";
+      if (s === "RETARD") return "RETARD";
+      if (s === "ANNULEE") return "ANNULEE";
+      return s || "—";
+    }
+
     function normalizeEntries() {
       const invoiceMap = Object.fromEntries(
         allFactures.map(f => [f.id, f])
@@ -421,14 +441,21 @@
 
       return allPaiements.map(item => {
         const invoice = invoiceMap[item.invoiceId] || {};
+
         return {
           id: item.id,
           date: item.date || "",
-          invoiceNumber: invoice.number || "",
-          clientName: invoice.clientSnapshot?.name || "",
+          invoiceNumber:
+            item.invoiceNumberSnapshot ||
+            invoice.number ||
+            "",
+          clientName:
+            item.clientNameSnapshot ||
+            invoice.clientSnapshot?.name ||
+            "",
           mode: item.mode || "",
           reference: item.reference || "",
-          invoiceStatus: invoice.status || "",
+          invoiceStatus: normalizeInvoiceStatus(invoice.status || item.invoiceStatusSnapshot || ""),
           amount: Number(item.amount || 0),
           notes: item.notes || ""
         };
@@ -440,16 +467,28 @@
       const list = [...entries];
 
       if (sort === "DATE_ASC") {
-        return list.sort((a, b) => String(a.date || "").localeCompare(String(b.date || "")));
+        return list.sort((a, b) => {
+          const da = String(a.date || "");
+          const db = String(b.date || "");
+          if (da === db) return String(a.invoiceNumber || "").localeCompare(String(b.invoiceNumber || ""));
+          return da.localeCompare(db);
+        });
       }
+
       if (sort === "AMOUNT_DESC") {
         return list.sort((a, b) => Number(b.amount || 0) - Number(a.amount || 0));
       }
+
       if (sort === "AMOUNT_ASC") {
         return list.sort((a, b) => Number(a.amount || 0) - Number(b.amount || 0));
       }
 
-      return list.sort((a, b) => String(b.date || "").localeCompare(String(a.date || "")));
+      return list.sort((a, b) => {
+        const da = String(a.date || "");
+        const db = String(b.date || "");
+        if (da === db) return String(b.invoiceNumber || "").localeCompare(String(a.invoiceNumber || ""));
+        return db.localeCompare(da);
+      });
     }
 
     function render() {
@@ -486,6 +525,7 @@
       );
       totalVirements.textContent = sorted.filter(i => i.mode === "VIREMENT").length;
       totalCheques.textContent = sorted.filter(i => i.mode === "CHEQUE").length;
+      totalOthers.textContent = sorted.filter(i => i.mode === "ESPECES" || i.mode === "AUTRE").length;
 
       if (!sorted.length) {
         journalBody.innerHTML = "";
@@ -507,6 +547,7 @@
           </td>
           <td>${escapeHtml(item.reference || "—")}</td>
           <td>${escapeHtml(item.invoiceStatus || "—")}</td>
+          <td>${escapeHtml(item.notes || "—")}</td>
           <td class="num">${formatMoney(item.amount)}</td>
         </tr>
       `).join("");
