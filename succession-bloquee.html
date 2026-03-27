@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="fr">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -6,267 +7,291 @@
   <meta name="description" content="Succession bloquée, notaire qui ne répond pas, conflit entre héritiers, dossier qui traîne : voici quoi faire pour remettre de l’ordre et reprendre la main." />
   <meta name="robots" content="index,follow" />
   <style>
-    :root {
-      --bg: #f3efe8;
-      --surface: rgba(255,255,255,0.88);
-      --text: #171717;
-      --muted: #5f5952;
-      --line: rgba(23,23,23,0.08);
-      --accent: #111111;
-      --accent-soft: #e9e1d4;
-      --radius-xl: 30px;
-      --radius-lg: 22px;
-      --radius-md: 16px;
-      --shadow: 0 20px 60px rgba(0,0,0,0.07);
-      --max: 1120px;
-    }* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  margin: 0;
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: var(--text);
-  line-height: 1.6;
-  background:
-    radial-gradient(circle at top left, rgba(255,255,255,0.92), transparent 28%),
-    radial-gradient(circle at right 20%, rgba(233,225,212,0.75), transparent 20%),
-    var(--bg);
-}
+    :root{
+      --bg:#f3efe8;
+      --surface:rgba(255,255,255,0.88);
+      --surface-strong:#ffffff;
+      --text:#171717;
+      --muted:#5f5952;
+      --line:rgba(23,23,23,0.08);
+      --accent:#111111;
+      --accent-soft:#e9e1d4;
+      --radius-xl:30px;
+      --radius-lg:22px;
+      --radius-md:18px;
+      --shadow:0 20px 60px rgba(0,0,0,0.07);
+      --max:1120px;
+    }
 
-a { color: inherit; text-decoration: none; }
-.wrap { width: min(var(--max), calc(100% - 32px)); margin: 0 auto; }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
 
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  background: rgba(243,239,232,0.78);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(23,23,23,0.05);
-}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      color:var(--text);
+      line-height:1.6;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.92), transparent 28%),
+        radial-gradient(circle at right 20%, rgba(233,225,212,0.75), transparent 20%),
+        var(--bg);
+    }
 
-.topbar-inner {
-  min-height: 76px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
+    a{color:inherit;text-decoration:none}
+    .wrap{width:min(var(--max),calc(100% - 32px));margin:0 auto}
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-}
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:20;
+      background:rgba(243,239,232,0.78);
+      backdrop-filter:blur(16px);
+      border-bottom:1px solid rgba(23,23,23,0.05);
+    }
 
-.brand-mark {
-  width: 44px;
-  height: 44px;
-  border-radius: 15px;
-  background: var(--accent);
-  color: #fff;
-  display: grid;
-  place-items: center;
-  font-weight: 900;
-  font-size: 0.95rem;
-  box-shadow: var(--shadow);
-}
+    .topbar-inner{
+      min-height:76px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
 
-.nav {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      font-weight:800;
+      letter-spacing:.02em;
+    }
 
-.pill {
-  padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.7);
-  border: 1px solid rgba(23,23,23,0.07);
-  font-size: 0.94rem;
-}
+    .brand-logo{
+      height:94px;
+      width:auto;
+      display:block;
+      object-fit:contain;
+    }
 
-.hero { padding: 54px 0 24px; }
+    .brand-name{
+      font-size:1.8rem;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      line-height:1;
+    }
 
-.hero-grid {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 20px;
-  align-items: stretch;
-}
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
 
-.card {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow);
-  backdrop-filter: blur(14px);
-}
+    .pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.7);
+      border:1px solid rgba(23,23,23,0.07);
+      font-size:.94rem;
+      transition:transform .2s ease, background .2s ease;
+    }
 
-.hero-main { padding: 42px; }
-.side-card, .content-card, .cta-card, .faq-item { padding: 26px; }
+    .pill:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,0.95);
+    }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: #4b443b;
-  font-size: 0.88rem;
-  font-weight: 700;
-  margin-bottom: 18px;
-}
+    .hero{padding:54px 0 24px}
 
-h1, h2, h3, p { margin: 0; }
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.2fr .8fr;
+      gap:20px;
+      align-items:stretch;
+    }
 
-h1 {
-  font-size: clamp(2.2rem, 4vw, 4.5rem);
-  line-height: 1.02;
-  letter-spacing: -0.055em;
-  margin-bottom: 18px;
-  max-width: 12ch;
-}
+    .card{
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:var(--radius-xl);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(14px);
+    }
 
-h2 {
-  font-size: clamp(1.6rem, 2.5vw, 2.5rem);
-  letter-spacing: -0.04em;
-  margin-bottom: 14px;
-}
+    .hero-main{padding:42px}
+    .side-card,.content-card,.cta-card,.faq-item{padding:26px}
 
-h3 {
-  font-size: 1.08rem;
-  letter-spacing: -0.02em;
-  margin-bottom: 10px;
-}
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--accent-soft);
+      color:#4b443b;
+      font-size:.88rem;
+      font-weight:700;
+      margin-bottom:18px;
+    }
 
-.lead {
-  max-width: 60ch;
-  color: #4b4640;
-  font-size: 1.08rem;
-}
+    h1,h2,h3,p{margin:0}
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 26px;
-}
+    h1{
+      font-size:clamp(2.2rem,4vw,4.5rem);
+      line-height:1.02;
+      letter-spacing:-.055em;
+      margin-bottom:18px;
+      max-width:12ch;
+    }
 
-.btn {
-  min-height: 52px;
-  padding: 0 20px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--accent);
-  font-weight: 700;
-}
+    h2{
+      font-size:clamp(1.6rem,2.5vw,2.5rem);
+      letter-spacing:-.04em;
+      margin-bottom:14px;
+    }
 
-.btn-primary { background: var(--accent); color: #fff; }
-.btn-secondary { background: rgba(255,255,255,0.75); color: var(--accent); border-color: rgba(23,23,23,0.1); }
+    h3{
+      font-size:1.08rem;
+      letter-spacing:-.02em;
+      margin-bottom:10px;
+    }
 
-.hero-side { display: grid; gap: 20px; }
+    .lead{
+      max-width:60ch;
+      color:#4b4640;
+      font-size:1.08rem;
+    }
 
-.mini-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 12px;
-}
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:26px;
+    }
 
-.mini-list li {
-  position: relative;
-  padding-left: 18px;
-  color: #49443e;
-}
+    .btn{
+      min-height:52px;
+      padding:0 20px;
+      border-radius:999px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--accent);
+      font-weight:700;
+      transition:transform .2s ease, opacity .2s ease;
+    }
 
-.mini-list li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 10px;
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: var(--accent);
-}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-secondary{background:rgba(255,255,255,0.75);color:var(--accent);border-color:rgba(23,23,23,0.1)}
 
-section { padding: 20px 0; }
+    .hero-side{display:grid;gap:20px}
 
-.section-head {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
-}
+    .mini-list{
+      list-style:none;
+      padding:0;
+      margin:0;
+      display:grid;
+      gap:12px;
+    }
 
-.section-head p {
-  max-width: 60ch;
-  color: var(--muted);
-}
+    .mini-list li{
+      position:relative;
+      padding-left:18px;
+      color:#49443e;
+    }
 
-.grid-2, .grid-3, .faq-grid {
-  display: grid;
-  gap: 18px;
-}
+    .mini-list li::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:10px;
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:var(--accent);
+    }
 
-.grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
-.grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
-.faq-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    section{padding:20px 0}
 
-.content-card, .cta-card, .faq-item {
-  border-radius: var(--radius-lg);
-  background: rgba(255,255,255,0.82);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow);
-}
+    .section-head{
+      display:flex;
+      align-items:end;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:18px;
+    }
 
-.content-card p, .cta-card p, .faq-item p { color: #4f4942; }
+    .section-head p{
+      max-width:60ch;
+      color:var(--muted);
+    }
 
-.footer { padding: 30px 0 64px; }
-.footer-box {
-  padding: 22px 24px;
-  border-radius: var(--radius-lg);
-  background: rgba(255,255,255,0.72);
-  border: 1px solid var(--line);
-  color: #605951;
-}
+    .grid-2,.grid-3,.faq-grid{
+      display:grid;
+      gap:18px;
+    }
 
-@media (max-width: 980px) {
-  .hero-grid, .grid-2, .grid-3, .faq-grid { grid-template-columns: 1fr; }
-  .section-head { flex-direction: column; align-items: start; }
-}
+    .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .faq-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 
-@media (max-width: 720px) {
-  .topbar-inner {
-    min-height: auto;
-    padding: 14px 0;
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .brand, .nav { justify-content: center; }
-  .hero-main, .side-card, .content-card, .cta-card, .faq-item, .footer-box { padding: 20px; }
-  .actions { flex-direction: column; }
-  .btn { width: 100%; }
-  h1 { max-width: none; }
-}
+    .content-card,.cta-card,.faq-item{
+      border-radius:var(--radius-lg);
+      background:rgba(255,255,255,0.82);
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+    }
 
+    .content-card p,.cta-card p,.faq-item p{color:#4f4942}
+
+    .footer{padding:30px 0 64px}
+
+    .footer-box{
+      padding:22px 24px;
+      border-radius:var(--radius-lg);
+      background:rgba(255,255,255,0.72);
+      border:1px solid var(--line);
+      color:#605951;
+    }
+
+    .footer-box small{
+      display:block;
+      margin-top:8px;
+      line-height:1.5;
+    }
+
+    @media (max-width:980px){
+      .hero-grid,.grid-2,.grid-3,.faq-grid{grid-template-columns:1fr}
+      .section-head{flex-direction:column;align-items:start}
+    }
+
+    @media (max-width:720px){
+      .topbar-inner{
+        min-height:auto;
+        padding:14px 0;
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .brand,.nav{justify-content:center}
+      .hero-main,.side-card,.content-card,.cta-card,.faq-item,.footer-box{padding:20px}
+      .actions{flex-direction:column}
+      .btn{width:100%}
+      h1{max-width:none}
+      .brand-logo{height:72px}
+      .brand-name{font-size:1.35rem;text-align:center}
+    }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="wrap topbar-inner">
       <a href="index.html" class="brand" aria-label="Axe Dossier">
-        <span class="brand-mark">AD</span>
-        <span>Axe Dossier</span>
+        <img src="images/axe-dossier.png" alt="Logo Axe Dossier" class="brand-logo" />
+        <span class="brand-name">AXE DOSSIER</span>
       </a>
+
       <nav class="nav" aria-label="Navigation principale">
         <a class="pill" href="index.html">Accueil</a>
         <a class="pill" href="#signes">Signes</a>
@@ -275,202 +300,223 @@ section { padding: 20px 0; }
         <a class="pill" href="#contact">Contact</a>
       </nav>
     </div>
-  </header>  <main>
+  </header>
+
+  <main>
     <section class="hero">
       <div class="wrap hero-grid">
         <article class="card hero-main">
           <div class="eyebrow">Succession bloquée · Notaire · Héritiers</div>
           <h1>Succession bloquée : que faire quand rien n’avance ?</h1>
           <p class="lead">
-            Quand une succession traîne, que le notaire répond peu, que les héritiers s’opposent ou que les pièces restent dispersées,
-            le problème devient vite un mélange de tension, de fatigue et d’inaction. Avant d’agir, il faut remettre le dossier dans l’ordre.
+            Quand une succession traîne, que le notaire répond peu, que les héritiers s’opposent ou que les pièces restent dispersées, le problème devient vite un mélange de tension, de fatigue et d’inaction. Avant d’agir, il faut remettre le dossier dans l’ordre.
           </p>
           <div class="actions">
             <a class="btn btn-primary" href="mailto:contact@axe-dossier.fr?subject=Succession%20bloqu%C3%A9e&body=Bonjour,%0A%0AJe%20souhaite%20vous%20transmettre%20un%20dossier%20de%20succession.%0A%0ASituation%20:%0A%0ADocuments%20disponibles%20:%0A">Envoyer mon dossier</a>
             <a class="btn btn-secondary" href="#actions">Voir quoi faire</a>
           </div>
-        </article><div class="hero-side">
-      <article class="card side-card">
-        <h3>Situations fréquentes</h3>
-        <ul class="mini-list">
-          <li>Notaire qui répond peu ou trop lentement</li>
-          <li>Désaccord entre héritiers</li>
-          <li>Inventaire flou ou incomplet</li>
-          <li>Courriers accumulés sans stratégie claire</li>
-        </ul>
-      </article>
-      <article class="card side-card">
-        <h3>Objectif</h3>
-        <p>Clarifier les faits, rassembler les pièces utiles, reprendre la chronologie et préparer une réponse ou une relance structurée.</p>
-      </article>
-    </div>
-  </div>
-</section>
+        </article>
 
-<section id="signes">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Quand une succession est réellement bloquée</h2>
-        <p>Une succession n’est pas seulement lente. Elle devient bloquée quand l’inertie s’installe et que plus personne ne sait exactement où en est le dossier.</p>
+        <div class="hero-side">
+          <article class="card side-card">
+            <h3>Situations fréquentes</h3>
+            <ul class="mini-list">
+              <li>Notaire qui répond peu ou trop lentement</li>
+              <li>Désaccord entre héritiers</li>
+              <li>Inventaire flou ou incomplet</li>
+              <li>Courriers accumulés sans stratégie claire</li>
+            </ul>
+          </article>
+
+          <article class="card side-card">
+            <h3>Objectif</h3>
+            <p>Clarifier les faits, rassembler les pièces utiles, reprendre la chronologie et préparer une réponse ou une relance structurée.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid-3">
-      <article class="content-card">
-        <h3>Le notaire ne répond plus clairement</h3>
-        <p>Les retours sont vagues, espacés ou inexistants. Les demandes restent sans suite et aucune vision d’ensemble n’est donnée.</p>
-      </article>
-      <article class="content-card">
-        <h3>Les héritiers s’opposent</h3>
-        <p>Chaque échange rallonge le conflit. Les positions se figent, les reproches s’accumulent, les décisions n’avancent pas.</p>
-      </article>
-      <article class="content-card">
-        <h3>Le dossier est devenu illisible</h3>
-        <p>Courriers, mails, pièces, dates, comptes, inventaire, demandes annexes : tout existe, mais rien n’est structuré.</p>
-      </article>
-    </div>
-  </div>
-</section>
+    <section id="signes">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Quand une succession est réellement bloquée</h2>
+            <p>Une succession n’est pas seulement lente. Elle devient bloquée quand l’inertie s’installe et que plus personne ne sait exactement où en est le dossier.</p>
+          </div>
+        </div>
 
-<section>
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Ce qu’il ne faut pas faire</h2>
-        <p>C’est souvent là que le dossier se détériore : trop d’émotion, trop de messages, pas assez de méthode.</p>
+        <div class="grid-3">
+          <article class="content-card">
+            <h3>Le notaire ne répond plus clairement</h3>
+            <p>Les retours sont vagues, espacés ou inexistants. Les demandes restent sans suite et aucune vision d’ensemble n’est donnée.</p>
+          </article>
+          <article class="content-card">
+            <h3>Les héritiers s’opposent</h3>
+            <p>Chaque échange rallonge le conflit. Les positions se figent, les reproches s’accumulent, les décisions n’avancent pas.</p>
+          </article>
+          <article class="content-card">
+            <h3>Le dossier est devenu illisible</h3>
+            <p>Courriers, mails, pièces, dates, comptes, inventaire, demandes annexes : tout existe, mais rien n’est structuré.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid-2">
-      <article class="content-card">
-        <h3>Relancer sans cadre</h3>
-        <p>Envoyer des messages dispersés, trop fréquents ou mal ciblés fatigue tout le monde et affaiblit le dossier au lieu de le renforcer.</p>
-      </article>
-      <article class="content-card">
-        <h3>Mélanger les faits et la colère</h3>
-        <p>La colère est compréhensible. Mais dans une succession, elle brouille rapidement la chronologie, les demandes et les preuves utiles.</p>
-      </article>
-    </div>
-  </div>
-</section>
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Ce qu’il ne faut pas faire</h2>
+            <p>C’est souvent là que le dossier se détériore : trop d’émotion, trop de messages, pas assez de méthode.</p>
+          </div>
+        </div>
 
-<section id="actions">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Ce qu’il faut faire quand le dossier bloque</h2>
-        <p>Avant toute nouvelle relance, il faut remettre le dossier à plat. C’est la seule façon d’arrêter de tourner en rond.</p>
+        <div class="grid-2">
+          <article class="content-card">
+            <h3>Relancer sans cadre</h3>
+            <p>Envoyer des messages dispersés, trop fréquents ou mal ciblés fatigue tout le monde et affaiblit le dossier au lieu de le renforcer.</p>
+          </article>
+          <article class="content-card">
+            <h3>Mélanger les faits et la colère</h3>
+            <p>La colère est compréhensible. Mais dans une succession, elle brouille rapidement la chronologie, les demandes et les preuves utiles.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid-2">
-      <article class="content-card">
-        <h3>1. Reprendre la chronologie</h3>
-        <p>Dates clés, courriers reçus, réponses envoyées, demandes restées en attente, acteurs impliqués : sans chronologie, le dossier reste brouillé.</p>
-      </article>
-      <article class="content-card">
-        <h3>2. Trier les pièces utiles</h3>
-        <p>Il faut isoler l’essentiel : documents du notaire, échanges significatifs, pièces d’inventaire, éléments liés au partage ou au désaccord.</p>
-      </article>
-      <article class="content-card">
-        <h3>3. Identifier le vrai blocage</h3>
-        <p>Le problème n’est pas toujours “le notaire”. Il peut s’agir d’un héritier, d’un inventaire incomplet, d’un point contesté ou d’une demande mal formulée.</p>
-      </article>
-      <article class="content-card">
-        <h3>4. Préparer une réponse écrite solide</h3>
-        <p>Une relance claire, factuelle et structurée vaut mieux qu’une série de mails confus. C’est elle qui redonne de la tenue au dossier.</p>
-      </article>
-    </div>
-  </div>
-</section>
+    <section id="actions">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Ce qu’il faut faire quand le dossier bloque</h2>
+            <p>Avant toute nouvelle relance, il faut remettre le dossier à plat. C’est la seule façon d’arrêter de tourner en rond.</p>
+          </div>
+        </div>
 
-<section>
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Comment Axe Dossier intervient</h2>
-        <p>Le travail porte sur le dossier lui-même : les pièces, les dates, les échanges et la formulation des réponses.</p>
+        <div class="grid-2">
+          <article class="content-card">
+            <h3>1. Reprendre la chronologie</h3>
+            <p>Dates clés, courriers reçus, réponses envoyées, demandes restées en attente, acteurs impliqués : sans chronologie, le dossier reste brouillé.</p>
+          </article>
+          <article class="content-card">
+            <h3>2. Trier les pièces utiles</h3>
+            <p>Il faut isoler l’essentiel : documents du notaire, échanges significatifs, pièces d’inventaire, éléments liés au partage ou au désaccord.</p>
+          </article>
+          <article class="content-card">
+            <h3>3. Identifier le vrai blocage</h3>
+            <p>Le problème n’est pas toujours “le notaire”. Il peut s’agir d’un héritier, d’un inventaire incomplet, d’un point contesté ou d’une demande mal formulée.</p>
+          </article>
+          <article class="content-card">
+            <h3>4. Préparer une réponse écrite solide</h3>
+            <p>Une relance claire, factuelle et structurée vaut mieux qu’une série de mails confus. C’est elle qui redonne de la tenue au dossier.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid-3">
-      <article class="cta-card">
-        <h3>Analyse</h3>
-        <p>Lecture des éléments transmis, repérage des incohérences, reprise de la logique d’ensemble.</p>
-      </article>
-      <article class="cta-card">
-        <h3>Synthèse</h3>
-        <p>Retour écrit clair avec les points forts, les angles morts et les priorités d’action.</p>
-      </article>
-      <article class="cta-card">
-        <h3>Rédaction</h3>
-        <p>Préparation d’un courrier ou d’une relance structurée pour sortir du flou et remettre le dossier dans l’axe.</p>
-      </article>
-    </div>
-  </div>
-</section>
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Comment Axe Dossier intervient</h2>
+            <p>Le travail porte sur le dossier lui-même : les pièces, les dates, les échanges et la formulation des réponses.</p>
+          </div>
+        </div>
 
-<section id="faq">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Questions fréquentes</h2>
-        <p>Les mêmes blocages reviennent souvent. Voilà les points les plus recherchés.</p>
+        <div class="grid-3">
+          <article class="cta-card">
+            <h3>Analyse</h3>
+            <p>Lecture des éléments transmis, repérage des incohérences, reprise de la logique d’ensemble.</p>
+          </article>
+          <article class="cta-card">
+            <h3>Synthèse</h3>
+            <p>Retour écrit clair avec les points forts, les angles morts et les priorités d’action.</p>
+          </article>
+          <article class="cta-card">
+            <h3>Rédaction</h3>
+            <p>Préparation d’un courrier ou d’une relance structurée pour sortir du flou et remettre le dossier dans l’axe.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="faq-grid">
-      <article class="faq-item">
-        <h3>Que faire si le notaire ne répond pas ?</h3>
-        <p>Commencer par reprendre les échanges existants, dater les demandes restées sans suite et préparer une relance structurée au lieu d’envoyer un nouveau message improvisé.</p>
-      </article>
-      <article class="faq-item">
-        <h3>Une succession peut-elle rester bloquée longtemps ?</h3>
-        <p>Oui, surtout quand les héritiers s’opposent, que les pièces sont mal tenues ou que le dossier n’est pas repris avec méthode.</p>
-      </article>
-      <article class="faq-item">
-        <h3>Faut-il tout envoyer d’un coup ?</h3>
-        <p>Non. Il faut envoyer ce qui est utile : résumé bref, courriers importants, pièces clés, et objectif clair.</p>
-      </article>
-      <article class="faq-item">
-        <h3>Peut-on être aidé pour remettre le dossier en ordre ?</h3>
-        <p>Oui, sur le plan documentaire et rédactionnel : tri, synthèse, chronologie et préparation d’une réponse écrite exploitable.</p>
-      </article>
-    </div>
-  </div>
-</section>
+    <section id="faq">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Questions fréquentes</h2>
+            <p>Les mêmes blocages reviennent souvent. Voilà les points les plus recherchés.</p>
+          </div>
+        </div>
 
-<section id="contact">
-  <div class="wrap">
-    <div class="section-head">
-      <div>
-        <h2>Envoyer un dossier de succession</h2>
-        <p>Un résumé bref, les pièces utiles, et l’objectif recherché. C’est largement suffisant pour démarrer proprement.</p>
+        <div class="faq-grid">
+          <article class="faq-item">
+            <h3>Que faire si le notaire ne répond pas ?</h3>
+            <p>Commencer par reprendre les échanges existants, dater les demandes restées sans suite et préparer une relance structurée au lieu d’envoyer un nouveau message improvisé.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Une succession peut-elle rester bloquée longtemps ?</h3>
+            <p>Oui, surtout quand les héritiers s’opposent, que les pièces sont mal tenues ou que le dossier n’est pas repris avec méthode.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Faut-il tout envoyer d’un coup ?</h3>
+            <p>Non. Il faut envoyer ce qui est utile : résumé bref, courriers importants, pièces clés, et objectif clair.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Peut-on être aidé pour remettre le dossier en ordre ?</h3>
+            <p>Oui, sur le plan documentaire et rédactionnel : tri, synthèse, chronologie et préparation d’une réponse écrite exploitable.</p>
+          </article>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <div class="grid-2">
-      <article class="cta-card">
-        <h3>À envoyer</h3>
-        <p>Résumé simple, courriers importants, pièces utiles, chronologie si elle existe déjà, et objectif de la demande.</p>
-      </article>
-      <article class="cta-card">
-        <h3>À éviter</h3>
-        <p>Messages trop longs, doublons, captures inutiles, et dossier transmis sans explication sur le vrai point de blocage.</p>
-      </article>
-    </div>
+    <section id="contact">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <h2>Envoyer un dossier de succession</h2>
+            <p>Un résumé bref, les pièces utiles, et l’objectif recherché. C’est largement suffisant pour démarrer proprement.</p>
+          </div>
+        </div>
 
-    <div class="actions" style="justify-content:center; margin-top:24px;">
-      <a class="btn btn-primary" href="mailto:contact@axe-dossier.fr?subject=Succession%20bloqu%C3%A9e&body=Bonjour,%0A%0AJe%20vous%20transmets%20un%20dossier%20de%20succession.%0A%0ASituation%20:%0A%0AObjectif%20:%0A%0APi%C3%A8ces%20jointes%20:%0A">Envoyer mon dossier</a>
-    </div>
-  </div>
-</section>
+        <div class="grid-2">
+          <article class="cta-card">
+            <h3>À envoyer</h3>
+            <p>Résumé simple, courriers importants, pièces utiles, chronologie si elle existe déjà, et objectif de la demande.</p>
+          </article>
+          <article class="cta-card">
+            <h3>À éviter</h3>
+            <p>Messages trop longs, doublons, captures inutiles, et dossier transmis sans explication sur le vrai point de blocage.</p>
+          </article>
+        </div>
 
-  </main>  <footer class="footer">
+        <div class="actions" style="justify-content:center; margin-top:24px;">
+          <a class="btn btn-primary" href="mailto:contact@axe-dossier.fr?subject=Succession%20bloqu%C3%A9e&body=Bonjour,%0A%0AJe%20vous%20transmets%20un%20dossier%20de%20succession.%0A%0ASituation%20:%0A%0AObjectif%20:%0A%0APi%C3%A8ces%20jointes%20:%0A">Envoyer mon dossier</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
     <div class="wrap footer-box">
-      <strong>Axe Dossier</strong>
-      <p style="margin-top:8px;">Service d’accompagnement documentaire et rédactionnel. Ne constitue pas une consultation juridique, une représentation en justice ou une prise en charge judiciaire.</p>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap;">
+        <div>
+          <strong style="display:block; font-size:1.05rem; margin-bottom:6px;">Axe Dossier</strong>
+          <small>Analyse · Structure · Rédaction</small>
+        </div>
+
+        <div style="text-align:right;">
+          <a href="mentions-legales.html" style="font-size:0.9rem; color:#666;">Mentions légales</a>
+        </div>
+      </div>
+
+      <div style="margin-top:16px; padding-top:14px; border-top:1px solid rgba(23,23,23,0.08);">
+        <small>
+          Service d’accompagnement documentaire et rédactionnel. Ne constitue pas une consultation juridique,
+          une représentation en justice ou une prise en charge judiciaire.<br>
+          © 2026 Axe Dossier
+        </small>
+      </div>
     </div>
   </footer>
 </body>
