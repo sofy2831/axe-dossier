@@ -530,10 +530,9 @@
     function renderClient(snapshot = {}) {
       const parts = [
         snapshot.name || "",
-        snapshot.type || "",
+       
         cleanSingleLine(snapshot.address || ""),
-        snapshot.email || "",
-        snapshot.phone || ""
+        
       ].filter(Boolean);
 
       return parts.length
