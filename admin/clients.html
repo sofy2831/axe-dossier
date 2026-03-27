@@ -437,8 +437,14 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
   const totalPros = document.getElementById("totalPros");
 
   const clientsRef = collection(db, "clients");
+  const dossiersRef = collection(db, "dossiers");
+  const invoicesRef = collection(db, "factures");
+  const quotesRef = collection(db, "devis");
 
   let allClients = [];
+  let allDossiers = [];
+  let allInvoices = [];
+  let allQuotes = [];
   let editingClientId = null;
 
   function escapeHtml(text = "") {
@@ -448,6 +454,10 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       .replace(/>/g, "&gt;")
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
+  }
+
+  function normalizeText(value = "") {
+    return String(value || "").trim();
   }
 
   function renderStats(clients) {
@@ -465,8 +475,21 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     document.getElementById("clientNotes").value = client.notes || "";
   }
 
+  function getClientUsage(clientId) {
+    const dossiersCount = allDossiers.filter(d => d.clientId === clientId).length;
+    const invoicesCount = allInvoices.filter(i => i.clientId === clientId).length;
+    const quotesCount = allQuotes.filter(q => q.clientId === clientId).length;
+
+    return {
+      dossiersCount,
+      invoicesCount,
+      quotesCount,
+      total: dossiersCount + invoicesCount + quotesCount
+    };
+  }
+
   function renderClients() {
-    const q = (searchInput.value || "").trim().toLowerCase();
+    const q = normalizeText(searchInput.value).toLowerCase();
 
     const filtered = allClients.filter(client => {
       const blob = [
@@ -488,38 +511,46 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       return;
     }
 
-    clientList.innerHTML = filtered.map(client => `
-      <article class="client-item">
-        <div class="client-top">
-          <div>
-            <div class="client-name">${escapeHtml(client.name || "")}</div>
-            <div class="client-meta">
-              ${client.email ? `<span>${escapeHtml(client.email)}</span>` : ""}
-              ${client.phone ? `<span>${escapeHtml(client.phone)}</span>` : ""}
+    clientList.innerHTML = filtered.map(client => {
+      const usage = getClientUsage(client.id);
+      const usageLine = usage.total
+        ? `<span><strong>Utilisation :</strong> ${usage.dossiersCount} dossier(s), ${usage.invoicesCount} facture(s), ${usage.quotesCount} devis</span>`
+        : "";
+
+      return `
+        <article class="client-item">
+          <div class="client-top">
+            <div>
+              <div class="client-name">${escapeHtml(client.name || "")}</div>
+              <div class="client-meta">
+                ${client.email ? `<span>${escapeHtml(client.email)}</span>` : ""}
+                ${client.phone ? `<span>${escapeHtml(client.phone)}</span>` : ""}
+                ${usageLine}
+              </div>
             </div>
+            <span class="badge">${escapeHtml(client.type || "")}</span>
           </div>
-          <span class="badge">${escapeHtml(client.type || "")}</span>
-        </div>
 
-        ${client.address ? `<div class="client-meta"><span>${escapeHtml(client.address).replace(/\n/g, "<br>")}</span></div>` : ""}
-        ${client.notes ? `<div class="client-notes">${escapeHtml(client.notes).replace(/\n/g, "<br>")}</div>` : ""}
+          ${client.address ? `<div class="client-meta"><span>${escapeHtml(client.address).replace(/\n/g, "<br>")}</span></div>` : ""}
+          ${client.notes ? `<div class="client-notes">${escapeHtml(client.notes).replace(/\n/g, "<br>")}</div>` : ""}
 
-        <div class="mini-actions">
-          <button class="mini-btn" type="button" data-edit-id="${client.id}">Modifier</button>
-          <button class="mini-btn" type="button" data-delete-id="${client.id}">Supprimer</button>
-        </div>
-      </article>
-    `).join("");
+          <div class="mini-actions">
+            <button class="mini-btn" type="button" data-edit-id="${client.id}">Modifier</button>
+            <button class="mini-btn" type="button" data-delete-id="${client.id}">Supprimer</button>
+          </div>
+        </article>
+      `;
+    }).join("");
   }
 
   function createClient(data) {
     return {
-      name: (data.get("clientName") || "").trim(),
+      name: normalizeText(data.get("clientName")),
       type: data.get("clientType") || "Particulier",
-      email: (data.get("clientEmail") || "").trim(),
-      phone: (data.get("clientPhone") || "").trim(),
-      address: (data.get("clientAddress") || "").trim(),
-      notes: (data.get("clientNotes") || "").trim(),
+      email: normalizeText(data.get("clientEmail")),
+      phone: normalizeText(data.get("clientPhone")),
+      address: normalizeText(data.get("clientAddress")),
+      notes: normalizeText(data.get("clientNotes")),
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
@@ -531,10 +562,20 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     const data = new FormData(form);
     const payload = createClient(data);
 
-    if (!payload.name) return;
+    if (!payload.name) {
+      alert("Nom obligatoire.");
+      return;
+    }
 
     try {
       if (editingClientId) {
+        const usage = getClientUsage(editingClientId);
+
+        if (usage.total > 0) {
+          alert("Modification bloquée : ce client est déjà utilisé par un dossier, un devis ou une facture.");
+          return;
+        }
+
         await updateDoc(doc(db, "clients", editingClientId), {
           name: payload.name,
           type: payload.type,
@@ -566,6 +607,12 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       const client = allClients.find(c => c.id === id);
       if (!client) return;
 
+      const usage = getClientUsage(id);
+      if (usage.total > 0) {
+        alert("Modification bloquée : ce client est déjà utilisé par un dossier, un devis ou une facture.");
+        return;
+      }
+
       editingClientId = id;
       fillForm(client);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -576,6 +623,13 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     if (!deleteBtn) return;
 
     const id = deleteBtn.getAttribute("data-delete-id");
+    const usage = getClientUsage(id);
+
+    if (usage.total > 0) {
+      alert("Suppression bloquée : ce client est déjà utilisé.");
+      return;
+    }
+
     const ok = confirm("Supprimer ce client ?");
     if (!ok) return;
 
@@ -593,10 +647,8 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
     }
   });
 
-  const clientsQuery = query(clientsRef, orderBy("createdAt", "desc"));
-
   onSnapshot(
-    clientsQuery,
+    query(clientsRef, orderBy("createdAt", "desc")),
     (snapshot) => {
       allClients = snapshot.docs.map(docSnap => ({
         id: docSnap.id,
@@ -609,6 +661,42 @@ h1{font-size:clamp(2rem,4vw,3rem);letter-spacing:-.05em}
       clientList.innerHTML = '<div class="empty">Erreur de chargement Firestore.</div>';
       renderStats([]);
     }
+  );
+
+  onSnapshot(
+    query(dossiersRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allDossiers = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      renderClients();
+    },
+    (err) => console.error("Erreur chargement dossiers :", err)
+  );
+
+  onSnapshot(
+    query(invoicesRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allInvoices = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      renderClients();
+    },
+    (err) => console.error("Erreur chargement factures :", err)
+  );
+
+  onSnapshot(
+    query(quotesRef, orderBy("createdAt", "desc")),
+    (snapshot) => {
+      allQuotes = snapshot.docs.map(docSnap => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+      renderClients();
+    },
+    (err) => console.error("Erreur chargement devis :", err)
   );
 </script>
 
