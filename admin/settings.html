@@ -152,6 +152,11 @@
       background:#fff;
     }
 
+    .field input[type="file"]{
+      padding:10px 12px;
+      min-height:auto;
+    }
+
     .field textarea{min-height:110px;resize:vertical}
 
     .row-2{
@@ -251,6 +256,47 @@
 
     .saved.show{display:block}
 
+    .logo-preview-wrap{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-top:8px;
+      flex-wrap:wrap;
+    }
+
+    .logo-preview-box{
+      width:96px;
+      height:96px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+    }
+
+    .logo-preview-box img{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
+      display:block;
+    }
+
+    .logo-preview-empty{
+      font-size:.84rem;
+      color:var(--muted);
+      text-align:center;
+      padding:8px;
+      line-height:1.35;
+    }
+
+    .mini-help{
+      font-size:.86rem;
+      color:var(--muted);
+      margin-top:6px;
+    }
+
     @media (max-width: 980px){
       .grid,.mini-grid{grid-template-columns:1fr}
     }
@@ -347,13 +393,19 @@
               </div>
             </div>
 
-<div class="row-2">
-  <div class="field">
-    <label for="logoUrl">URL du logo</label>
-    <input id="logoUrl" name="logoUrl" type="text" placeholder="https://..." />
-  </div>
-  
-            
+            <div class="field">
+              <label for="logoFile">Logo</label>
+              <input id="logoFile" name="logoFile" type="file" accept=".png,.jpg,.jpeg,.webp,.svg" />
+              <div class="mini-help">Formats conseillés : PNG, JPG, WEBP ou SVG. Le logo sera envoyé dans Firebase Storage.</div>
+
+              <div class="logo-preview-wrap">
+                <div id="logoPreviewBox" class="logo-preview-box">
+                  <div class="logo-preview-empty">Aucun logo</div>
+                </div>
+                <button type="button" id="removeLogoBtn" class="btn btn-secondary">Supprimer le logo</button>
+              </div>
+            </div>
+
             <div class="card-section">
               <h3>TVA</h3>
 
@@ -381,12 +433,11 @@
               </div>
             </div>
 
+            <div class="field">
+              <label for="bankName">Nom de la banque</label>
+              <input id="bankName" name="bankName" type="text" placeholder="Ex. Crédit Agricole" />
+            </div>
 
-  <div class="field">
-    <label for="bankName">Nom de la banque</label>
-    <input id="bankName" name="bankName" type="text" placeholder="Ex. Crédit Agricole" />
-  </div>
-</div>
             <div class="row-2">
               <div class="field">
                 <label for="iban">IBAN</label>
@@ -451,296 +502,395 @@
   </main>
 
   <script type="module">
-  import "./auth-guard.js";
-  import { db } from "./firebase-config.js";
-  import {
-    doc,
-    setDoc,
-    onSnapshot,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import "./auth-guard.js";
+    import { db, storage } from "./firebase-config.js";
+    import {
+      doc,
+      setDoc,
+      onSnapshot,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import {
+      ref,
+      uploadBytes,
+      getDownloadURL,
+      deleteObject
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-  const form = document.getElementById("settingsForm");
-  const savedMessage = document.getElementById("savedMessage");
-  const resetSettingsBtn = document.getElementById("resetSettings");
+    const form = document.getElementById("settingsForm");
+    const savedMessage = document.getElementById("savedMessage");
+    const resetSettingsBtn = document.getElementById("resetSettings");
+    const removeLogoBtn = document.getElementById("removeLogoBtn");
+    const logoFileInput = document.getElementById("logoFile");
+    const logoPreviewBox = document.getElementById("logoPreviewBox");
 
-  const previewIdentity = document.getElementById("previewIdentity");
-  const previewTerms = document.getElementById("previewTerms");
-  const nextDevis = document.getElementById("nextDevis");
-  const nextFacture = document.getElementById("nextFacture");
-  const nextPaiement = document.getElementById("nextPaiement");
+    const previewIdentity = document.getElementById("previewIdentity");
+    const previewTerms = document.getElementById("previewTerms");
+    const nextDevis = document.getElementById("nextDevis");
+    const nextFacture = document.getElementById("nextFacture");
+    const nextPaiement = document.getElementById("nextPaiement");
 
-  const settingsRef = doc(db, "settings", "main");
-  const countersRef = doc(db, "counters", "main");
+    const settingsRef = doc(db, "settings", "main");
+    const countersRef = doc(db, "counters", "main");
 
-  let currentSettings = {};
-  let currentCounters = {};
+    let currentSettings = {};
+    let currentCounters = {};
+    let pendingRemoveLogo = false;
 
-  function escapeHtml(text = "") {
-    return String(text)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-
-  function currentYear() {
-    return new Date().getFullYear();
-  }
-
-  function getEl(id) {
-    return document.getElementById(id);
-  }
-
-  function getValue(id, fallback = "") {
-    const el = getEl(id);
-    return el ? (el.value ?? fallback) : fallback;
-  }
-
-  function setValue(id, value) {
-    const el = getEl(id);
-    if (el) el.value = value ?? "";
-  }
-
-  function defaultSettings() {
-    return {
-      businessName: "Axe Dossier",
-      ownerName: "Sophie Dumas",
-      legalForm: "EI",
-      address: "24 hameau de danis\n09700 Saverdun",
-      email: "contact@axe-dossier.fr",
-      phone: "",
-      siret: "",
-      ape: "",
-      logoUrl: "",
-      bankName: "",
-      iban: "",
-      bic: "",
-      legalNotice: "",
-      vatMode: "NO",
-      vatRate: 20,
-      vatNumber: "",
-      tvaExemptionText: "TVA non applicable, art. 293 B du CGI"
-    };
-  }
-
-  function defaultCounters() {
-    return {
-      quotePrefix: "DEV",
-      invoicePrefix: "FAC",
-      paymentPrefix: "PAY",
-      nextQuoteNumber: 1,
-      nextInvoiceNumber: 1,
-      nextPaymentNumber: 1
-    };
-  }
-
-  function padNumber(n) {
-    return String(Number(n || 1)).padStart(3, "0");
-  }
-
-  function renderCounters() {
-    const year = currentYear();
-    const c = { ...defaultCounters(), ...currentCounters };
-
-    nextDevis.textContent = `${c.quotePrefix}-${year}-${padNumber(c.nextQuoteNumber)}`;
-    nextFacture.textContent = `${c.invoicePrefix}-${year}-${padNumber(c.nextInvoiceNumber)}`;
-    nextPaiement.textContent = `${c.paymentPrefix}-${year}-${padNumber(c.nextPaymentNumber)}`;
-  }
-
-  function toggleVatFields() {
-    const vatMode = getValue("vatMode", "NO");
-    const vatRateField = getEl("vatRateField");
-    const vatNumberField = getEl("vatNumberField");
-    const tvaExemptionField = getEl("tvaExemptionField");
-
-    if (vatMode === "YES") {
-      if (vatRateField) vatRateField.style.display = "";
-      if (vatNumberField) vatNumberField.style.display = "";
-      if (tvaExemptionField) tvaExemptionField.style.display = "none";
-    } else {
-      if (vatRateField) vatRateField.style.display = "none";
-      if (vatNumberField) vatNumberField.style.display = "none";
-      if (tvaExemptionField) tvaExemptionField.style.display = "";
-    }
-  }
-
-  function fillForm() {
-    const s = { ...defaultSettings(), ...currentSettings };
-
-    setValue("businessName", s.businessName);
-    setValue("ownerName", s.ownerName);
-    setValue("legalForm", s.legalForm);
-    setValue("address", s.address);
-    setValue("email", s.email);
-    setValue("phone", s.phone);
-    setValue("siret", s.siret);
-    setValue("ape", s.ape);
-    setValue("logoUrl", s.logoUrl);
-    setValue("bankName", s.bankName);
-    setValue("iban", s.iban);
-    setValue("bic", s.bic);
-    setValue("legalNotice", s.legalNotice);
-    setValue("vatMode", s.vatMode);
-    setValue("vatRate", s.vatRate);
-    setValue("vatNumber", s.vatNumber);
-    setValue("tvaExemptionText", s.tvaExemptionText);
-
-    toggleVatFields();
-    renderPreview();
-    renderCounters();
-  }
-
-  function renderPreview() {
-    const s = { ...defaultSettings(), ...currentSettings };
-
-    const identityParts = [
-      s.businessName,
-      s.ownerName,
-      s.legalForm,
-      s.address,
-      s.email,
-      s.phone,
-      s.siret ? `SIRET : ${s.siret}` : "",
-      s.ape ? `APE : ${s.ape}` : "",
-      s.vatMode === "YES" && s.vatNumber ? `TVA : ${s.vatNumber}` : "",
-      s.bankName ? `Banque : ${s.bankName}` : "",
-      s.iban ? `IBAN : ${s.iban}` : "",
-      s.bic ? `BIC : ${s.bic}` : "",
-      s.logoUrl ? `Logo : configuré` : ""
-    ].filter(Boolean);
-
-    previewIdentity.innerHTML = identityParts.length
-      ? identityParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("")
-      : "Aucun paramètre enregistré.";
-
-    const termsParts = [];
-
-    if (s.vatMode === "YES") {
-      termsParts.push(`Soumis à la TVA${s.vatRate !== "" && s.vatRate != null ? ` : ${s.vatRate} %` : ""}`);
-      if (s.vatNumber) termsParts.push(`N° TVA : ${s.vatNumber}`);
-    } else {
-      termsParts.push(s.tvaExemptionText || "TVA non applicable, art. 293 B du CGI");
+    function escapeHtml(text = "") {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
 
-    if (s.legalNotice) termsParts.push(s.legalNotice);
-
-    previewTerms.innerHTML = termsParts.length
-      ? termsParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("<br>")
-      : "Aucune mention enregistrée.";
-  }
-
-  function showSaved() {
-    savedMessage.classList.add("show");
-    setTimeout(() => savedMessage.classList.remove("show"), 1800);
-  }
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const settings = {
-      businessName: getValue("businessName").trim(),
-      ownerName: getValue("ownerName").trim(),
-      legalForm: getValue("legalForm").trim(),
-      address: getValue("address").trim(),
-      email: getValue("email").trim(),
-      phone: getValue("phone").trim(),
-      siret: getValue("siret").trim(),
-      ape: getValue("ape").trim(),
-      logoUrl: getValue("logoUrl").trim(),
-      bankName: getValue("bankName").trim(),
-      iban: getValue("iban").trim(),
-      bic: getValue("bic").trim(),
-      legalNotice: getValue("legalNotice").trim(),
-      vatMode: getValue("vatMode", currentSettings.vatMode || "NO").trim() || "NO",
-      vatRate: Number(getValue("vatRate", currentSettings.vatRate ?? 20)) || 20,
-      vatNumber: getValue("vatNumber", currentSettings.vatNumber || "").trim(),
-      tvaExemptionText: getValue(
-        "tvaExemptionText",
-        currentSettings.tvaExemptionText || "TVA non applicable, art. 293 B du CGI"
-      ).trim() || "TVA non applicable, art. 293 B du CGI",
-      updatedAt: serverTimestamp()
-    };
-
-    try {
-      await setDoc(settingsRef, settings, { merge: true });
-
-      await setDoc(
-        countersRef,
-        {
-          quotePrefix: currentCounters.quotePrefix || "DEV",
-          invoicePrefix: currentCounters.invoicePrefix || "FAC",
-          paymentPrefix: currentCounters.paymentPrefix || "PAY",
-          nextQuoteNumber: currentCounters.nextQuoteNumber || 1,
-          nextInvoiceNumber: currentCounters.nextInvoiceNumber || 1,
-          nextPaymentNumber: currentCounters.nextPaymentNumber || 1,
-          updatedAt: serverTimestamp()
-        },
-        { merge: true }
-      );
-
-      showSaved();
-    } catch (err) {
-      console.error("Erreur enregistrement settings :", err);
-      alert("Impossible d’enregistrer les paramètres.");
+    function currentYear() {
+      return new Date().getFullYear();
     }
-  });
 
-  resetSettingsBtn.addEventListener("click", async () => {
-    const ok = confirm("Réinitialiser les paramètres avec les valeurs par défaut ?");
-    if (!ok) return;
-
-    try {
-      await setDoc(
-        settingsRef,
-        {
-          ...defaultSettings(),
-          updatedAt: serverTimestamp()
-        },
-        { merge: true }
-      );
-
-      await setDoc(
-        countersRef,
-        {
-          ...defaultCounters(),
-          updatedAt: serverTimestamp()
-        },
-        { merge: true }
-      );
-    } catch (err) {
-      console.error("Erreur reset settings :", err);
-      alert("Impossible de réinitialiser les paramètres.");
+    function getEl(id) {
+      return document.getElementById(id);
     }
-  });
 
-  getEl("vatMode")?.addEventListener("change", () => {
-    toggleVatFields();
-    renderPreview();
-  });
-
-  onSnapshot(
-    settingsRef,
-    (snap) => {
-      currentSettings = snap.exists() ? snap.data() : defaultSettings();
-      fillForm();
-    },
-    (err) => {
-      console.error("Erreur chargement settings :", err);
+    function getValue(id, fallback = "") {
+      const el = getEl(id);
+      return el ? (el.value ?? fallback) : fallback;
     }
-  );
 
-  onSnapshot(
-    countersRef,
-    (snap) => {
-      currentCounters = snap.exists() ? snap.data() : defaultCounters();
+    function setValue(id, value) {
+      const el = getEl(id);
+      if (el) el.value = value ?? "";
+    }
+
+    function defaultSettings() {
+      return {
+        businessName: "Axe Dossier",
+        ownerName: "Sophie Dumas",
+        legalForm: "EI",
+        address: "24 hameau de danis\n09700 Saverdun",
+        email: "contact@axe-dossier.fr",
+        phone: "",
+        siret: "",
+        ape: "",
+        logoUrl: "",
+        logoPath: "",
+        bankName: "",
+        iban: "",
+        bic: "",
+        legalNotice: "",
+        vatMode: "NO",
+        vatRate: 20,
+        vatNumber: "",
+        tvaExemptionText: "TVA non applicable, art. 293 B du CGI"
+      };
+    }
+
+    function defaultCounters() {
+      return {
+        quotePrefix: "DEV",
+        invoicePrefix: "FAC",
+        paymentPrefix: "PAY",
+        nextQuoteNumber: 1,
+        nextInvoiceNumber: 1,
+        nextPaymentNumber: 1
+      };
+    }
+
+    function padNumber(n) {
+      return String(Number(n || 1)).padStart(3, "0");
+    }
+
+    function renderCounters() {
+      const year = currentYear();
+      const c = { ...defaultCounters(), ...currentCounters };
+
+      nextDevis.textContent = `${c.quotePrefix}-${year}-${padNumber(c.nextQuoteNumber)}`;
+      nextFacture.textContent = `${c.invoicePrefix}-${year}-${padNumber(c.nextInvoiceNumber)}`;
+      nextPaiement.textContent = `${c.paymentPrefix}-${year}-${padNumber(c.nextPaymentNumber)}`;
+    }
+
+    function toggleVatFields() {
+      const vatMode = getValue("vatMode", "NO");
+      const vatRateField = getEl("vatRateField");
+      const vatNumberField = getEl("vatNumberField");
+      const tvaExemptionField = getEl("tvaExemptionField");
+
+      if (vatMode === "YES") {
+        if (vatRateField) vatRateField.style.display = "";
+        if (vatNumberField) vatNumberField.style.display = "";
+        if (tvaExemptionField) tvaExemptionField.style.display = "none";
+      } else {
+        if (vatRateField) vatRateField.style.display = "none";
+        if (vatNumberField) vatNumberField.style.display = "none";
+        if (tvaExemptionField) tvaExemptionField.style.display = "";
+      }
+    }
+
+    function renderLogoPreview(url = "") {
+      if (!url) {
+        logoPreviewBox.innerHTML = '<div class="logo-preview-empty">Aucun logo</div>';
+        return;
+      }
+
+      logoPreviewBox.innerHTML = `<img src="${escapeHtml(url)}" alt="Logo" />`;
+    }
+
+    function fillForm() {
+      const s = { ...defaultSettings(), ...currentSettings };
+
+      setValue("businessName", s.businessName);
+      setValue("ownerName", s.ownerName);
+      setValue("legalForm", s.legalForm);
+      setValue("address", s.address);
+      setValue("email", s.email);
+      setValue("phone", s.phone);
+      setValue("siret", s.siret);
+      setValue("ape", s.ape);
+      setValue("bankName", s.bankName);
+      setValue("iban", s.iban);
+      setValue("bic", s.bic);
+      setValue("legalNotice", s.legalNotice);
+      setValue("vatMode", s.vatMode);
+      setValue("vatRate", s.vatRate);
+      setValue("vatNumber", s.vatNumber);
+      setValue("tvaExemptionText", s.tvaExemptionText);
+
+      if (logoFileInput) logoFileInput.value = "";
+      pendingRemoveLogo = false;
+
+      renderLogoPreview(s.logoUrl || "");
+      toggleVatFields();
+      renderPreview();
       renderCounters();
-    },
-    (err) => {
-      console.error("Erreur chargement counters :", err);
     }
-  );
-</script>
+
+    function renderPreview() {
+      const s = { ...defaultSettings(), ...currentSettings };
+
+      const identityParts = [
+        s.businessName,
+        s.ownerName,
+        s.legalForm,
+        s.address,
+        s.email,
+        s.phone,
+        s.siret ? `SIRET : ${s.siret}` : "",
+        s.ape ? `APE : ${s.ape}` : "",
+        s.vatMode === "YES" && s.vatNumber ? `TVA : ${s.vatNumber}` : "",
+        s.bankName ? `Banque : ${s.bankName}` : "",
+        s.iban ? `IBAN : ${s.iban}` : "",
+        s.bic ? `BIC : ${s.bic}` : "",
+        s.logoUrl ? `Logo : configuré` : ""
+      ].filter(Boolean);
+
+      previewIdentity.innerHTML = identityParts.length
+        ? identityParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("")
+        : "Aucun paramètre enregistré.";
+
+      const termsParts = [];
+
+      if (s.vatMode === "YES") {
+        termsParts.push(`Soumis à la TVA${s.vatRate !== "" && s.vatRate != null ? ` : ${s.vatRate} %` : ""}`);
+        if (s.vatNumber) termsParts.push(`N° TVA : ${s.vatNumber}`);
+      } else {
+        termsParts.push(s.tvaExemptionText || "TVA non applicable, art. 293 B du CGI");
+      }
+
+      if (s.legalNotice) termsParts.push(s.legalNotice);
+
+      previewTerms.innerHTML = termsParts.length
+        ? termsParts.map(line => `<div>${escapeHtml(line).replace(/\n/g, "<br>")}</div>`).join("<br>")
+        : "Aucune mention enregistrée.";
+    }
+
+    function showSaved() {
+      savedMessage.classList.add("show");
+      setTimeout(() => savedMessage.classList.remove("show"), 1800);
+    }
+
+    function sanitizeFileName(name = "") {
+      return String(name)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9._-]/g, "_");
+    }
+
+    async function uploadLogoFile(file) {
+      const safeName = sanitizeFileName(file.name || "logo");
+      const path = `settings/assets/logo_${Date.now()}_${safeName}`;
+      const fileRef = ref(storage, path);
+
+      await uploadBytes(fileRef, file);
+      const logoUrl = await getDownloadURL(fileRef);
+
+      return {
+        logoUrl,
+        logoPath: path
+      };
+    }
+
+    async function removeStoredLogoIfNeeded(path = "") {
+      if (!path) return;
+      try {
+        await deleteObject(ref(storage, path));
+      } catch (err) {
+        console.warn("Impossible de supprimer l'ancien logo :", err);
+      }
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const current = { ...defaultSettings(), ...currentSettings };
+      const selectedLogoFile = logoFileInput?.files?.[0] || null;
+
+      let logoUrl = current.logoUrl || "";
+      let logoPath = current.logoPath || "";
+
+      try {
+        if (pendingRemoveLogo) {
+          await removeStoredLogoIfNeeded(logoPath);
+          logoUrl = "";
+          logoPath = "";
+        }
+
+        if (selectedLogoFile) {
+          await removeStoredLogoIfNeeded(logoPath);
+          const uploaded = await uploadLogoFile(selectedLogoFile);
+          logoUrl = uploaded.logoUrl;
+          logoPath = uploaded.logoPath;
+        }
+
+        const settings = {
+          businessName: getValue("businessName").trim(),
+          ownerName: getValue("ownerName").trim(),
+          legalForm: getValue("legalForm").trim(),
+          address: getValue("address").trim(),
+          email: getValue("email").trim(),
+          phone: getValue("phone").trim(),
+          siret: getValue("siret").trim(),
+          ape: getValue("ape").trim(),
+          logoUrl,
+          logoPath,
+          bankName: getValue("bankName").trim(),
+          iban: getValue("iban").trim(),
+          bic: getValue("bic").trim(),
+          legalNotice: getValue("legalNotice").trim(),
+          vatMode: getValue("vatMode", currentSettings.vatMode || "NO").trim() || "NO",
+          vatRate: Number(getValue("vatRate", currentSettings.vatRate ?? 20)) || 20,
+          vatNumber: getValue("vatNumber", currentSettings.vatNumber || "").trim(),
+          tvaExemptionText: getValue(
+            "tvaExemptionText",
+            currentSettings.tvaExemptionText || "TVA non applicable, art. 293 B du CGI"
+          ).trim() || "TVA non applicable, art. 293 B du CGI",
+          updatedAt: serverTimestamp()
+        };
+
+        await setDoc(settingsRef, settings, { merge: true });
+
+        await setDoc(
+          countersRef,
+          {
+            quotePrefix: currentCounters.quotePrefix || "DEV",
+            invoicePrefix: currentCounters.invoicePrefix || "FAC",
+            paymentPrefix: currentCounters.paymentPrefix || "PAY",
+            nextQuoteNumber: currentCounters.nextQuoteNumber || 1,
+            nextInvoiceNumber: currentCounters.nextInvoiceNumber || 1,
+            nextPaymentNumber: currentCounters.nextPaymentNumber || 1,
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+
+        pendingRemoveLogo = false;
+        if (logoFileInput) logoFileInput.value = "";
+        showSaved();
+      } catch (err) {
+        console.error("Erreur enregistrement settings :", err);
+        alert("Impossible d’enregistrer les paramètres.");
+      }
+    });
+
+    removeLogoBtn.addEventListener("click", () => {
+      pendingRemoveLogo = true;
+      if (logoFileInput) logoFileInput.value = "";
+      renderLogoPreview("");
+    });
+
+    logoFileInput.addEventListener("change", () => {
+      const file = logoFileInput.files?.[0];
+      if (!file) {
+        if (!pendingRemoveLogo) renderLogoPreview(currentSettings.logoUrl || "");
+        return;
+      }
+
+      pendingRemoveLogo = false;
+      const previewUrl = URL.createObjectURL(file);
+      renderLogoPreview(previewUrl);
+    });
+
+    resetSettingsBtn.addEventListener("click", async () => {
+      const ok = confirm("Réinitialiser les paramètres avec les valeurs par défaut ?");
+      if (!ok) return;
+
+      try {
+        const current = { ...defaultSettings(), ...currentSettings };
+        await removeStoredLogoIfNeeded(current.logoPath || "");
+
+        await setDoc(
+          settingsRef,
+          {
+            ...defaultSettings(),
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+
+        await setDoc(
+          countersRef,
+          {
+            ...defaultCounters(),
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+
+        pendingRemoveLogo = false;
+        if (logoFileInput) logoFileInput.value = "";
+      } catch (err) {
+        console.error("Erreur reset settings :", err);
+        alert("Impossible de réinitialiser les paramètres.");
+      }
+    });
+
+    getEl("vatMode")?.addEventListener("change", () => {
+      toggleVatFields();
+      renderPreview();
+    });
+
+    onSnapshot(
+      settingsRef,
+      (snap) => {
+        currentSettings = snap.exists() ? snap.data() : defaultSettings();
+        fillForm();
+      },
+      (err) => {
+        console.error("Erreur chargement settings :", err);
+      }
+    );
+
+    onSnapshot(
+      countersRef,
+      (snap) => {
+        currentCounters = snap.exists() ? snap.data() : defaultCounters();
+        renderCounters();
+      },
+      (err) => {
+        console.error("Erreur chargement counters :", err);
+      }
+    );
+  </script>
 </body>
 </html>
